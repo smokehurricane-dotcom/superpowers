@@ -124,6 +124,10 @@ if (require.main === module) {
         process.stderr.write('Usage: node todo.js edit <id> "text"\n');
         process.exit(1);
       }
+      if (!text || text.trim() === '') {
+        process.stderr.write('Error: Todo text cannot be empty.\n');
+        process.exit(1);
+      }
       const updated = editTodo(id, text);
       if (!updated) {
         process.stderr.write(`Todo #${id} not found.\n`);
