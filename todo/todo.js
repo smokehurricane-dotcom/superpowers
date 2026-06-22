@@ -56,6 +56,30 @@ function markDone(id, storePath = DEFAULT_STORE) {
   return todo;
 }
 
+function removeTodo(id, storePath = DEFAULT_STORE) {
+  const todos = readStore(storePath);
+  const index = todos.findIndex(t => t.id === id);
+  if (index === -1) return null;
+  const [removed] = todos.splice(index, 1);
+  writeStore(storePath, todos);
+  console.log(`Deleted #${id}: ${removed.text}`);
+  return removed;
+}
+
+function editTodo(id, text, storePath = DEFAULT_STORE) {
+  if (!text || text.trim() === '') {
+    process.stderr.write('Error: Todo text cannot be empty.\n');
+    return null;
+  }
+  const todos = readStore(storePath);
+  const todo = todos.find(t => t.id === id);
+  if (!todo) return null;
+  todo.text = text;
+  writeStore(storePath, todos);
+  console.log(`Edited #${id}: ${text}`);
+  return todo;
+}
+
 if (require.main === module) {
   const [,, command, ...args] = process.argv;
   switch (command) {
@@ -67,9 +91,19 @@ if (require.main === module) {
     case 'list':
       list();
       break;
-    case 'done':
-      markDone(Number(args[0]));
+    case 'done': {
+      const id = Number(args[0]);
+      if (args[0] === undefined || Number.isNaN(id)) {
+        process.stderr.write('Usage: node todo.js done <id>\n');
+        process.exit(1);
+      }
+      const done = markDone(id);
+      if (!done) {
+        process.stderr.write(`Todo #${id} not found.\n`);
+        process.exit(1);
+      }
       break;
+    }
     case 'delete': {
       const id = Number(args[0]);
       if (args[0] === undefined || Number.isNaN(id)) {
@@ -101,26 +135,6 @@ if (require.main === module) {
       process.stderr.write(`Unknown command: ${command}\nUsage: node todo.js add|list|done|delete|edit\n`);
       process.exit(1);
   }
-}
-
-function removeTodo(id, storePath = DEFAULT_STORE) {
-  const todos = readStore(storePath);
-  const index = todos.findIndex(t => t.id === id);
-  if (index === -1) return null;
-  const [removed] = todos.splice(index, 1);
-  writeStore(storePath, todos);
-  console.log(`Deleted #${id}: ${removed.text}`);
-  return removed;
-}
-
-function editTodo(id, text, storePath = DEFAULT_STORE) {
-  const todos = readStore(storePath);
-  const todo = todos.find(t => t.id === id);
-  if (!todo) return null;
-  todo.text = text;
-  writeStore(storePath, todos);
-  console.log(`Edited #${id}: ${text}`);
-  return todo;
 }
 
 module.exports = { add, list, markDone, removeTodo, editTodo };
