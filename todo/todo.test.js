@@ -5,8 +5,12 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const { add, list, markDone, removeTodo, editTodo } = require('./todo.js');
+
+const TODO_JS = path.join(__dirname, 'todo.js');
+const DEFAULT_STORE = path.join(__dirname, 'todos.json');
 
 function makeTempPath() {
   return path.join(os.tmpdir(), `todo-test-${Date.now()}-${Math.random()}.json`);
@@ -14,6 +18,18 @@ function makeTempPath() {
 
 function cleanup(storePath) {
   try { fs.rmSync(storePath, { force: true }); } catch (_) {}
+}
+
+function clearDefaultStore() {
+  try { fs.rmSync(DEFAULT_STORE, { force: true }); } catch (_) {}
+}
+
+function runCli(args, options = {}) {
+  return spawnSync(process.execPath, [TODO_JS, ...args], {
+    encoding: 'utf8',
+    cwd: __dirname,
+    ...options,
+  });
 }
 
 describe('add', () => {
@@ -126,6 +142,19 @@ describe('editTodo', () => {
       cleanup(storePath);
     }
   });
+
+  test('rejects empty or whitespace-only text', () => {
+    const storePath = makeTempPath();
+    try {
+      add('Only', storePath);
+      const result = editTodo(1, '   ', storePath);
+      assert.equal(result, null);
+      const todos = list(storePath);
+      assert.equal(todos[0].text, 'Only');
+    } finally {
+      cleanup(storePath);
+    }
+  });
 });
 
 describe('list', () => {
@@ -185,5 +214,84 @@ describe('markDone', () => {
     } finally {
       cleanup(storePath);
     }
+  });
+});
+
+describe('CLI error handling', () => {
+  test.afterEach(() => {
+    clearDefaultStore();
+  });
+
+  test('unknown command prints error and exits 1', () => {
+    const result = runCli(['badcmd']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Unknown command/);
+  });
+
+  test('add with empty text exits 1', () => {
+    const result = runCli(['add', '   ']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /cannot be empty/);
+  });
+
+  test('delete with missing ID exits 1', () => {
+    const result = runCli(['delete']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js delete <id>/);
+  });
+
+  test('delete with non-numeric ID exits 1', () => {
+    const result = runCli(['delete', 'abc']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js delete <id>/);
+  });
+
+  test('delete with unknown ID exits 1', () => {
+    const result = runCli(['delete', '99']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Todo #99 not found/);
+  });
+
+  test('edit with missing ID exits 1', () => {
+    const result = runCli(['edit']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js edit <id>/);
+  });
+
+  test('edit with non-numeric ID exits 1', () => {
+    const result = runCli(['edit', 'abc']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js edit <id>/);
+  });
+
+  test('edit with unknown ID exits 1', () => {
+    const result = runCli(['edit', '99', 'foo']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Todo #99 not found/);
+  });
+
+  test('edit with empty text exits 1', () => {
+    runCli(['add', 'Buy milk']);
+    const result = runCli(['edit', '1', '   ']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /cannot be empty/);
+  });
+
+  test('done with missing ID exits 1', () => {
+    const result = runCli(['done']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js done <id>/);
+  });
+
+  test('done with non-numeric ID exits 1', () => {
+    const result = runCli(['done', 'abc']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js done <id>/);
+  });
+
+  test('done with unknown ID exits 1', () => {
+    const result = runCli(['done', '99']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Todo #99 not found/);
   });
 });
