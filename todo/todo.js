@@ -70,10 +70,30 @@ if (require.main === module) {
     case 'done':
       markDone(Number(args[0]));
       break;
+    case 'delete': {
+      const removed = removeTodo(Number(args[0]));
+      if (!removed) {
+        process.stderr.write(`Todo #${args[0]} not found.\n`);
+        process.exit(1);
+      }
+      break;
+    }
     default:
       process.stderr.write(`Unknown command: ${command}\nUsage: node todo.js add|list|done\n`);
       process.exit(1);
   }
 }
 
-module.exports = { add, list, markDone };
+function removeTodo(id, storePath = DEFAULT_STORE) {
+  const todos = readStore(storePath);
+  const index = todos.findIndex(t => t.id === id);
+  if (index === -1) return null;
+  const [removed] = todos.splice(index, 1);
+  writeStore(storePath, todos);
+  console.log(`Deleted #${id}: ${removed.text}`);
+  return removed;
+}
+
+function editTodo() {}
+
+module.exports = { add, list, markDone, removeTodo, editTodo };

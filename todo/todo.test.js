@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const { add, list, markDone } = require('./todo.js');
+const { add, list, markDone, removeTodo, editTodo } = require('./todo.js');
 
 function makeTempPath() {
   return path.join(os.tmpdir(), `todo-test-${Date.now()}-${Math.random()}.json`);
@@ -59,6 +59,39 @@ describe('add', () => {
       assert.equal(result, null);
       const todos = list(storePath);
       assert.equal(todos.length, 0);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+});
+
+describe('removeTodo', () => {
+  test('removes a todo by ID and leaves other IDs stable', () => {
+    const storePath = makeTempPath();
+    try {
+      add('First', storePath);
+      add('Second', storePath);
+      add('Third', storePath);
+      const removed = removeTodo(2, storePath);
+      assert.equal(removed.id, 2);
+      assert.equal(removed.text, 'Second');
+      const todos = list(storePath);
+      assert.equal(todos.length, 2);
+      assert.deepEqual(todos.map(t => t.id), [1, 3]);
+      assert.deepEqual(todos.map(t => t.text), ['First', 'Third']);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('returns null for unknown ID', () => {
+    const storePath = makeTempPath();
+    try {
+      add('Only', storePath);
+      const result = removeTodo(99, storePath);
+      assert.equal(result, null);
+      const todos = list(storePath);
+      assert.equal(todos.length, 1);
     } finally {
       cleanup(storePath);
     }
