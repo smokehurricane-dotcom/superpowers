@@ -71,17 +71,28 @@ if (require.main === module) {
       markDone(Number(args[0]));
       break;
     case 'delete': {
-      const removed = removeTodo(Number(args[0]));
+      const id = Number(args[0]);
+      if (args[0] === undefined || Number.isNaN(id)) {
+        process.stderr.write('Usage: node todo.js delete <id>\n');
+        process.exit(1);
+      }
+      const removed = removeTodo(id);
       if (!removed) {
-        process.stderr.write(`Todo #${args[0]} not found.\n`);
+        process.stderr.write(`Todo #${id} not found.\n`);
         process.exit(1);
       }
       break;
     }
     case 'edit': {
-      const updated = editTodo(Number(args[0]), args.slice(1).join(' '));
+      const id = Number(args[0]);
+      const text = args.slice(1).join(' ');
+      if (args[0] === undefined || Number.isNaN(id)) {
+        process.stderr.write('Usage: node todo.js edit <id> "text"\n');
+        process.exit(1);
+      }
+      const updated = editTodo(id, text);
       if (!updated) {
-        process.stderr.write(`Todo #${args[0]} not found.\n`);
+        process.stderr.write(`Todo #${id} not found.\n`);
         process.exit(1);
       }
       break;
