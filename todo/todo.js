@@ -87,7 +87,7 @@ if (require.main === module) {
       break;
     }
     default:
-      process.stderr.write(`Unknown command: ${command}\nUsage: node todo.js add|list|done\n`);
+      process.stderr.write(`Unknown command: ${command}\nUsage: node todo.js add|list|done|delete|edit\n`);
       process.exit(1);
   }
 }
