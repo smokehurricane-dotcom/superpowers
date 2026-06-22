@@ -50,27 +50,44 @@ Eigenständige Entwicklung vollfunktionsfähiger Software durch ein spezialisier
   - Genehmigt Phasenübergänge
   - Aktualisiert Lessons-Learned und Agent-Prompts nach Projektabschluss
   - Nutzt immer brainstorming und using-superpowers Skills
+  - **Ideen-Kurator:** Bewertet vom Researcher gesammelte Software-Ideen, filtert die vielversprechendsten heraus und präsentiert sie dem Auftraggeber als Vorschläge für zukünftige Projekte
 - **Scope:** Keine eigene Code-Arbeit, nur Koordination und Genehmigung
 
-#### #1 Informationsbeschaffer (Researcher)
-- **Verantwortung:** Umfassende Recherche zum Projekt-Thema
-- **Output:** `.superpowers/team/research-report.md` — detaillierter Bericht mit allen gesammelten Infos
-- **Anforderungen:**
+#### #1 Informationsbeschaffer (Researcher + Ideen-Scout)
+- **Verantwortung:** Umfassende Recherche zum Projekt-Thema + Sammlung neuer Software-Ideen
+- **Output:**
+  - `.superpowers/team/research-report.md` — detaillierter Bericht mit allen gesammelten Infos
+  - `.superpowers/team/idea-pipeline.md` — gesammelte Software-Ideen für zukünftige Projekte
+- **Anforderungen Recherche:**
   - Möglichst umfangreich recherchieren
   - Quellen dokumentieren
   - Technologie-Optionen auflisten
   - Best Practices zusammenfassen
   - Alles für alle zugänglich notieren
+- **Anforderungen Ideen-Scout:**
+  - Neue lukrative, sinnvolle Software-Ideen sammeln (Marktlücken, Trends, Nutzerprobleme)
+  - Für jede Idee bewerten: Marktpotenzial, technische Machbarkeit, Wettbewerb, Monetarisierung
+  - Ideen nach Potenzial-Score sortieren (🔥 Hit / ⭐ Vielversprechend / 💡 Interessant)
+  - Nur Ideen mit echtem Hit-Potenzial als 🔥 markieren
 
 #### #2 Fakten-Prüfer (Fact-Checker)
-- **Verantwortung:** Verifizierung aller gesammelten Informationen
-- **Prozess:**
+- **Verantwortung:** Verifizierung aller gesammelten Informationen + Ideen-Validierung
+- **Prozess Recherche:**
   1. Research-Report von #1 lesen
   2. Jede Behauptung auf Fakten prüfen
   3. Halluzinationen identifizieren und markieren
   4. Bei Unsicherheit: mehrfach prüfen (verschiedene Quellen)
   5. Aufgeräumten, faktengeprüften Report erstellen
-- **Output:** `.superpowers/team/verified-research.md`
+- **Prozess Ideen-Validierung:**
+  1. Ideen-Pipeline von #1 lesen
+  2. Marktbehauptungen prüfen (gibt es echte Nachfrage?)
+  3. Wettbewerbs-Check (existiert das schon? wie erfolgreich?)
+  4. Technische Machbarkeit einschätzen
+  5. Hit-Potenzial realistisch bewerten — übertriebene Bewertungen korrigieren
+  6. Validierte Ideen-Liste erstellen mit Fakten-Status
+- **Output:**
+  - `.superpowers/team/verified-research.md`
+  - `.superpowers/team/verified-ideas.md` — faktengeprüfte Ideen-Liste
 - **Anforderungen:** Lieber zu vorsichtig als zu locker, im Zweifel als "unbestätigt" markieren
 
 #### #3 Planer (Architect)
@@ -281,6 +298,24 @@ Chef → Aktualisiert Agent-Prompt-Templates mit neuen Regeln
 Chef → Informiert alle Agenten über gefundene Fehler und Lösungen
 ```
 
+### Phase 10: Ideen-Präsentation (Optional, nach Projektabschluss)
+```
+Voraussetzung: Phase 9 abgeschlossen
+Agenten: Chef + Auftraggeber
+
+Chef → Liest verified-ideas.md (faktengeprüfte Ideen von #1 + #2)
+Chef → Filtert die Top-Ideen (🔥 Hits) heraus
+Chef → Präsentiert dem Auftraggeber:
+  - Ideen-Name und Kurzbeschreibung
+  - Warum es ein Hit sein könnte (Marktlücke, Trend, Nachfrage)
+  - Geschätzter Aufwand und Komplexität
+  - Monetarisierungs-Möglichkeiten
+  - Wettbewerbslage
+
+Auftraggeber → Wählt Ideen für zukünftige Projekte aus
+Chef → Speichert ausgewählte Ideen in project-backlog.md
+```
+
 ---
 
 ## Kommunikations-System
@@ -309,13 +344,16 @@ Auftraggeber (Du)
 .superpowers/team/
 ├── taskboard.md        # Status aller Tasks (Single Source of Truth)
 ├── messages.jsonl      # Inter-Agent-Kommunikation
-├── research-report.md  # Output von #1
-├── verified-research.md # Output von #2
+├── research-report.md  # Output von #1 (Recherche)
+├── idea-pipeline.md    # Output von #1 (Software-Ideen)
+├── verified-research.md # Output von #2 (geprüfte Recherche)
+├── verified-ideas.md   # Output von #2 (geprüfte Ideen)
 ├── architecture-plan.md # Output von #3
 ├── security-report.md  # Output von #8
 ├── test-report.md      # Output von #7
 ├── integration-report.md # Output von #11
-└── lessons-learned.md  # Persistentes Wissen
+├── lessons-learned.md  # Persistentes Wissen
+└── project-backlog.md  # Ausgewählte Ideen für zukünftige Projekte
 ```
 
 ---
