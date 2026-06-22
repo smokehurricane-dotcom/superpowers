@@ -51,6 +51,18 @@ describe('add', () => {
       cleanup(storePath);
     }
   });
+
+  test('rejects empty or whitespace-only text', () => {
+    const storePath = makeTempPath();
+    try {
+      const result = add('   ', storePath);
+      assert.equal(result, null);
+      const todos = list(storePath);
+      assert.equal(todos.length, 0);
+    } finally {
+      cleanup(storePath);
+    }
+  });
 });
 
 describe('list', () => {

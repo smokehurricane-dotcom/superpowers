@@ -20,6 +20,10 @@ function writeStore(storePath, todos) {
 }
 
 function add(text, storePath = DEFAULT_STORE) {
+  if (!text || text.trim() === '') {
+    process.stderr.write('Error: Todo text cannot be empty.\n');
+    return null;
+  }
   const todos = readStore(storePath);
   const id = Math.max(0, ...todos.map(t => t.id)) + 1;
   const todo = { id, text, done: false };
@@ -55,9 +59,11 @@ function markDone(id, storePath = DEFAULT_STORE) {
 if (require.main === module) {
   const [,, command, ...args] = process.argv;
   switch (command) {
-    case 'add':
-      add(args.join(' '));
+    case 'add': {
+      const todo = add(args.join(' '));
+      if (!todo) process.exit(1);
       break;
+    }
     case 'list':
       list();
       break;
