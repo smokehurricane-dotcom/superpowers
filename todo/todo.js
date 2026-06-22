@@ -78,6 +78,14 @@ if (require.main === module) {
       }
       break;
     }
+    case 'edit': {
+      const updated = editTodo(Number(args[0]), args.slice(1).join(' '));
+      if (!updated) {
+        process.stderr.write(`Todo #${args[0]} not found.\n`);
+        process.exit(1);
+      }
+      break;
+    }
     default:
       process.stderr.write(`Unknown command: ${command}\nUsage: node todo.js add|list|done\n`);
       process.exit(1);
@@ -94,6 +102,14 @@ function removeTodo(id, storePath = DEFAULT_STORE) {
   return removed;
 }
 
-function editTodo() {}
+function editTodo(id, text, storePath = DEFAULT_STORE) {
+  const todos = readStore(storePath);
+  const todo = todos.find(t => t.id === id);
+  if (!todo) return null;
+  todo.text = text;
+  writeStore(storePath, todos);
+  console.log(`Edited #${id}: ${text}`);
+  return todo;
+}
 
 module.exports = { add, list, markDone, removeTodo, editTodo };

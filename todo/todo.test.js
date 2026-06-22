@@ -98,6 +98,36 @@ describe('removeTodo', () => {
   });
 });
 
+describe('editTodo', () => {
+  test('updates the text of a todo by ID', () => {
+    const storePath = makeTempPath();
+    try {
+      add('Old text', storePath);
+      const updated = editTodo(1, 'New text', storePath);
+      assert.equal(updated.id, 1);
+      assert.equal(updated.text, 'New text');
+      const todos = list(storePath);
+      assert.equal(todos[0].text, 'New text');
+      assert.equal(todos[0].done, false);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('returns null for unknown ID', () => {
+    const storePath = makeTempPath();
+    try {
+      add('Only', storePath);
+      const result = editTodo(99, 'New text', storePath);
+      assert.equal(result, null);
+      const todos = list(storePath);
+      assert.equal(todos[0].text, 'Only');
+    } finally {
+      cleanup(storePath);
+    }
+  });
+});
+
 describe('list', () => {
   test('returns empty array when store file does not exist', () => {
     const storePath = makeTempPath(); // never created
