@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
-const { spawnSync } = require('node:child_process');
+const { spawnSync, spawn } = require('node:child_process');
 const http = require('node:http');
 
 const SEARCH_JS = path.join(__dirname, 'search.js');
@@ -163,21 +163,50 @@ describe('Hybrid Search Engine Tests', { concurrency: false }, () => {
 
   test('HTTP server serves mini-dashboard on port 3000', async () => {
     // Start server in background
-    const serverProcess = runCli(['serve']);
+    const serverProcess = spawn(process.execPath, [SEARCH_JS, 'serve'], {
+      cwd: __dirname,
+      env: {
+        ...process.env,
+        SEARCH_DOCS: tempDocsPath,
+        SEARCH_QUERIES: tempQueriesPath
+      }
+    });
+
+    serverProcess.on('error', (err) => {
+      console.error('Failed to start server:', err);
+    });
+
     // Wait a brief moment for server to bind
     await new Promise(r => setTimeout(r, 1000));
 
-    // Request dashboard page
-    const req = http.get('http://localhost:3000/', (res) => {
-      assert.equal(res.statusCode, 200);
-      assert.match(res.headers['content-type'], /text\/html/);
-    });
+    try {
+      // Request dashboard page
+      await new Promise((resolve, reject) => {
+        const req = http.get('http://localhost:3000/', (res) => {
+          try {
+            assert.equal(res.statusCode, 200);
+            assert.match(res.headers['content-type'], /text\/html/);
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
 
-    req.on('error', (err) => {
-      assert.fail(`Could not connect to server: ${err.message}`);
-    });
-
-    // Cleanup process
-    serverProcess.kill();
+        req.on('error', (err) => {
+          reject(new Error(`Could not connect to server: ${err.message}`));
+        });
+      });
+    } finally {
+      // Cleanup process
+      serverProcess.kill();
+      // Wait for process to fully terminate
+      await new Promise(r => {
+        serverProcess.on('exit', r);
+        setTimeout(() => {
+          try { serverProcess.kill('SIGKILL'); } catch (_) {}
+          r();
+        }, 500);
+      });
+    }
   });
 });
