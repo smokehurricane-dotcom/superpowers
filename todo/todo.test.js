@@ -32,7 +32,6 @@ function runCli(args, options = {}) {
     env: { ...process.env, TODO_STORE: currentStorePath, ...options.env },
     ...options,
   });
-  console.error(`CLI RUN: ${JSON.stringify(args)} | STATUS: ${result.status} | STDOUT: ${JSON.stringify(result.stdout)} | STDERR: ${JSON.stringify(result.stderr)}`);
   return result;
 }
 
