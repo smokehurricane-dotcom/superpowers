@@ -25,11 +25,13 @@ function clearDefaultStore() {
 }
 
 function runCli(args, options = {}) {
-  return spawnSync(process.execPath, [TODO_JS, ...args], {
+  const result = spawnSync(process.execPath, [TODO_JS, ...args], {
     encoding: 'utf8',
     cwd: __dirname,
     ...options,
   });
+  console.error(`CLI RUN: ${JSON.stringify(args)} | STATUS: ${result.status} | STDOUT: ${JSON.stringify(result.stdout)} | STDERR: ${JSON.stringify(result.stderr)}`);
+  return result;
 }
 
 function captureStderr(fn) {
