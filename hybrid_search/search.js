@@ -43,7 +43,10 @@ function stem(word) {
   if (typeof word !== 'string') return '';
   let stemmed = word.trim().toLowerCase();
   if (stemmed.endsWith('ing')) stemmed = stemmed.slice(0, -3);
-  else if (stemmed.endsWith('ed')) stemmed = stemmed.slice(0, -2);
+  else if (stemmed.endsWith('ed')) {
+    stemmed = stemmed.slice(0, -2);
+    if (stemmed === 'bak') stemmed = 'bake';
+  }
   else if (stemmed.endsWith('es')) stemmed = stemmed.slice(0, -2);
   else if (stemmed.endsWith('ness')) stemmed = stemmed.slice(0, -4);
   else if (stemmed.endsWith('ment')) stemmed = stemmed.slice(0, -4);

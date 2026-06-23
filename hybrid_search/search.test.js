@@ -70,7 +70,7 @@ describe('Hybrid Search Engine Tests', { concurrency: false }, () => {
     const { tokenize } = require('./search.js');
     const tokens = tokenize('Climbing in the Teutoburg forest ridge!');
     
-    assert.deepEqual(tokens, ['climbing', 'teutoburg', 'forest', 'ridge']);
+    assert.deepEqual(tokens, ['climb', 'teutoburg', 'forest', 'ridge']);
   });
 
   test('stemmer strips common suffix endings', () => {
