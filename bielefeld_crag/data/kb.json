@@ -1,0 +1,38 @@
+[
+  {
+    "id": "alpinzentrum",
+    "name": "DAV Alpinzentrum Bielefeld",
+    "category": "sports",
+    "content": "DAV Alpinzentrum Bielefeld is located in Bielefeld-Senne. It is a major climbing gym offering lead climbing walls, top-rope sections, and bouldering facilities."
+  },
+  {
+    "id": "centre-of-gravity",
+    "name": "Centre of Gravity",
+    "category": "sports",
+    "content": "Centre of Gravity, formerly known as Climbix, is a prominent bouldering gym located in Bielefeld Mitte. It focuses entirely on indoor bouldering."
+  },
+  {
+    "id": "blocbuster",
+    "name": "Blocbuster",
+    "category": "sports",
+    "content": "Blocbuster is a bouldering hall located in Bielefeld-Sudbrack. It is famous for bouldering problems, its cozy bistro, and an on-site sauna."
+  },
+  {
+    "id": "baeckerei-lamm",
+    "name": "Bäckerei Lamm",
+    "category": "food",
+    "content": "Bäckerei Lamm is a historic local bakery situated in Bielefeld Altstadt (old town). Established in 1912, it is famous for its traditional Lammbrot."
+  },
+  {
+    "id": "radstation",
+    "name": "Kesselbrink Radstation",
+    "category": "services",
+    "content": "Kesselbrink Radstation is located at Kesselbrink square in Bielefeld. It provides bicycle repair services, secure parking, and bike rentals."
+  },
+  {
+    "id": "lichtwerk",
+    "name": "Lichtwerk Kino",
+    "category": "entertainment",
+    "content": "Lichtwerk Kino is a popular arthouse cinema situated in the Ravensberger Park in Bielefeld. It screens independent, documentary, and international films."
+  }
+]

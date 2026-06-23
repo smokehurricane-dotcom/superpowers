@@ -1,0 +1,7 @@
+{
+  "name": "bielefeld_crag",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node --test crag.test.js"
+  }
+}
