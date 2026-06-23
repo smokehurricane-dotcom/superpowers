@@ -209,5 +209,48 @@ describe('CLI read/delete commands', { concurrency: false }, () => {
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /Error: Note #99 not found\./);
   });
+
+  test('list --category filters notes by category (case-insensitive)', () => {
+    runCli(['add', 'Note A', 'Body'], { input: 'work\n\n' });
+    runCli(['add', 'Note B', 'Body'], { input: 'personal\n\n' });
+
+    const result = runCli(['list', '--category', 'WORK']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Note A/);
+    assert.doesNotMatch(result.stdout, /Note B/);
+  });
+
+  test('list --tag filters notes by tag (case-insensitive)', () => {
+    runCli(['add', 'Note A', 'Body'], { input: '\nurgent\n' });
+    runCli(['add', 'Note B', 'Body'], { input: '\nchore\n' });
+
+    const result = runCli(['list', '--tag', 'URGENT']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Note A/);
+    assert.doesNotMatch(result.stdout, /Note B/);
+  });
+
+  test('list filters by both category and tag combined', () => {
+    runCli(['add', 'Match', 'Body'], { input: 'work\nurgent\n' });
+    runCli(['add', 'Wrong Tag', 'Body'], { input: 'work\nchore\n' });
+    runCli(['add', 'Wrong Category', 'Body'], { input: 'personal\nurgent\n' });
+
+    const result = runCli(['list', '--category', 'work', '--tag', 'urgent']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Match/);
+    assert.doesNotMatch(result.stdout, /Wrong Tag/);
+    assert.doesNotMatch(result.stdout, /Wrong Category/);
+  });
+
+  test('list rejects missing filter values', () => {
+    const res1 = runCli(['list', '--category']);
+    assert.notEqual(res1.status, 0);
+    assert.match(res1.stderr, /Usage:/);
+
+    const res2 = runCli(['list', '--tag']);
+    assert.notEqual(res2.status, 0);
+    assert.match(res2.stderr, /Usage:/);
+  });
 });
+
 
