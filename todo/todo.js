@@ -8,9 +8,18 @@ const DEFAULT_STORE = path.join(__dirname, 'todos.json');
 function readStore(storePath) {
   try {
     const raw = fs.readFileSync(storePath, 'utf8');
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      process.stderr.write(`Error: Store file ${storePath} is corrupted (expected an array).\n`);
+      return [];
+    }
+    return parsed;
   } catch (err) {
     if (err.code === 'ENOENT') return [];
+    if (err instanceof SyntaxError) {
+      process.stderr.write(`Error: Store file ${storePath} contains invalid JSON.\n`);
+      return [];
+    }
     throw err;
   }
 }

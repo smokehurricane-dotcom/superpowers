@@ -32,6 +32,20 @@ function runCli(args, options = {}) {
   });
 }
 
+function captureStderr(fn) {
+  const originalWrite = process.stderr.write;
+  let captured = '';
+  process.stderr.write = (chunk) => {
+    captured += chunk;
+    return true;
+  };
+  try {
+    return { result: fn(), stderr: captured };
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+}
+
 describe('add', () => {
   test('adds first item and returns it', () => {
     const storePath = makeTempPath();
@@ -95,6 +109,19 @@ describe('removeTodo', () => {
       assert.equal(todos.length, 2);
       assert.deepEqual(todos.map(t => t.id), [1, 3]);
       assert.deepEqual(todos.map(t => t.text), ['First', 'Third']);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('returns the removed todo on success', () => {
+    const storePath = makeTempPath();
+    try {
+      add('Buy milk', storePath);
+      const removed = removeTodo(1, storePath);
+      assert.equal(removed.id, 1);
+      assert.equal(removed.text, 'Buy milk');
+      assert.equal(removed.done, false);
     } finally {
       cleanup(storePath);
     }
@@ -177,6 +204,30 @@ describe('list', () => {
       cleanup(storePath);
     }
   });
+
+  test('returns empty array when store file contains invalid JSON', () => {
+    const storePath = makeTempPath();
+    try {
+      fs.writeFileSync(storePath, 'not valid json', 'utf8');
+      const { result, stderr } = captureStderr(() => list(storePath));
+      assert.deepEqual(result, []);
+      assert.match(stderr, /invalid JSON|corrupted/i);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('returns empty array when store file contains non-array JSON', () => {
+    const storePath = makeTempPath();
+    try {
+      fs.writeFileSync(storePath, JSON.stringify({ foo: 'bar' }), 'utf8');
+      const { result, stderr } = captureStderr(() => list(storePath));
+      assert.deepEqual(result, []);
+      assert.match(stderr, /array|corrupted/i);
+    } finally {
+      cleanup(storePath);
+    }
+  });
 });
 
 describe('markDone', () => {
@@ -187,6 +238,19 @@ describe('markDone', () => {
       markDone(1, storePath);
       const todos = list(storePath);
       assert.equal(todos[0].done, true);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('returns the updated todo on success', () => {
+    const storePath = makeTempPath();
+    try {
+      add('Buy milk', storePath);
+      const result = markDone(1, storePath);
+      assert.equal(result.id, 1);
+      assert.equal(result.text, 'Buy milk');
+      assert.equal(result.done, true);
     } finally {
       cleanup(storePath);
     }
@@ -329,5 +393,57 @@ describe('CLI error handling', () => {
     const result = runCli(['done', '99']);
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /Todo #99 not found/);
+  });
+});
+
+describe('CLI happy path', () => {
+  test.afterEach(() => {
+    clearDefaultStore();
+  });
+
+  test('add prints success and persists todo', () => {
+    const result = runCli(['add', 'Buy milk']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Added #1: Buy milk/);
+    const todos = list(DEFAULT_STORE);
+    assert.equal(todos.length, 1);
+    assert.equal(todos[0].text, 'Buy milk');
+    assert.equal(todos[0].done, false);
+  });
+
+  test('list prints todos', () => {
+    runCli(['add', 'Buy milk']);
+    runCli(['add', 'Walk the dog']);
+    const result = runCli(['list']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /\[1\] \[ \] Buy milk/);
+    assert.match(result.stdout, /\[2\] \[ \] Walk the dog/);
+  });
+
+  test('done marks todo done', () => {
+    runCli(['add', 'Buy milk']);
+    const result = runCli(['done', '1']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Done #1: Buy milk/);
+    const todos = list(DEFAULT_STORE);
+    assert.equal(todos[0].done, true);
+  });
+
+  test('delete removes todo', () => {
+    runCli(['add', 'Buy milk']);
+    const result = runCli(['delete', '1']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Deleted #1: Buy milk/);
+    const todos = list(DEFAULT_STORE);
+    assert.equal(todos.length, 0);
+  });
+
+  test('edit updates todo text', () => {
+    runCli(['add', 'Old text']);
+    const result = runCli(['edit', '1', 'New text']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Edited #1: New text/);
+    const todos = list(DEFAULT_STORE);
+    assert.equal(todos[0].text, 'New text');
   });
 });
