@@ -151,7 +151,7 @@ function findNoteFile(id) {
   return filename ? path.join(dir, filename) : null;
 }
 
-function listNotes() {
+function listNotes(options = {}) {
   const dir = getNotesDir();
   if (!fs.existsSync(dir)) {
     console.log('No notes found.');
@@ -165,12 +165,30 @@ function listNotes() {
   }
 
   // Parse notes and map them with ID
-  const notes = noteFiles.map(file => {
+  let notes = noteFiles.map(file => {
     const id = parseInt(file.split('-')[0], 10);
     const raw = fs.readFileSync(path.join(dir, file), 'utf8');
     const parsed = parseNote(raw);
     return { id, metadata: parsed.metadata, body: parsed.body };
   });
+
+  // Apply filters
+  if (options.category) {
+    const filterCat = options.category.toLowerCase();
+    notes = notes.filter(n => n.metadata.category && String(n.metadata.category).toLowerCase() === filterCat);
+  }
+  if (options.tag) {
+    const filterTag = options.tag.toLowerCase();
+    notes = notes.filter(n => {
+      if (!n.metadata.tags || !Array.isArray(n.metadata.tags)) return false;
+      return n.metadata.tags.some(t => String(t).toLowerCase() === filterTag);
+    });
+  }
+
+  if (notes.length === 0) {
+    console.log('No notes found.');
+    return;
+  }
 
   // Sort by ID ascending
   notes.sort((a, b) => a.id - b.id);
@@ -269,7 +287,28 @@ async function runCliMain() {
       break;
     }
     case 'list': {
-      listNotes();
+      const options = {};
+      for (let i = 0; i < args.length; i++) {
+        if (args[i] === '--category') {
+          if (i + 1 >= args.length || args[i + 1].startsWith('--')) {
+            process.stderr.write('Usage: node notes.js list [--category <name>] [--tag <name>]\n');
+            process.exit(1);
+          }
+          options.category = args[i + 1];
+          i++;
+        } else if (args[i] === '--tag') {
+          if (i + 1 >= args.length || args[i + 1].startsWith('--')) {
+            process.stderr.write('Usage: node notes.js list [--category <name>] [--tag <name>]\n');
+            process.exit(1);
+          }
+          options.tag = args[i + 1];
+          i++;
+        } else {
+          process.stderr.write(`Unknown list option: ${args[i]}\nUsage: node notes.js list [--category <name>] [--tag <name>]\n`);
+          process.exit(1);
+        }
+      }
+      listNotes(options);
       break;
     }
     case 'show': {
