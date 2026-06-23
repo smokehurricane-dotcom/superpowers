@@ -104,4 +104,71 @@ describe('Flashcard App Slice 1 CRUD & Study', { concurrency: false }, () => {
     assert.match(result.stdout, /Study session complete!/);
     assert.match(result.stdout, /Success Rate: 50%/);
   });
+
+  test('study session promotes correct cards and demotes incorrect ones to Box 1', () => {
+    runCli(['add', 'Q1', 'A1']);
+    
+    // 1st correct answer: Box 1 -> Box 2
+    runCli(['study'], { input: '\ny\n' });
+    let data = JSON.parse(fs.readFileSync(currentStorePath, 'utf8'));
+    assert.equal(data[0].box, 2);
+
+    // 2nd correct answer: Box 2 -> Box 3
+    runCli(['study'], { input: '\ny\n' });
+    data = JSON.parse(fs.readFileSync(currentStorePath, 'utf8'));
+    assert.equal(data[0].box, 3);
+
+    // 3rd correct answer: Box 3 stays Box 3 (max is 3)
+    runCli(['study'], { input: '\ny\n' });
+    data = JSON.parse(fs.readFileSync(currentStorePath, 'utf8'));
+    assert.equal(data[0].box, 3);
+
+    // Incorrect answer: Box 3 -> Box 1
+    runCli(['study'], { input: '\nn\n' });
+    data = JSON.parse(fs.readFileSync(currentStorePath, 'utf8'));
+    assert.equal(data[0].box, 1);
+  });
+
+  test('CLI study --box filters by Leitner box', () => {
+    runCli(['add', 'Q1', 'A1']);
+    runCli(['add', 'Q2', 'A2']);
+
+    // Promote Q1 to Box 2
+    runCli(['study'], { input: '\ny\n\nn\n' });
+
+    // Study only Box 2
+    const result = runCli(['study', '--box', '2'], { input: '\ny\n' });
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Question: Q1/);
+    assert.doesNotMatch(result.stdout, /Question: Q2/);
+  });
+
+  test('CLI study --box rejects invalid box values', () => {
+    const res1 = runCli(['study', '--box', '9']);
+    assert.notEqual(res1.status, 0);
+    assert.match(res1.stderr, /Error: Box must be 1, 2, or 3/);
+
+    const res2 = runCli(['study', '--box']);
+    assert.notEqual(res2.status, 0);
+    assert.match(res2.stderr, /Usage:/);
+  });
+
+  test('CLI stats command lists cards counts by box', () => {
+    runCli(['add', 'Q1', 'A1']);
+    runCli(['add', 'Q2', 'A2']);
+    runCli(['add', 'Q3', 'A3']);
+
+    // Promote Q1 to Box 2, Q2 to Box 3, Q3 stays Box 1
+    // Q1: Correct once (Box 2)
+    runCli(['study', '--box', '1'], { input: '\ny\n\ny\n\nn\n' });
+    // Q2: Correct again (Box 3)
+    runCli(['study', '--box', '2'], { input: '\ny\n\ny\n' });
+
+    const statsRes = runCli(['stats']);
+    assert.equal(statsRes.status, 0);
+    assert.match(statsRes.stdout, /Box 1: 1 cards/);
+    assert.match(statsRes.stdout, /Box 2: 1 cards/);
+    assert.match(statsRes.stdout, /Box 3: 1 cards/);
+  });
 });
+
