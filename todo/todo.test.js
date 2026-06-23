@@ -53,10 +53,12 @@ function captureStderr(fn) {
 describe('todo app', { concurrency: false }, () => {
   beforeEach(() => {
     currentStorePath = makeTempPath();
+    process.env.TODO_STORE = currentStorePath;
   });
 
   afterEach(() => {
     cleanup(currentStorePath);
+    delete process.env.TODO_STORE;
   });
 
 describe('add', () => {
