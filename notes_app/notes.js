@@ -113,7 +113,7 @@ function getNextId() {
   return maxId + 1;
 }
 
-function createNote(title, content) {
+function createNote(title, content, category = null, tags = []) {
   if (!title || title.trim() === '') {
     process.stderr.write('Error: Note title cannot be empty.\n');
     return null;
@@ -128,11 +128,15 @@ function createNote(title, content) {
   const filepath = path.join(getNotesDir(), filename);
 
   const created = new Date().toISOString().slice(0, 10);
-  const note = {
-    metadata: { title, created },
-    body: content
-  };
+  const metadata = { title, created };
+  if (category) {
+    metadata.category = category;
+  }
+  if (tags && tags.length > 0) {
+    metadata.tags = tags;
+  }
 
+  const note = { metadata, body: content };
   fs.writeFileSync(filepath, serializeNote(note), 'utf8');
   console.log(`Added note #${id}: "${title}"`);
   return { id, filepath, title };
@@ -212,8 +216,41 @@ function deleteNote(id) {
   return true;
 }
 
+const readline = require('node:readline');
+
+function promptMetadata() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  return new Promise(resolve => {
+    let resolved = false;
+    
+    rl.on('close', () => {
+      if (!resolved) {
+        resolved = true;
+        resolve({ category: null, tags: [] });
+      }
+    });
+
+    rl.question('Category (optional): ', category => {
+      rl.question('Tags (comma-separated, optional): ', tagsStr => {
+        if (!resolved) {
+          resolved = true;
+          rl.close();
+          const categoryVal = category.trim() || null;
+          const tags = tagsStr.trim()
+            ? tagsStr.split(',').map(t => t.trim()).filter(Boolean)
+            : [];
+          resolve({ category: categoryVal, tags });
+        }
+      });
+    });
+  });
+}
+
 // CLI Routing
-if (require.main === module) {
+async function runCliMain() {
   const cliArgs = process.argv.slice(2);
   const command = cliArgs[0];
   const args = cliArgs.slice(1);
@@ -224,7 +261,10 @@ if (require.main === module) {
         process.stderr.write('Usage: node notes.js add "<title>" "<content>"\n');
         process.exit(1);
       }
-      const note = createNote(args[0], args[1]);
+      
+      const { category, tags } = await promptMetadata();
+
+      const note = createNote(args[0], args[1], category, tags);
       if (!note) process.exit(1);
       break;
     }
@@ -256,6 +296,13 @@ if (require.main === module) {
       process.stderr.write(`Unknown command: ${command}\nUsage: node notes.js add|list|show|delete\n`);
       process.exit(1);
   }
+}
+
+if (require.main === module) {
+  runCliMain().catch(err => {
+    process.stderr.write(`Fatal: ${err.message}\n`);
+    process.exit(1);
+  });
 }
 
 module.exports = { parseNote, serializeNote, slugify, getNotesDir, getNextId, createNote, findNoteFile, listNotes, showNote, deleteNote };

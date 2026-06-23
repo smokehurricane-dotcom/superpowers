@@ -116,6 +116,38 @@ describe('CLI add command', { concurrency: false }, () => {
     assert.notEqual(res2.status, 0);
     assert.match(res2.stderr, /Error: Note content cannot be empty/);
   });
+
+  test('adds note with category and tags via mock interactive prompt', () => {
+    const result = runCli(['add', 'Project Plan', 'We need to design Slice 2.'], {
+      input: 'work\nurgent, chore\n'
+    });
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Added note #1: "Project Plan"/);
+
+    const expectedFile = path.join(currentNotesDir, '1-project-plan.md');
+    assert.ok(fs.existsSync(expectedFile));
+
+    const content = fs.readFileSync(expectedFile, 'utf8');
+    const parsed = parseNote(content);
+    assert.equal(parsed.metadata.category, 'work');
+    assert.deepEqual(parsed.metadata.tags, ['urgent', 'chore']);
+  });
+
+  test('adds note with no category and tags (pressing enter directly)', () => {
+    const result = runCli(['add', 'Quick Thought', 'Body content here.'], {
+      input: '\n\n'
+    });
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Added note #1: "Quick Thought"/);
+
+    const expectedFile = path.join(currentNotesDir, '1-quick-thought.md');
+    assert.ok(fs.existsSync(expectedFile));
+
+    const content = fs.readFileSync(expectedFile, 'utf8');
+    const parsed = parseNote(content);
+    assert.equal(parsed.metadata.category, undefined);
+    assert.equal(parsed.metadata.tags, undefined);
+  });
 });
 
 describe('CLI read/delete commands', { concurrency: false }, () => {
