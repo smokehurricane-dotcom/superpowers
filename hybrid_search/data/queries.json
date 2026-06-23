@@ -1,0 +1,29 @@
+[
+  {
+    "query": "climbing in Bielefeld",
+    "relevance": {
+      "doc1": 3,
+      "doc3": 3,
+      "doc5": 1
+    }
+  },
+  {
+    "query": "traditional baking bread",
+    "relevance": {
+      "doc2": 3
+    }
+  },
+  {
+    "query": "shopping in Loom mall",
+    "relevance": {
+      "doc4": 3
+    }
+  },
+  {
+    "query": "hiking trails in Teutoburg",
+    "relevance": {
+      "doc5": 3,
+      "doc1": 1
+    }
+  }
+]
