@@ -5,6 +5,16 @@ const path = require('node:path');
 
 const DEFAULT_STORE = path.join(__dirname, 'todos.json');
 
+const VALID_PRIORITIES = ['high', 'normal', 'low'];
+
+function validatePriority(priority) {
+  if (!VALID_PRIORITIES.includes(priority)) {
+    process.stderr.write(`Error: Invalid priority "${priority}". Valid priorities are: ${VALID_PRIORITIES.join(', ')}.\n`);
+    return false;
+  }
+  return true;
+}
+
 function readStore(storePath) {
   try {
     const raw = fs.readFileSync(storePath, 'utf8');
@@ -28,18 +38,25 @@ function writeStore(storePath, todos) {
   fs.writeFileSync(storePath, JSON.stringify(todos, null, 2), 'utf8');
 }
 
-function add(text, storePath = DEFAULT_STORE) {
+function createTodo(text, priority = 'normal', storePath = DEFAULT_STORE) {
   if (!text || text.trim() === '') {
     process.stderr.write('Error: Todo text cannot be empty.\n');
     return null;
   }
+  if (!validatePriority(priority)) {
+    return null;
+  }
   const todos = readStore(storePath);
-  const id = Math.max(0, ...todos.map(t => t.id)) + 1;
-  const todo = { id, text, done: false };
+  const id = todos.reduce((max, t) => Math.max(max, t.id), 0) + 1;
+  const todo = { id, text, done: false, priority };
   todos.push(todo);
   writeStore(storePath, todos);
-  console.log(`Added #${id}: ${text}`);
+  console.log(`Added #${id}: ${text} [${priority}]`);
   return todo;
+}
+
+function add(text, storePath = DEFAULT_STORE) {
+  return createTodo(text, 'normal', storePath);
 }
 
 function list(storePath = DEFAULT_STORE) {
@@ -93,7 +110,22 @@ if (require.main === module) {
   const [,, command, ...args] = process.argv;
   switch (command) {
     case 'add': {
-      const todo = add(args.join(' '));
+      let priority = 'normal';
+      const textArgs = [];
+      for (let i = 0; i < args.length; i++) {
+        if (args[i] === '--priority') {
+          if (i + 1 >= args.length) {
+            process.stderr.write('Usage: node todo.js add "text" [--priority high|normal|low]\n');
+            process.exit(1);
+          }
+          priority = args[i + 1];
+          i++;
+        } else {
+          textArgs.push(args[i]);
+        }
+      }
+      const text = textArgs.join(' ');
+      const todo = createTodo(text, priority);
       if (!todo) process.exit(1);
       break;
     }
@@ -150,4 +182,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { add, list, markDone, removeTodo, editTodo };
+module.exports = { add, createTodo, list, markDone, removeTodo, editTodo };

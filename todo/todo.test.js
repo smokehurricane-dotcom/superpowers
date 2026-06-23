@@ -7,7 +7,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const { add, list, markDone, removeTodo, editTodo } = require('./todo.js');
+const { add, list, markDone, removeTodo, editTodo, createTodo } = require('./todo.js');
 
 const TODO_JS = path.join(__dirname, 'todo.js');
 const DEFAULT_STORE = path.join(__dirname, 'todos.json');
@@ -86,6 +86,65 @@ describe('add', () => {
     const storePath = makeTempPath();
     try {
       const result = add('   ', storePath);
+      assert.equal(result, null);
+      const todos = list(storePath);
+      assert.equal(todos.length, 0);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+});
+
+describe('createTodo', () => {
+  test('stores priority high', () => {
+    const storePath = makeTempPath();
+    try {
+      const item = createTodo('Buy milk', 'high', storePath);
+      assert.equal(item.priority, 'high');
+      const todos = list(storePath);
+      assert.equal(todos[0].priority, 'high');
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('stores priority low', () => {
+    const storePath = makeTempPath();
+    try {
+      const item = createTodo('Buy milk', 'low', storePath);
+      assert.equal(item.priority, 'low');
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('defaults priority to normal', () => {
+    const storePath = makeTempPath();
+    try {
+      const item = createTodo('Buy milk', undefined, storePath);
+      assert.equal(item.priority, 'normal');
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('rejects invalid priority', () => {
+    const storePath = makeTempPath();
+    try {
+      const { result, stderr } = captureStderr(() => createTodo('Buy milk', 'urgent', storePath));
+      assert.equal(result, null);
+      assert.match(stderr, /Invalid priority/);
+      const todos = list(storePath);
+      assert.equal(todos.length, 0);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('rejects empty text with priority', () => {
+    const storePath = makeTempPath();
+    try {
+      const result = createTodo('   ', 'high', storePath);
       assert.equal(result, null);
       const todos = list(storePath);
       assert.equal(todos.length, 0);
