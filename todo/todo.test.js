@@ -46,6 +46,8 @@ function captureStderr(fn) {
   }
 }
 
+describe('todo app', { concurrency: false }, () => {
+
 describe('add', () => {
   test('adds first item and returns it', () => {
     const storePath = makeTempPath();
@@ -843,4 +845,6 @@ describe('CLI due date handling', () => {
     assert.match(result.stdout, /Overdue high/);
     assert.doesNotMatch(result.stdout, /Overdue low/);
   });
+});
+
 });

@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1,
+    "text": "Buy milk",
+    "done": true,
+    "priority": "normal"
+  },
+  {
+    "id": 2,
+    "text": "Walk the dog",
+    "done": false,
+    "priority": "normal"
+  },
+  {
+    "id": 3,
+    "text": "Buy milk",
+    "done": false,
+    "priority": "normal",
+    "due": "2026-06-30"
+  }
+]
