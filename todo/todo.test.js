@@ -684,3 +684,163 @@ describe('parseDueDate (via CLI)', () => {
     assert.match(result.stderr, /Invalid date/);
   });
 });
+
+
+describe('createTodo due date', () => {
+  test('stores optional due date', () => {
+    const storePath = makeTempPath();
+    try {
+      const item = createTodo('Buy milk', 'normal', storePath, '2026-06-30');
+      assert.equal(item.due, '2026-06-30');
+      const todos = list(storePath);
+      assert.equal(todos[0].due, '2026-06-30');
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('add without due date stores no due field', () => {
+    const storePath = makeTempPath();
+    try {
+      const item = add('Buy milk', storePath);
+      assert.equal(item.due, undefined);
+      const todos = list(storePath);
+      assert.equal(todos[0].due, undefined);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+});
+
+describe('list sorting', () => {
+  test('sorts by due date with undated todos at the end', () => {
+    const storePath = makeTempPath();
+    try {
+      createTodo('No date', 'normal', storePath);
+      createTodo('Late', 'normal', storePath, '2026-07-01');
+      createTodo('Early', 'normal', storePath, '2026-06-20');
+      const todos = list({ sort: 'due' }, storePath);
+      assert.deepEqual(todos.map(t => t.text), ['Early', 'Late', 'No date']);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+});
+
+describe('list overdue', () => {
+  test('filters overdue todos', () => {
+    const storePath = makeTempPath();
+    try {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const yyyymmdd = (d) => d.toISOString().slice(0, 10);
+
+      createTodo('Overdue', 'normal', storePath, yyyymmdd(yesterday));
+      createTodo('Future', 'normal', storePath, yyyymmdd(tomorrow));
+      createTodo('No date', 'normal', storePath);
+      const todos = list({ overdue: true }, storePath);
+      assert.equal(todos.length, 1);
+      assert.equal(todos[0].text, 'Overdue');
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('combines overdue and priority filters', () => {
+    const storePath = makeTempPath();
+    try {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yyyymmdd = (d) => d.toISOString().slice(0, 10);
+
+      createTodo('Overdue high', 'high', storePath, yyyymmdd(yesterday));
+      createTodo('Overdue low', 'low', storePath, yyyymmdd(yesterday));
+      createTodo('Future high', 'high', storePath, '2099-01-01');
+      const todos = list({ overdue: true, priority: 'high' }, storePath);
+      assert.equal(todos.length, 1);
+      assert.equal(todos[0].text, 'Overdue high');
+    } finally {
+      cleanup(storePath);
+    }
+  });
+});
+
+describe('CLI due date handling', () => {
+  test.afterEach(() => {
+    clearDefaultStore();
+  });
+
+  test('add stores due date via CLI', () => {
+    const result = runCli(['add', 'Buy milk', '--due', '2026-06-30']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Added #1: Buy milk/);
+    const todos = list(DEFAULT_STORE);
+    assert.equal(todos[0].due, '2026-06-30');
+  });
+
+  test('add with invalid due date exits 1', () => {
+    const result = runCli(['add', 'Buy milk', '--due', '2026-02-31']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid date/);
+  });
+
+  test('add with missing due date value exits 1', () => {
+    const result = runCli(['add', 'Buy milk', '--due']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage:/);
+  });
+
+  test('list shows due date in plain output', () => {
+    runCli(['add', '--due', '2026-06-30', 'Buy milk']);
+    runCli(['add', 'Walk the dog']);
+    const result = runCli(['list']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /\[1\] \[ \] \[normal\] Buy milk \(due: 2026-06-30\)/);
+    assert.match(result.stdout, /\[2\] \[ \] \[normal\] Walk the dog/);
+    assert.doesNotMatch(result.stdout, /Walk the dog.*due:/);
+  });
+
+  test('list --sort due sorts output', () => {
+    runCli(['add', 'No date']);
+    runCli(['add', '--due', '2026-07-01', 'Late']);
+    runCli(['add', '--due', '2026-06-20', 'Early']);
+    const result = runCli(['list', '--sort', 'due']);
+    assert.equal(result.status, 0);
+    const lines = result.stdout.trim().split('\n').filter(l => l.startsWith('['));
+    assert.match(lines[0], /Early/);
+    assert.match(lines[1], /Late/);
+    assert.match(lines[2], /No date/);
+  });
+
+  test('list --overdue shows only overdue', () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const yyyymmdd = (d) => d.toISOString().slice(0, 10);
+
+    runCli(['add', '--due', yyyymmdd(yesterday), 'Overdue']);
+    runCli(['add', '--due', yyyymmdd(tomorrow), 'Future']);
+    runCli(['add', 'No date']);
+    const result = runCli(['list', '--overdue']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Overdue/);
+    assert.doesNotMatch(result.stdout, /Future/);
+    assert.doesNotMatch(result.stdout, /No date/);
+  });
+
+  test('list combines --overdue and --priority', () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yyyymmdd = (d) => d.toISOString().slice(0, 10);
+
+    runCli(['add', '--due', yyyymmdd(yesterday), '--priority', 'high', 'Overdue high']);
+    runCli(['add', '--due', yyyymmdd(yesterday), '--priority', 'low', 'Overdue low']);
+    const result = runCli(['list', '--overdue', '--priority', 'high']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Overdue high/);
+    assert.doesNotMatch(result.stdout, /Overdue low/);
+  });
+});
