@@ -151,7 +151,29 @@ function studySession(targetBox = null) {
 }
 
 function onAnswerReviewed(cardId, isCorrect) {
-  // To be extended in Slice 2
+  const cards = readStore();
+  const card = cards.find(c => c.id === cardId);
+  if (!card) return;
+  
+  if (isCorrect) {
+    card.box = Math.min(3, card.box + 1);
+  } else {
+    card.box = 1;
+  }
+  writeStore(cards);
+}
+
+function printStats() {
+  const cards = readStore();
+  const counts = { 1: 0, 2: 0, 3: 0 };
+  for (const c of cards) {
+    if (counts[c.box] !== undefined) {
+      counts[c.box]++;
+    }
+  }
+  console.log(`Box 1: ${counts[1]} cards`);
+  console.log(`Box 2: ${counts[2]} cards`);
+  console.log(`Box 3: ${counts[3]} cards`);
 }
 
 async function runCliMain() {
@@ -183,11 +205,33 @@ async function runCliMain() {
       break;
     }
     case 'study': {
-      await studySession();
+      let targetBox = null;
+      if (args.length > 0) {
+        if (args[0] === '--box') {
+          if (args.length < 2) {
+            process.stderr.write('Usage: node flashcards.js study [--box 1|2|3]\n');
+            process.exit(1);
+          }
+          const boxNum = parseInt(args[1], 10);
+          if (isNaN(boxNum) || ![1, 2, 3].includes(boxNum)) {
+            process.stderr.write('Error: Box must be 1, 2, or 3.\n');
+            process.exit(1);
+          }
+          targetBox = boxNum;
+        } else {
+          process.stderr.write(`Unknown study option: ${args[0]}\nUsage: node flashcards.js study [--box 1|2|3]\n`);
+          process.exit(1);
+        }
+      }
+      await studySession(targetBox);
+      break;
+    }
+    case 'stats': {
+      printStats();
       break;
     }
     default:
-      process.stderr.write(`Unknown command: ${command}\nUsage: node flashcards.js add|list|delete|study\n`);
+      process.stderr.write(`Unknown command: ${command}\nUsage: node flashcards.js add|list|delete|study|stats\n`);
       process.exit(1);
   }
 }
@@ -199,4 +243,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { addFlashcard, listFlashcards, deleteFlashcard, studySession, onAnswerReviewed };
+module.exports = { addFlashcard, listFlashcards, deleteFlashcard, studySession, onAnswerReviewed, printStats };

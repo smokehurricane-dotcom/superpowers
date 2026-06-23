@@ -158,11 +158,12 @@ describe('Flashcard App Slice 1 CRUD & Study', { concurrency: false }, () => {
     runCli(['add', 'Q2', 'A2']);
     runCli(['add', 'Q3', 'A3']);
 
-    // Promote Q1 to Box 2, Q2 to Box 3, Q3 stays Box 1
-    // Q1: Correct once (Box 2)
-    runCli(['study', '--box', '1'], { input: '\ny\n\ny\n\nn\n' });
-    // Q2: Correct again (Box 3)
-    runCli(['study', '--box', '2'], { input: '\ny\n\ny\n' });
+    // Study Box 1: Q1 (y -> Box 2), Q2 (n -> Box 1), Q3 (n -> Box 1)
+    runCli(['study', '--box', '1'], { input: '\ny\n\nn\n\nn\n' });
+    // Study Box 2: Q1 (y -> Box 3)
+    runCli(['study', '--box', '2'], { input: '\ny\n' });
+    // Study Box 1: Q2 (y -> Box 2), Q3 (n -> Box 1)
+    runCli(['study', '--box', '1'], { input: '\ny\n\nn\n' });
 
     const statsRes = runCli(['stats']);
     assert.equal(statsRes.status, 0);
