@@ -864,7 +864,11 @@ describe('CLI config handling', () => {
 
   afterEach(() => {
     try { fs.rmSync(CONFIG_PATH, { force: true }); } catch (_) {}
-    try { fs.rmSync(path.join(__dirname, 'todos-testproj.json'), { force: true }); } catch (_) {}
+    if (currentStorePath) {
+      const ext = path.extname(currentStorePath);
+      const base = currentStorePath.slice(0, -ext.length);
+      try { fs.rmSync(`${base}-testproj${ext}`, { force: true }); } catch (_) {}
+    }
   });
 
   test('respects defaultProject in .todoconfig.json', () => {
@@ -873,8 +877,10 @@ describe('CLI config handling', () => {
     const addResult = runCli(['add', 'Buy milk']);
     assert.equal(addResult.status, 0);
 
-    const projectStorePath = path.join(__dirname, 'todos-testproj.json');
-    assert.ok(fs.existsSync(projectStorePath), 'Should write to todos-testproj.json');
+    const ext = path.extname(currentStorePath);
+    const base = currentStorePath.slice(0, -ext.length);
+    const projectStorePath = `${base}-testproj${ext}`;
+    assert.ok(fs.existsSync(projectStorePath), 'Should write to temporary project store path');
     
     const content = JSON.parse(fs.readFileSync(projectStorePath, 'utf8'));
     assert.equal(content[0].text, 'Buy milk');
@@ -882,12 +888,13 @@ describe('CLI config handling', () => {
 });
 
 describe('CLI project handling', () => {
-  const WORK_STORE = path.join(__dirname, 'todos-work.json');
-  const PERS_STORE = path.join(__dirname, 'todos-personal.json');
-
   afterEach(() => {
-    try { fs.rmSync(WORK_STORE, { force: true }); } catch (_) {}
-    try { fs.rmSync(PERS_STORE, { force: true }); } catch (_) {}
+    if (currentStorePath) {
+      const ext = path.extname(currentStorePath);
+      const base = currentStorePath.slice(0, -ext.length);
+      try { fs.rmSync(`${base}-work${ext}`, { force: true }); } catch (_) {}
+      try { fs.rmSync(`${base}-personal${ext}`, { force: true }); } catch (_) {}
+    }
   });
 
   test('isolates different projects via --project', () => {
