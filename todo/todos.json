@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "text": "buy milk",
+    "done": false,
+    "priority": "high"
+  },
+  {
+    "id": 2,
+    "text": "walk dog",
+    "done": true,
+    "priority": "normal"
+  },
+  {
+    "id": 3,
+    "text": "pay bills",
+    "done": false,
+    "priority": "low"
+  }
+]
