@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "text": "Buy milk",
+    "done": false,
+    "priority": "high"
+  },
+  {
+    "id": 2,
+    "text": "Buy milk",
+    "done": false,
+    "priority": "normal"
+  }
+]
