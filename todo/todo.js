@@ -59,14 +59,28 @@ function add(text, storePath = DEFAULT_STORE) {
   return createTodo(text, 'normal', storePath);
 }
 
-function list(storePath = DEFAULT_STORE) {
-  const todos = readStore(storePath);
+function list(options = {}, storePath = DEFAULT_STORE) {
+  if (typeof options === 'string') {
+    storePath = options;
+    options = {};
+  }
+  let todos = readStore(storePath);
+  if (options.done === true) {
+    todos = todos.filter(t => t.done);
+  }
+  if (options.pending === true) {
+    todos = todos.filter(t => !t.done);
+  }
+  if (options.priority) {
+    todos = todos.filter(t => t.priority === options.priority);
+  }
   if (todos.length === 0) {
     console.log('No todos yet.');
   } else {
     for (const todo of todos) {
       const status = todo.done ? 'x' : ' ';
-      console.log(`[${todo.id}] [${status}] ${todo.text}`);
+      const priority = todo.priority || 'normal';
+      console.log(`[${todo.id}] [${status}] [${priority}] ${todo.text}`);
     }
   }
   return todos;
@@ -129,9 +143,31 @@ if (require.main === module) {
       if (!todo) process.exit(1);
       break;
     }
-    case 'list':
-      list();
+    case 'list': {
+      const options = {};
+      for (let i = 0; i < args.length; i++) {
+        if (args[i] === '--done') {
+          options.done = true;
+        } else if (args[i] === '--pending') {
+          options.pending = true;
+        } else if (args[i] === '--priority') {
+          if (i + 1 >= args.length) {
+            process.stderr.write('Usage: node todo.js list [--done|--pending] [--priority high|normal|low]\n');
+            process.exit(1);
+          }
+          options.priority = args[i + 1];
+          i++;
+        } else {
+          process.stderr.write(`Unknown list option: ${args[i]}\nUsage: node todo.js list [--done|--pending] [--priority high|normal|low]\n`);
+          process.exit(1);
+        }
+      }
+      if (options.priority && !validatePriority(options.priority)) {
+        process.exit(1);
+      }
+      list(options);
       break;
+    }
     case 'done': {
       const id = Number(args[0]);
       if (args[0] === undefined || args[0].trim() === '' || !Number.isInteger(id)) {

@@ -289,6 +289,67 @@ describe('list', () => {
   });
 });
 
+describe('list filters', () => {
+  test('filters by done status', () => {
+    const storePath = makeTempPath();
+    try {
+      add('Pending one', storePath);
+      add('Done one', storePath);
+      markDone(2, storePath);
+      const todos = list({ done: true }, storePath);
+      assert.equal(todos.length, 1);
+      assert.equal(todos[0].text, 'Done one');
+      assert.equal(todos[0].done, true);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('filters by pending status', () => {
+    const storePath = makeTempPath();
+    try {
+      add('Pending one', storePath);
+      add('Done one', storePath);
+      markDone(2, storePath);
+      const todos = list({ pending: true }, storePath);
+      assert.equal(todos.length, 1);
+      assert.equal(todos[0].text, 'Pending one');
+      assert.equal(todos[0].done, false);
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('filters by priority', () => {
+    const storePath = makeTempPath();
+    try {
+      createTodo('Low task', 'low', storePath);
+      createTodo('High task', 'high', storePath);
+      createTodo('Normal task', 'normal', storePath);
+      const todos = list({ priority: 'high' }, storePath);
+      assert.equal(todos.length, 1);
+      assert.equal(todos[0].text, 'High task');
+    } finally {
+      cleanup(storePath);
+    }
+  });
+
+  test('combines pending and priority filters', () => {
+    const storePath = makeTempPath();
+    try {
+      createTodo('High pending', 'high', storePath);
+      createTodo('High done', 'high', storePath);
+      markDone(2, storePath);
+      createTodo('Low pending', 'low', storePath);
+      const todos = list({ pending: true, priority: 'high' }, storePath);
+      assert.equal(todos.length, 1);
+      assert.equal(todos[0].text, 'High pending');
+    } finally {
+      cleanup(storePath);
+    }
+  });
+});
+
 describe('markDone', () => {
   test('marks an existing todo done by ID', () => {
     const storePath = makeTempPath();
@@ -475,8 +536,8 @@ describe('CLI happy path', () => {
     runCli(['add', 'Walk the dog']);
     const result = runCli(['list']);
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /\[1\] \[ \] Buy milk/);
-    assert.match(result.stdout, /\[2\] \[ \] Walk the dog/);
+    assert.match(result.stdout, /\[1\] \[ \] \[normal\] Buy milk/);
+    assert.match(result.stdout, /\[2\] \[ \] \[normal\] Walk the dog/);
   });
 
   test('done marks todo done', () => {
