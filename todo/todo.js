@@ -33,19 +33,27 @@ function validatePriority(priority) {
   return true;
 }
 
+function getStorePath(storePath) {
+  if (!storePath || storePath === DEFAULT_STORE) {
+    return process.env.TODO_STORE || DEFAULT_STORE;
+  }
+  return storePath;
+}
+
 function readStore(storePath) {
+  const resolvedPath = getStorePath(storePath);
   try {
-    const raw = fs.readFileSync(storePath, 'utf8');
+    const raw = fs.readFileSync(resolvedPath, 'utf8');
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) {
-      process.stderr.write(`Error: Store file ${storePath} is corrupted (expected an array).\n`);
+      process.stderr.write(`Error: Store file ${resolvedPath} is corrupted (expected an array).\n`);
       return [];
     }
     return parsed;
   } catch (err) {
     if (err.code === 'ENOENT') return [];
     if (err instanceof SyntaxError) {
-      process.stderr.write(`Error: Store file ${storePath} contains invalid JSON.\n`);
+      process.stderr.write(`Error: Store file ${resolvedPath} contains invalid JSON.\n`);
       return [];
     }
     throw err;
@@ -53,7 +61,8 @@ function readStore(storePath) {
 }
 
 function writeStore(storePath, todos) {
-  fs.writeFileSync(storePath, JSON.stringify(todos, null, 2), 'utf8');
+  const resolvedPath = getStorePath(storePath);
+  fs.writeFileSync(resolvedPath, JSON.stringify(todos, null, 2), 'utf8');
 }
 
 function createTodo(text, priority = 'normal', storePath = DEFAULT_STORE, due = undefined) {

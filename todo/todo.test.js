@@ -1,6 +1,6 @@
 'use strict';
 
-const { test, describe } = require('node:test');
+const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -11,6 +11,7 @@ const { add, list, markDone, removeTodo, editTodo, createTodo } = require('./tod
 
 const TODO_JS = path.join(__dirname, 'todo.js');
 const DEFAULT_STORE = path.join(__dirname, 'todos.json');
+let currentStorePath = DEFAULT_STORE;
 
 function makeTempPath() {
   return path.join(os.tmpdir(), `todo-test-${Date.now()}-${Math.random()}.json`);
@@ -28,6 +29,7 @@ function runCli(args, options = {}) {
   const result = spawnSync(process.execPath, [TODO_JS, ...args], {
     encoding: 'utf8',
     cwd: __dirname,
+    env: { ...process.env, TODO_STORE: currentStorePath, ...options.env },
     ...options,
   });
   console.error(`CLI RUN: ${JSON.stringify(args)} | STATUS: ${result.status} | STDOUT: ${JSON.stringify(result.stdout)} | STDERR: ${JSON.stringify(result.stderr)}`);
@@ -49,6 +51,13 @@ function captureStderr(fn) {
 }
 
 describe('todo app', { concurrency: false }, () => {
+  beforeEach(() => {
+    currentStorePath = makeTempPath();
+  });
+
+  afterEach(() => {
+    cleanup(currentStorePath);
+  });
 
 describe('add', () => {
   test('adds first item and returns it', () => {
@@ -417,7 +426,7 @@ describe('markDone', () => {
   });
 });
 
-describe('CLI error handling', () => {
+describe('CLI error handling', { concurrency: false }, () => {
   test.afterEach(() => {
     clearDefaultStore();
   });
@@ -562,7 +571,7 @@ describe('CLI error handling', () => {
   });
 });
 
-describe('CLI happy path', () => {
+describe('CLI happy path', { concurrency: false }, () => {
   test.afterEach(() => {
     clearDefaultStore();
   });
@@ -673,7 +682,7 @@ describe('CLI happy path', () => {
 });
 
 
-describe('parseDueDate (via CLI)', () => {
+describe('parseDueDate (via CLI)', { concurrency: false }, () => {
   test('rejects impossible date via CLI', () => {
     const result = runCli(['add', 'Buy milk', '--due', '2026-02-31']);
     assert.notEqual(result.status, 0);
@@ -771,7 +780,7 @@ describe('list overdue', () => {
   });
 });
 
-describe('CLI due date handling', () => {
+describe('CLI due date handling', { concurrency: false }, () => {
   test.afterEach(() => {
     clearDefaultStore();
   });
