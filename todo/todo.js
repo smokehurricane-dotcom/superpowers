@@ -93,7 +93,7 @@ if (require.main === module) {
       break;
     case 'done': {
       const id = Number(args[0]);
-      if (args[0] === undefined || Number.isNaN(id)) {
+      if (args[0] === undefined || args[0].trim() === '' || !Number.isInteger(id)) {
         process.stderr.write('Usage: node todo.js done <id>\n');
         process.exit(1);
       }
@@ -106,7 +106,7 @@ if (require.main === module) {
     }
     case 'delete': {
       const id = Number(args[0]);
-      if (args[0] === undefined || Number.isNaN(id)) {
+      if (args[0] === undefined || args[0].trim() === '' || !Number.isInteger(id)) {
         process.stderr.write('Usage: node todo.js delete <id>\n');
         process.exit(1);
       }
@@ -120,7 +120,7 @@ if (require.main === module) {
     case 'edit': {
       const id = Number(args[0]);
       const text = args.slice(1).join(' ');
-      if (args[0] === undefined || Number.isNaN(id)) {
+      if (args[0] === undefined || args[0].trim() === '' || !Number.isInteger(id)) {
         process.stderr.write('Usage: node todo.js edit <id> "text"\n');
         process.exit(1);
       }

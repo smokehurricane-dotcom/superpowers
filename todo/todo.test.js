@@ -246,6 +246,18 @@ describe('CLI error handling', () => {
     assert.match(result.stderr, /Usage: node todo.js delete <id>/);
   });
 
+  test('delete with empty string ID exits 1', () => {
+    const result = runCli(['delete', '']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js delete <id>/);
+  });
+
+  test('delete with float ID exits 1', () => {
+    const result = runCli(['delete', '1.5']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js delete <id>/);
+  });
+
   test('delete with unknown ID exits 1', () => {
     const result = runCli(['delete', '99']);
     assert.notEqual(result.status, 0);
@@ -260,6 +272,18 @@ describe('CLI error handling', () => {
 
   test('edit with non-numeric ID exits 1', () => {
     const result = runCli(['edit', 'abc']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js edit <id>/);
+  });
+
+  test('edit with empty string ID exits 1', () => {
+    const result = runCli(['edit', '', 'foo']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js edit <id>/);
+  });
+
+  test('edit with float ID exits 1', () => {
+    const result = runCli(['edit', '1.5', 'foo']);
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /Usage: node todo.js edit <id>/);
   });
@@ -285,6 +309,18 @@ describe('CLI error handling', () => {
 
   test('done with non-numeric ID exits 1', () => {
     const result = runCli(['done', 'abc']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js done <id>/);
+  });
+
+  test('done with empty string ID exits 1', () => {
+    const result = runCli(['done', '']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage: node todo.js done <id>/);
+  });
+
+  test('done with float ID exits 1', () => {
+    const result = runCli(['done', '1.5']);
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /Usage: node todo.js done <id>/);
   });
