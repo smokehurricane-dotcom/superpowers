@@ -514,6 +514,36 @@ describe('CLI error handling', () => {
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /Todo #99 not found/);
   });
+
+  test('add with invalid priority exits 1', () => {
+    const result = runCli(['add', 'Buy milk', '--priority', 'urgent']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid priority/);
+  });
+
+  test('add with missing priority value exits 1', () => {
+    const result = runCli(['add', 'Buy milk', '--priority']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage:/);
+  });
+
+  test('list with invalid priority exits 1', () => {
+    const result = runCli(['list', '--priority', 'urgent']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid priority/);
+  });
+
+  test('list with missing priority value exits 1', () => {
+    const result = runCli(['list', '--priority']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Usage:/);
+  });
+
+  test('list with unknown option exits 1', () => {
+    const result = runCli(['list', '--foo']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Unknown list option/);
+  });
 });
 
 describe('CLI happy path', () => {
@@ -565,5 +595,63 @@ describe('CLI happy path', () => {
     assert.match(result.stdout, /Edited #1: New text/);
     const todos = list(DEFAULT_STORE);
     assert.equal(todos[0].text, 'New text');
+  });
+
+  test('add stores priority high via CLI', () => {
+    const result = runCli(['add', 'Buy milk', '--priority', 'high']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Added #1: Buy milk/);
+    const todos = list(DEFAULT_STORE);
+    assert.equal(todos[0].priority, 'high');
+  });
+
+  test('list shows priority in plain output', () => {
+    runCli(['add', 'Buy milk', '--priority', 'high']);
+    runCli(['add', 'Walk the dog']);
+    const result = runCli(['list']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /\[1\] \[ \] \[high\] Buy milk/);
+    assert.match(result.stdout, /\[2\] \[ \] \[normal\] Walk the dog/);
+  });
+
+  test('list --done shows only done todos', () => {
+    runCli(['add', 'Buy milk']);
+    runCli(['add', 'Walk the dog']);
+    runCli(['done', '1']);
+    const result = runCli(['list', '--done']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Buy milk/);
+    assert.doesNotMatch(result.stdout, /Walk the dog/);
+  });
+
+  test('list --pending shows only pending todos', () => {
+    runCli(['add', 'Buy milk']);
+    runCli(['add', 'Walk the dog']);
+    runCli(['done', '1']);
+    const result = runCli(['list', '--pending']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Walk the dog/);
+    assert.doesNotMatch(result.stdout, /Buy milk/);
+  });
+
+  test('list --priority high shows only high-priority todos', () => {
+    runCli(['add', 'Buy milk', '--priority', 'high']);
+    runCli(['add', 'Walk the dog']);
+    const result = runCli(['list', '--priority', 'high']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Buy milk/);
+    assert.doesNotMatch(result.stdout, /Walk the dog/);
+  });
+
+  test('list combines --pending and --priority', () => {
+    runCli(['add', 'Urgent task', '--priority', 'high']);
+    runCli(['add', 'Done urgent', '--priority', 'high']);
+    runCli(['done', '2']);
+    runCli(['add', 'Low task', '--priority', 'low']);
+    const result = runCli(['list', '--pending', '--priority', 'high']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Urgent task/);
+    assert.doesNotMatch(result.stdout, /Done urgent/);
+    assert.doesNotMatch(result.stdout, /Low task/);
   });
 });
