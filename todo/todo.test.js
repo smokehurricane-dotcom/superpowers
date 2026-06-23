@@ -859,4 +859,68 @@ describe('CLI due date handling', { concurrency: false }, () => {
   });
 });
 
+describe('CLI config handling', () => {
+  const CONFIG_PATH = path.join(__dirname, '.todoconfig.json');
+
+  afterEach(() => {
+    try { fs.rmSync(CONFIG_PATH, { force: true }); } catch (_) {}
+    try { fs.rmSync(path.join(__dirname, 'todos-testproj.json'), { force: true }); } catch (_) {}
+  });
+
+  test('respects defaultProject in .todoconfig.json', () => {
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify({ defaultProject: 'testproj' }), 'utf8');
+
+    const addResult = runCli(['add', 'Buy milk']);
+    assert.equal(addResult.status, 0);
+
+    const projectStorePath = path.join(__dirname, 'todos-testproj.json');
+    assert.ok(fs.existsSync(projectStorePath), 'Should write to todos-testproj.json');
+    
+    const content = JSON.parse(fs.readFileSync(projectStorePath, 'utf8'));
+    assert.equal(content[0].text, 'Buy milk');
+  });
+});
+
+describe('CLI project handling', () => {
+  const WORK_STORE = path.join(__dirname, 'todos-work.json');
+  const PERS_STORE = path.join(__dirname, 'todos-personal.json');
+
+  afterEach(() => {
+    try { fs.rmSync(WORK_STORE, { force: true }); } catch (_) {}
+    try { fs.rmSync(PERS_STORE, { force: true }); } catch (_) {}
+  });
+
+  test('isolates different projects via --project', () => {
+    const addWork = runCli(['add', 'Buy computer', '--project', 'work']);
+    assert.equal(addWork.status, 0);
+
+    const addPers = runCli(['add', 'Buy groceries', '--project', 'personal']);
+    assert.equal(addPers.status, 0);
+
+    const listWork = runCli(['list', '--project', 'work']);
+    assert.equal(listWork.status, 0);
+    assert.match(listWork.stdout, /Buy computer/);
+    assert.doesNotMatch(listWork.stdout, /Buy groceries/);
+
+    const listPers = runCli(['list', '--project', 'personal']);
+    assert.equal(listPers.status, 0);
+    assert.match(listPers.stdout, /Buy groceries/);
+    assert.doesNotMatch(listPers.stdout, /Buy computer/);
+  });
+
+  test('combines --project with priority and due date', () => {
+    const result = runCli(['add', 'Urgent task', '--priority', 'high', '--due', '2026-06-30', '--project', 'work']);
+    assert.equal(result.status, 0);
+
+    const listResult = runCli(['list', '--project', 'work']);
+    assert.match(listResult.stdout, /high.*Urgent task.*due: 2026-06-30/);
+  });
+
+  test('rejects missing project name value', () => {
+    const result = runCli(['add', 'Task', '--project']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Missing project name/);
+  });
+});
+
 });

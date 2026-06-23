@@ -35,7 +35,34 @@ function validatePriority(priority) {
 
 function getStorePath(storePath) {
   if (!storePath || storePath === DEFAULT_STORE) {
-    return process.env.TODO_STORE || DEFAULT_STORE;
+    let project = 'default';
+    if (process.env.TODO_PROJECT) {
+      project = process.env.TODO_PROJECT;
+    } else {
+      try {
+        const configPath = path.join(__dirname, '.todoconfig.json');
+        if (fs.existsSync(configPath)) {
+          const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+          if (config && config.defaultProject) {
+            project = config.defaultProject;
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (process.env.TODO_STORE) {
+      if (project === 'default') {
+        return process.env.TODO_STORE;
+      }
+      const ext = path.extname(process.env.TODO_STORE);
+      const base = process.env.TODO_STORE.slice(0, -ext.length);
+      return `${base}-${project}${ext}`;
+    }
+
+    if (project === 'default') {
+      return DEFAULT_STORE;
+    }
+    return path.join(__dirname, `todos-${project}.json`);
   }
   return storePath;
 }
@@ -169,7 +196,18 @@ function editTodo(id, text, storePath = DEFAULT_STORE) {
 }
 
 if (require.main === module) {
-  const [,, command, ...args] = process.argv;
+  let cliArgs = process.argv.slice(2);
+  const projectIdx = cliArgs.indexOf('--project');
+  if (projectIdx !== -1) {
+    if (projectIdx + 1 >= cliArgs.length) {
+      process.stderr.write('Error: Missing project name after --project.\n');
+      process.exit(1);
+    }
+    process.env.TODO_PROJECT = cliArgs[projectIdx + 1];
+    cliArgs.splice(projectIdx, 2);
+  }
+  const command = cliArgs[0];
+  const args = cliArgs.slice(1);
   switch (command) {
     case 'add': {
       let priority = 'normal';
