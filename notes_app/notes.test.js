@@ -118,3 +118,64 @@ describe('CLI add command', { concurrency: false }, () => {
   });
 });
 
+describe('CLI read/delete commands', { concurrency: false }, () => {
+  beforeEach(() => {
+    currentNotesDir = fs.mkdtempSync(path.join(os.tmpdir(), 'notes-test-'));
+    process.env.NOTES_DIR = currentNotesDir;
+  });
+
+  afterEach(() => {
+    try { fs.rmSync(currentNotesDir, { recursive: true, force: true }); } catch (_) {}
+    delete process.env.NOTES_DIR;
+  });
+
+  test('list shows all notes ordered by ID', () => {
+    runCli(['add', 'Alpha Note', 'Short body']);
+    runCli(['add', 'Beta Note', 'A somewhat longer body text that will be snippeted.']);
+
+    const result = runCli(['list']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /\[1\] Alpha Note \(Created: \d{4}-\d{2}-\d{2}\) - Short body/);
+    assert.match(result.stdout, /\[2\] Beta Note \(Created: \d{4}-\d{2}-\d{2}\) - A somewhat longer body text that will be sni\.\.\./);
+  });
+
+  test('list handles empty directory gracefully', () => {
+    const result = runCli(['list']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /No notes found\./);
+  });
+
+  test('show prints note title, metadata, and full body content', () => {
+    runCli(['add', 'Hello', 'First line.\nSecond line.']);
+    
+    const result = runCli(['show', '1']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Title: Hello/);
+    assert.match(result.stdout, /Created: \d{4}-\d{2}-\d{2}/);
+    assert.match(result.stdout, /First line\.\nSecond line\./);
+  });
+
+  test('show on non-existent note returns error and exits 1', () => {
+    const result = runCli(['show', '99']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Error: Note #99 not found\./);
+  });
+
+  test('delete removes note file from directory', () => {
+    runCli(['add', 'Deleteme', 'Content']);
+    const expectedFile = path.join(currentNotesDir, '1-deleteme.md');
+    assert.ok(fs.existsSync(expectedFile));
+
+    const result = runCli(['delete', '1']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Deleted note #1: "Deleteme"/);
+    assert.ok(!fs.existsSync(expectedFile), 'File should be removed');
+  });
+
+  test('delete on non-existent note returns error and exits 1', () => {
+    const result = runCli(['delete', '99']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Error: Note #99 not found\./);
+  });
+});
+

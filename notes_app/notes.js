@@ -138,20 +138,124 @@ function createNote(title, content) {
   return { id, filepath, title };
 }
 
+function findNoteFile(id) {
+  const dir = getNotesDir();
+  if (!fs.existsSync(dir)) return null;
+  const files = fs.readdirSync(dir);
+  const pattern = new RegExp(`^${id}-.*\\.md$`);
+  const filename = files.find(f => pattern.test(f));
+  return filename ? path.join(dir, filename) : null;
+}
+
+function listNotes() {
+  const dir = getNotesDir();
+  if (!fs.existsSync(dir)) {
+    console.log('No notes found.');
+    return;
+  }
+  const files = fs.readdirSync(dir);
+  const noteFiles = files.filter(f => /^\d+-.*\.md$/.test(f));
+  if (noteFiles.length === 0) {
+    console.log('No notes found.');
+    return;
+  }
+
+  // Parse notes and map them with ID
+  const notes = noteFiles.map(file => {
+    const id = parseInt(file.split('-')[0], 10);
+    const raw = fs.readFileSync(path.join(dir, file), 'utf8');
+    const parsed = parseNote(raw);
+    return { id, metadata: parsed.metadata, body: parsed.body };
+  });
+
+  // Sort by ID ascending
+  notes.sort((a, b) => a.id - b.id);
+
+  for (const note of notes) {
+    const title = note.metadata.title || 'Untitled';
+    const created = note.metadata.created || 'Unknown';
+    let snippet = note.body.replace(/\n/g, ' ');
+    if (snippet.length > 40) {
+      snippet = snippet.slice(0, 40) + '...';
+    }
+    console.log(`[${note.id}] ${title} (Created: ${created}) - ${snippet}`);
+  }
+}
+
+function showNote(id) {
+  const filepath = findNoteFile(id);
+  if (!filepath) {
+    process.stderr.write(`Error: Note #${id} not found.\n`);
+    return false;
+  }
+  const raw = fs.readFileSync(filepath, 'utf8');
+  const parsed = parseNote(raw);
+  console.log(`Title: ${parsed.metadata.title || 'Untitled'}`);
+  console.log(`Created: ${parsed.metadata.created || 'Unknown'}`);
+  console.log('-------------------------');
+  console.log(parsed.body);
+  return true;
+}
+
+function deleteNote(id) {
+  const filepath = findNoteFile(id);
+  if (!filepath) {
+    process.stderr.write(`Error: Note #${id} not found.\n`);
+    return false;
+  }
+  const raw = fs.readFileSync(filepath, 'utf8');
+  const parsed = parseNote(raw);
+  const title = parsed.metadata.title || 'Untitled';
+
+  fs.unlinkSync(filepath);
+  console.log(`Deleted note #${id}: "${title}"`);
+  return true;
+}
+
 // CLI Routing
 if (require.main === module) {
   const cliArgs = process.argv.slice(2);
   const command = cliArgs[0];
   const args = cliArgs.slice(1);
 
-  if (command === 'add') {
-    if (args.length < 2) {
-      process.stderr.write('Usage: node notes.js add "<title>" "<content>"\n');
-      process.exit(1);
+  switch (command) {
+    case 'add': {
+      if (args.length < 2) {
+        process.stderr.write('Usage: node notes.js add "<title>" "<content>"\n');
+        process.exit(1);
+      }
+      const note = createNote(args[0], args[1]);
+      if (!note) process.exit(1);
+      break;
     }
-    const note = createNote(args[0], args[1]);
-    if (!note) process.exit(1);
+    case 'list': {
+      listNotes();
+      break;
+    }
+    case 'show': {
+      const id = Number(args[0]);
+      if (args[0] === undefined || args[0].trim() === '' || !Number.isInteger(id)) {
+        process.stderr.write('Usage: node notes.js show <id>\n');
+        process.exit(1);
+      }
+      const ok = showNote(id);
+      if (!ok) process.exit(1);
+      break;
+    }
+    case 'delete': {
+      const id = Number(args[0]);
+      if (args[0] === undefined || args[0].trim() === '' || !Number.isInteger(id)) {
+        process.stderr.write('Usage: node notes.js delete <id>\n');
+        process.exit(1);
+      }
+      const ok = deleteNote(id);
+      if (!ok) process.exit(1);
+      break;
+    }
+    default:
+      process.stderr.write(`Unknown command: ${command}\nUsage: node notes.js add|list|show|delete\n`);
+      process.exit(1);
   }
 }
 
-module.exports = { parseNote, serializeNote, slugify, getNotesDir, getNextId, createNote };
+module.exports = { parseNote, serializeNote, slugify, getNotesDir, getNextId, createNote, findNoteFile, listNotes, showNote, deleteNote };
