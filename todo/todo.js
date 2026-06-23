@@ -7,6 +7,24 @@ const DEFAULT_STORE = path.join(__dirname, 'todos.json');
 
 const VALID_PRIORITIES = ['high', 'normal', 'low'];
 
+function parseDueDate(dateString) {
+  if (typeof dateString !== 'string') return null;
+  const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() + 1 !== month ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+  return date;
+}
+
 function validatePriority(priority) {
   if (!VALID_PRIORITIES.includes(priority)) {
     process.stderr.write(`Error: Invalid priority "${priority}". Valid priorities are: ${VALID_PRIORITIES.join(', ')}.\n`);
@@ -38,7 +56,7 @@ function writeStore(storePath, todos) {
   fs.writeFileSync(storePath, JSON.stringify(todos, null, 2), 'utf8');
 }
 
-function createTodo(text, priority = 'normal', storePath = DEFAULT_STORE) {
+function createTodo(text, priority = 'normal', storePath = DEFAULT_STORE, due = undefined) {
   if (!text || text.trim() === '') {
     process.stderr.write('Error: Todo text cannot be empty.\n');
     return null;
@@ -49,6 +67,9 @@ function createTodo(text, priority = 'normal', storePath = DEFAULT_STORE) {
   const todos = readStore(storePath);
   const id = todos.reduce((max, t) => Math.max(max, t.id), 0) + 1;
   const todo = { id, text, done: false, priority };
+  if (due !== undefined) {
+    todo.due = due;
+  }
   todos.push(todo);
   writeStore(storePath, todos);
   console.log(`Added #${id}: ${text} [${priority}]`);
@@ -72,7 +93,24 @@ function list(options = {}, storePath = DEFAULT_STORE) {
     todos = todos.filter(t => !t.done);
   }
   if (options.priority) {
-    todos = todos.filter(t => t.priority === options.priority);
+    todos = todos.filter(t => (t.priority || 'normal') === options.priority);
+  }
+  if (options.overdue === true) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    todos = todos.filter(t => {
+      if (!t.due) return false;
+      const due = new Date(t.due + 'T00:00:00Z');
+      return due < today;
+    });
+  }
+  if (options.sort === 'due') {
+    todos = todos.slice().sort((a, b) => {
+      if (!a.due && !b.due) return 0;
+      if (!a.due) return 1;
+      if (!b.due) return -1;
+      return new Date(a.due + 'T00:00:00Z') - new Date(b.due + 'T00:00:00Z');
+    });
   }
   if (todos.length === 0) {
     console.log('No todos yet.');
@@ -80,7 +118,8 @@ function list(options = {}, storePath = DEFAULT_STORE) {
     for (const todo of todos) {
       const status = todo.done ? 'x' : ' ';
       const priority = todo.priority || 'normal';
-      console.log(`[${todo.id}] [${status}] [${priority}] ${todo.text}`);
+      const dueSuffix = todo.due ? ` (due: ${todo.due})` : '';
+      console.log(`[${todo.id}] [${status}] [${priority}] ${todo.text}${dueSuffix}`);
     }
   }
   return todos;
@@ -125,21 +164,34 @@ if (require.main === module) {
   switch (command) {
     case 'add': {
       let priority = 'normal';
+      let due = undefined;
       const textArgs = [];
       for (let i = 0; i < args.length; i++) {
         if (args[i] === '--priority') {
           if (i + 1 >= args.length) {
-            process.stderr.write('Usage: node todo.js add "text" [--priority high|normal|low]\n');
+            process.stderr.write('Usage: node todo.js add "text" [--priority high|normal|low] [--due YYYY-MM-DD]\n');
             process.exit(1);
           }
           priority = args[i + 1];
+          i++;
+        } else if (args[i] === '--due') {
+          if (i + 1 >= args.length) {
+            process.stderr.write('Usage: node todo.js add "text" [--priority high|normal|low] [--due YYYY-MM-DD]\n');
+            process.exit(1);
+          }
+          const parsed = parseDueDate(args[i + 1]);
+          if (!parsed) {
+            process.stderr.write(`Error: Invalid date "${args[i + 1]}". Use YYYY-MM-DD.\n`);
+            process.exit(1);
+          }
+          due = args[i + 1];
           i++;
         } else {
           textArgs.push(args[i]);
         }
       }
       const text = textArgs.join(' ');
-      const todo = createTodo(text, priority);
+      const todo = createTodo(text, priority, DEFAULT_STORE, due);
       if (!todo) process.exit(1);
       break;
     }
@@ -152,13 +204,22 @@ if (require.main === module) {
           options.pending = true;
         } else if (args[i] === '--priority') {
           if (i + 1 >= args.length) {
-            process.stderr.write('Usage: node todo.js list [--done|--pending] [--priority high|normal|low]\n');
+            process.stderr.write('Usage: node todo.js list [--done|--pending] [--priority high|normal|low] [--sort due] [--overdue]\n');
             process.exit(1);
           }
           options.priority = args[i + 1];
           i++;
+        } else if (args[i] === '--sort') {
+          if (i + 1 >= args.length) {
+            process.stderr.write('Usage: node todo.js list [--done|--pending] [--priority high|normal|low] [--sort due] [--overdue]\n');
+            process.exit(1);
+          }
+          options.sort = args[i + 1];
+          i++;
+        } else if (args[i] === '--overdue') {
+          options.overdue = true;
         } else {
-          process.stderr.write(`Unknown list option: ${args[i]}\nUsage: node todo.js list [--done|--pending] [--priority high|normal|low]\n`);
+          process.stderr.write(`Unknown list option: ${args[i]}\nUsage: node todo.js list [--done|--pending] [--priority high|normal|low] [--sort due] [--overdue]\n`);
           process.exit(1);
         }
       }

@@ -348,6 +348,18 @@ describe('list filters', () => {
       cleanup(storePath);
     }
   });
+
+  test('treats legacy todos without priority as normal when filtering', () => {
+    const storePath = makeTempPath();
+    try {
+      fs.writeFileSync(storePath, JSON.stringify([{ id: 1, text: 'Legacy task', done: false }]), 'utf8');
+      const todos = list({ priority: 'normal' }, storePath);
+      assert.equal(todos.length, 1);
+      assert.equal(todos[0].text, 'Legacy task');
+    } finally {
+      cleanup(storePath);
+    }
+  });
 });
 
 describe('markDone', () => {
@@ -653,5 +665,22 @@ describe('CLI happy path', () => {
     assert.match(result.stdout, /Urgent task/);
     assert.doesNotMatch(result.stdout, /Done urgent/);
     assert.doesNotMatch(result.stdout, /Low task/);
+  });
+});
+
+
+describe('parseDueDate (via CLI)', () => {
+  test('rejects impossible date via CLI', () => {
+    const result = runCli(['add', 'Buy milk', '--due', '2026-02-31']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid date/);
+    const todos = list(DEFAULT_STORE);
+    assert.equal(todos.length, 0);
+  });
+
+  test('rejects non-date string via CLI', () => {
+    const result = runCli(['add', 'Buy milk', '--due', 'not-a-date']);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid date/);
   });
 });
