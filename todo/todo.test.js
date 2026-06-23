@@ -859,7 +859,7 @@ describe('CLI due date handling', { concurrency: false }, () => {
   });
 });
 
-describe('CLI config handling', () => {
+describe('CLI config handling', { concurrency: false }, () => {
   const CONFIG_PATH = path.join(__dirname, '.todoconfig.json');
 
   afterEach(() => {
@@ -887,7 +887,7 @@ describe('CLI config handling', () => {
   });
 });
 
-describe('CLI project handling', () => {
+describe('CLI project handling', { concurrency: false }, () => {
   afterEach(() => {
     if (currentStorePath) {
       const ext = path.extname(currentStorePath);
