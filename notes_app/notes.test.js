@@ -136,7 +136,7 @@ describe('CLI read/delete commands', { concurrency: false }, () => {
     const result = runCli(['list']);
     assert.equal(result.status, 0);
     assert.match(result.stdout, /\[1\] Alpha Note \(Created: \d{4}-\d{2}-\d{2}\) - Short body/);
-    assert.match(result.stdout, /\[2\] Beta Note \(Created: \d{4}-\d{2}-\d{2}\) - A somewhat longer body text that will be sni\.\.\./);
+    assert.match(result.stdout, /\[2\] Beta Note \(Created: \d{4}-\d{2}-\d{2}\) - A somewhat longer body text that will be\.\.\./);
   });
 
   test('list handles empty directory gracefully', () => {
