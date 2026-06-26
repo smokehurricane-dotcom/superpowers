@@ -62,7 +62,8 @@ if (cmdString.startsWith('status')) {
     version: "1.2.0-mock",
     wallets: {
       solana: state.wallets.solana.address,
-      hyperliquid: state.wallets.hyperliquid.address
+      hyperliquid: state.wallets.hyperliquid.address,
+      polymarket: state.wallets.polymarket ? state.wallets.polymarket.address : "0xPolymarketMockAddress777"
     },
     network: "mainnet-beta"
   });
@@ -71,6 +72,7 @@ if (cmdString.startsWith('status')) {
 
 if (cmdString.startsWith('portfolio balances')) {
   const state = readState();
+  const polymarketWallet = state.wallets.polymarket || { pusd: 5000 };
   printResult({
     solana: {
       USDC: state.wallets.solana.usdc,
@@ -81,7 +83,122 @@ if (cmdString.startsWith('portfolio balances')) {
       USDC: state.wallets.hyperliquid.usdc,
       SPCX: state.wallets.hyperliquid.spcx
     },
-    aggregated_balance_usd: state.wallets.solana.usdc + state.wallets.hyperliquid.usdc + (state.wallets.solana.sol * state.prices.SOL) + (state.wallets.hyperliquid.spcx * state.prices.SPCX) + ((state.wallets.solana.chz || 0.0) * (state.prices.CHZ || 0.12))
+    polymarket: {
+      pUSD: polymarketWallet.pusd
+    },
+    aggregated_balance_usd: state.wallets.solana.usdc + state.wallets.hyperliquid.usdc + (state.wallets.solana.sol * state.prices.SOL) + (state.wallets.hyperliquid.spcx * state.prices.SPCX) + ((state.wallets.solana.chz || 0.0) * (state.prices.CHZ || 0.12)) + (polymarketWallet.pusd)
+  });
+  process.exit(0);
+}
+
+// Polymarket Prediction Trades
+if (cmdString.startsWith('polymarket buy')) {
+  verifyNotReadOnly();
+  const state = readState();
+  if (!state.wallets.polymarket) {
+    state.wallets.polymarket = { address: "0xPolymarketMockAddress777", pusd: 5000 };
+  }
+
+  let market = "";
+  let outcome = "";
+  let amount = 0;
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--market') market = args[i+1];
+    if (args[i] === '--outcome') outcome = args[i+1];
+    if (args[i] === '--amount') amount = parseFloat(args[i+1]);
+  }
+
+  if (!market || !outcome || isNaN(amount)) {
+    console.error(JSON.stringify({ error: "Missing parameters: --market, --outcome, or --amount." }));
+    process.exit(1);
+  }
+
+  if (state.wallets.polymarket.pusd < amount) {
+    console.error(JSON.stringify({ error: `Insufficient pUSD balance. Required: ${amount} pUSD, Available: ${state.wallets.polymarket.pusd} pUSD` }));
+    process.exit(1);
+  }
+
+  if (hasPreview) {
+    printResult({
+      preview: true,
+      market,
+      outcome,
+      amount_pusd: amount,
+      estimated_shares: amount / 0.50,
+      fee_pusd: 0.0
+    });
+    process.exit(0);
+  }
+
+  if (hasYes) {
+    state.wallets.polymarket.pusd -= amount;
+    const posId = "poly_" + Math.random().toString(36).substr(2, 9);
+    const shares = amount / 0.50; // simple mock execution price
+    const newPosition = {
+      id: posId,
+      type: "prediction",
+      market,
+      outcome,
+      sizeUsd: amount,
+      shares,
+      entryPrice: 0.50,
+      currentPrice: 0.52,
+      timestamp: new Date().toISOString()
+    };
+    state.positions.push(newPosition);
+    state.history.push({
+      action: "polymarket_buy",
+      details: newPosition,
+      timestamp: new Date().toISOString()
+    });
+    writeState(state);
+
+    printResult({
+      success: true,
+      position_id: posId,
+      msg: `Successfully bought ${shares} shares of ${outcome.toUpperCase()} on ${market} with pUSD.`,
+      execution: newPosition
+    });
+  } else {
+    console.error("Execution blocked. Use --yes or --preview.");
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
+if (cmdString.startsWith('polymarket sell')) {
+  verifyNotReadOnly();
+  const state = readState();
+  const posId = args[args.indexOf('sell') + 1];
+
+  const posIndex = state.positions.findIndex(p => p.id === posId);
+  if (posIndex === -1) {
+    console.error(JSON.stringify({ error: `Prediction position ${posId} not found.` }));
+    process.exit(1);
+  }
+
+  const pos = state.positions[posIndex];
+  const payout = pos.shares * pos.currentPrice;
+
+  if (!state.wallets.polymarket) {
+    state.wallets.polymarket = { address: "0xPolymarketMockAddress777", pusd: 5000 };
+  }
+  state.wallets.polymarket.pusd += payout;
+  state.positions.splice(posIndex, 1);
+  state.history.push({
+    action: "polymarket_sell",
+    position_id: posId,
+    payout,
+    timestamp: new Date().toISOString()
+  });
+  writeState(state);
+
+  printResult({
+    success: true,
+    position_id: posId,
+    payout_pusd: payout,
+    msg: `Successfully sold shares of ${pos.market} for ${payout} pUSD.`
   });
   process.exit(0);
 }
@@ -433,7 +550,6 @@ if (cmdString.startsWith('hl cancel') && !cmdString.includes('cancel-all')) {
   const order = state.orders[orderIndex];
   state.orders.splice(orderIndex, 1);
   
-  // Refund cost if Solana limit buy
   if (order.market.startsWith('solana:')) {
     state.wallets.solana.usdc += order.size * order.price;
   }
@@ -522,6 +638,21 @@ if (cmdString.startsWith('solana swap')) {
     }
     state.wallets.solana.sol -= amount;
     state.wallets.solana.usdc += (amount * state.prices.SOL) * 0.998;
+  } else if (tokenA.toUpperCase() === 'USDC' && tokenB.toUpperCase() === 'CHZ') {
+    if (state.wallets.solana.usdc < amount) {
+      console.error(JSON.stringify({ error: "Insufficient USDC on Solana." }));
+      process.exit(1);
+    }
+    state.wallets.solana.usdc -= amount;
+    state.wallets.solana.chz = (state.wallets.solana.chz || 0) + (amount / state.prices.CHZ) * 0.998;
+  } else if (tokenA.toUpperCase() === 'CHZ' && tokenB.toUpperCase() === 'USDC') {
+    const chzBal = state.wallets.solana.chz || 0;
+    if (chzBal < amount) {
+      console.error(JSON.stringify({ error: "Insufficient CHZ on Solana." }));
+      process.exit(1);
+    }
+    state.wallets.solana.chz -= amount;
+    state.wallets.solana.usdc += (amount * state.prices.CHZ) * 0.998;
   } else {
     console.error(JSON.stringify({ error: `Unsupported swap token pair: ${tokenA}/${tokenB}` }));
     process.exit(1);
@@ -632,6 +763,8 @@ if (cmdString.startsWith('hl cancel-all')) {
       returnedCollateral += p.size / p.leverage;
     } else if (p.type === 'pair') {
       returnedCollateral += p.sizeUsd;
+    } else if (p.type === 'prediction') {
+      returnedCollateral += p.sizeUsd;
     }
   });
   state.orders.forEach(o => {
@@ -640,7 +773,18 @@ if (cmdString.startsWith('hl cancel-all')) {
     }
   });
 
-  state.wallets.hyperliquid.usdc += returnedCollateral;
+  if (!state.wallets.polymarket) {
+    state.wallets.polymarket = { address: "0xPolymarketMockAddress777", pusd: 5000 };
+  }
+  
+  // Refund polymarket positions to pUSD wallet
+  state.positions.forEach(p => {
+    if (p.type === 'prediction') {
+      state.wallets.polymarket.pusd += p.sizeUsd;
+    }
+  });
+
+  state.wallets.hyperliquid.usdc += returnedCollateral - state.positions.filter(p => p.type === 'prediction').reduce((acc, curr) => acc + curr.sizeUsd, 0);
   state.positions = [];
   state.orders = [];
   state.history.push({

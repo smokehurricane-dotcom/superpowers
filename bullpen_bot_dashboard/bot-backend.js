@@ -27,8 +27,9 @@ let botConfig = {
     momentum: { enabled: false, targetMarket: "xyz:SPCX", notional: 20, leverage: 2, tpPct: 15, slPct: 10 },
     smartMoney: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 2 },
     binaryMomentum: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 5, durationMinutes: 5 },
-    weatherHedging: { enabled: false, targetAsset: "BTC", sizeUsd: 100, probabilityThreshold: 0.70 }, // New Weather Strategy
-    sportsFanToken: { enabled: false, targetToken: "CHZ", sizeUsd: 150, probabilityShiftThreshold: 0.10 } // New Sports Strategy
+    weatherHedging: { enabled: false, targetAsset: "BTC", sizeUsd: 100, probabilityThreshold: 0.70 },
+    sportsFanToken: { enabled: false, targetToken: "CHZ", sizeUsd: 150, probabilityShiftThreshold: 0.10 },
+    polymarketPredictions: { enabled: false, targetMarket: "will-btc-reach-100k-in-2026", outcome: "yes", sizeUsd: 100 } // Direct pUSD strategy
   },
   risk: {
     maxMarginUsage: 5000,
@@ -59,7 +60,7 @@ function runCLI(argsStr) {
     const isReadOnly = botConfig.readOnly || process.env.BULLPEN_READ_ONLY === '1';
     let cmd = `node "${MOCK_CLI_PATH}" ${argsStr}`;
     
-    if (isReadOnly && !argsStr.includes('--read-only') && (argsStr.includes('open') || argsStr.includes('setup') || argsStr.includes('close') || argsStr.includes('long') || argsStr.includes('short') || argsStr.includes('swap') || argsStr.includes('limit-buy') || argsStr.includes('cancel') || argsStr.includes('twap'))) {
+    if (isReadOnly && !argsStr.includes('--read-only') && (argsStr.includes('open') || argsStr.includes('setup') || argsStr.includes('close') || argsStr.includes('long') || argsStr.includes('short') || argsStr.includes('swap') || argsStr.includes('limit-buy') || argsStr.includes('cancel') || argsStr.includes('twap') || argsStr.includes('polymarket buy') || argsStr.includes('polymarket sell'))) {
       cmd += ' --read-only';
     }
 
@@ -119,11 +120,13 @@ setInterval(() => {
     state.prices.SPCX += (Math.random() - 0.495) * 0.01;
     state.prices.SOL += (Math.random() - 0.5) * 0.5;
     
-    // Inject and drift CHZ
     if (!state.prices.CHZ) state.prices.CHZ = 0.12;
     state.prices.CHZ += (Math.random() - 0.5) * 0.002;
     
     if (!state.wallets.solana.chz) state.wallets.solana.chz = 1000.0;
+    if (!state.wallets.polymarket) {
+      state.wallets.polymarket = { address: "0xPolymarketMockAddress777", pusd: 5000.0 };
+    }
 
     state.positions = state.positions.map(p => {
       if (p.type === 'pair') {
@@ -131,6 +134,14 @@ setInterval(() => {
           ...p,
           currentPriceLong: state.prices[p.longAsset],
           currentPriceShort: state.prices[p.shortAsset]
+        };
+      } else if (p.type === 'prediction') {
+        // Drift YES token price
+        const drift = (Math.random() - 0.49) * 0.01;
+        const newPrice = Math.max(0.05, Math.min(0.95, p.currentPrice + drift));
+        return {
+          ...p,
+          currentPrice: newPrice
         };
       }
       return p;
@@ -185,6 +196,7 @@ async function triggerCircuitBreaker(reason) {
   botConfig.strategies.binaryMomentum.enabled = false;
   botConfig.strategies.weatherHedging.enabled = false;
   botConfig.strategies.sportsFanToken.enabled = false;
+  botConfig.strategies.polymarketPredictions.enabled = false;
   broadcast({ type: 'BOT_CONFIG', data: botConfig });
 
   try {
@@ -323,11 +335,9 @@ async function runWeatherHedgingStrategy() {
     const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
     const activePositions = state.positions.filter(p => p.type === 'perp' && p.market === wConfig.targetAsset && p.direction === 'short');
 
-    // Simulate weather forecast drift on Polymarket (e.g. record heat wave probabilities)
     weatherProbability += (Math.random() - 0.5) * 0.08;
     weatherProbability = Math.max(0.10, Math.min(0.95, weatherProbability));
     
-    // Broadcast weather updates
     broadcast({ type: 'WEATHER_FORECAST', data: { probability: weatherProbability } });
 
     if (weatherProbability >= wConfig.probabilityThreshold) {
@@ -342,7 +352,6 @@ async function runWeatherHedgingStrategy() {
         addSignal("WEATHER HEDGER", `BTC Weather short hedge opened. ID: ${res.position_id}`, "success");
       }
     } else {
-      // Weather cooled down, exit shorts
       if (activePositions.length > 0) {
         addSignal("WEATHER HEDGER", `Weather risk normalized (${(weatherProbability*100).toFixed(0)}%). Closing short hedges...`, "info");
         await runCLI("hl cancel-all");
@@ -362,7 +371,6 @@ async function runSportsFanTokenStrategy() {
     const sConfig = botConfig.strategies.sportsFanToken;
     const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
 
-    // Simulate semi-final game drift on Polymarket
     const oldProb = sportsProbability;
     sportsProbability += (Math.random() - 0.5) * 0.15;
     sportsProbability = Math.max(0.05, Math.min(0.95, sportsProbability));
@@ -372,13 +380,11 @@ async function runSportsFanTokenStrategy() {
     const shift = sportsProbability - oldProb;
 
     if (shift >= sConfig.probabilityShiftThreshold) {
-      // Rapid shift up: buy fan token
       addSignal("SPORTS FAN BOT", `Team probability shifted up by ${(shift*100).toFixed(0)}% (Now ${(sportsProbability*100).toFixed(0)}%). Buying ${sConfig.targetToken} fan token...`, "info");
       
       const res = await runCLI(`solana swap USDC ${sConfig.targetToken} ${sConfig.sizeUsd} --yes --output json`);
       addSignal("SPORTS FAN BOT", `Swapped USDC for ${sConfig.sizeUsd} ${sConfig.targetToken} fan tokens.`, "success");
     } else if (shift <= -sConfig.probabilityShiftThreshold) {
-      // Rapid shift down: exit to USDC
       const currentTokenBal = state.wallets.solana.chz || 0;
       if (currentTokenBal > 0) {
         addSignal("SPORTS FAN BOT", `Team probability dropped by ${(-shift*100).toFixed(0)}%. Selling ${sConfig.targetToken} back to USDC...`, "warning");
@@ -391,6 +397,42 @@ async function runSportsFanTokenStrategy() {
   }
 }
 
+// 8. Direct Polymarket pUSD Prediction Trading Loop
+async function runPolymarketPredictionStrategy() {
+  if (!botConfig.strategies.polymarketPredictions.enabled) return;
+
+  try {
+    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const pmConfig = botConfig.strategies.polymarketPredictions;
+    
+    // Check active prediction positions
+    const activePredictions = state.positions.filter(p => p.type === 'prediction' && p.market === pmConfig.targetMarket);
+
+    if (activePredictions.length === 0) {
+      // Simulate copy signal: if news alerts trigger smart-money yes buy
+      addSignal("POLY DIRECT", `Smart money signal detected for ${pmConfig.targetMarket}. Executing direct pUSD buy on YES token...`, "info");
+
+      if (botConfig.risk.previewFirst) {
+        await runCLI(`polymarket buy --market ${pmConfig.targetMarket} --outcome ${pmConfig.outcome} --amount ${pmConfig.sizeUsd} --preview --output json`);
+      }
+
+      const res = await runCLI(`polymarket buy --market ${pmConfig.targetMarket} --outcome ${pmConfig.outcome} --amount ${pmConfig.sizeUsd} --yes --output json`);
+      addSignal("POLY DIRECT", `Direct YES prediction bought successfully. Shares: ${res.execution.shares.toFixed(1)} | ID: ${res.position_id}`, "success");
+    } else {
+      // Monitor exits: if position value increases by 10% (price > 0.55), take profits
+      for (const pos of activePredictions) {
+        if (pos.currentPrice >= 0.55) {
+          addSignal("POLY DIRECT", `Target profit reached on prediction shares (current YES price: $${pos.currentPrice.toFixed(2)}). Selling shares...`, "info");
+          await runCLI(`polymarket sell ${pos.id} --yes --output json`);
+          addSignal("POLY DIRECT", `Direct YES prediction position sold. Payout completed in pUSD.`, "success");
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Polymarket Prediction Strategy error:", e);
+  }
+}
+
 // Run bot loops
 setInterval(() => {
   runPearPairStrategy();
@@ -398,6 +440,7 @@ setInterval(() => {
   runBinaryMomentumStrategy();
   runWeatherHedgingStrategy();
   runSportsFanTokenStrategy();
+  runPolymarketPredictionStrategy();
 }, 8000);
 
 // Simulated News Signal generator
@@ -517,6 +560,20 @@ app.post('/api/action', async (req, res) => {
       
       const cmd = `hl ${direction} ${asset} --notional ${notional} --leverage ${leverage}${tpSlFlags} --yes --output json`;
       const result = await runCLI(cmd);
+      syncPortfolioState();
+      return res.json({ success: true, result });
+    }
+
+    if (action === 'polymarket_buy') {
+      const { market, outcome, amount } = params;
+      const result = await runCLI(`polymarket buy --market ${market} --outcome ${outcome} --amount ${amount} --yes --output json`);
+      syncPortfolioState();
+      return res.json({ success: true, result });
+    }
+
+    if (action === 'polymarket_sell') {
+      const { posId } = params;
+      const result = await runCLI(`polymarket sell ${posId} --yes --output json`);
       syncPortfolioState();
       return res.json({ success: true, result });
     }

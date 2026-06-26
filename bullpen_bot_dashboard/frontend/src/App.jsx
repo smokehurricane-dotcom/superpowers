@@ -57,7 +57,7 @@ function App() {
   }, []);
 
   const connectWS = () => {
-    ws.current = new WebSocket('ws://localhost:3001');
+    ws.current = new WebSocket('ws://127.0.0.1:3001');
 
     ws.current.onopen = () => {
       setWsConnected(true);
@@ -110,7 +110,7 @@ function App() {
   }, []);
 
   const updateBackendConfig = (updatedStrategies = strategies, isReadOnly = readOnly) => {
-    fetch('http://localhost:3001/api/config', {
+    fetch('http://127.0.0.1:3001/api/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -152,7 +152,7 @@ function App() {
   };
 
   const triggerCircuitBreaker = () => {
-    fetch('http://localhost:3001/api/action', {
+    fetch('http://127.0.0.1:3001/api/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'circuit_breaker' })
@@ -161,7 +161,7 @@ function App() {
   };
 
   const triggerHlSetup = () => {
-    fetch('http://localhost:3001/api/action', {
+    fetch('http://127.0.0.1:3001/api/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'hl_setup' })
@@ -172,7 +172,7 @@ function App() {
   const handleSwapSubmit = (e) => {
     e.preventDefault();
     setSwapLoading(true);
-    fetch('http://localhost:3001/api/action', {
+    fetch('http://127.0.0.1:3001/api/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -198,7 +198,7 @@ function App() {
   const handleManualTrade = (e) => {
     e.preventDefault();
     setTradeLoading(true);
-    fetch('http://localhost:3001/api/action', {
+    fetch('http://127.0.0.1:3001/api/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -225,7 +225,7 @@ function App() {
   };
 
   const handleCancelOrder = (orderId) => {
-    fetch('http://localhost:3001/api/action', {
+    fetch('http://127.0.0.1:3001/api/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'cancel_order', params: { orderId } })
@@ -233,7 +233,7 @@ function App() {
   };
 
   const handleClosePosition = (posId) => {
-    fetch('http://localhost:3001/api/action', {
+    fetch('http://127.0.0.1:3001/api/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'hl_cancel_all' })

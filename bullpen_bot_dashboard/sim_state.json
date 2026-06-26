@@ -8,15 +8,151 @@
     },
     "hyperliquid": {
       "address": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-      "usdc": 15000,
+      "usdc": 14858,
       "spcx": 0,
       "maintenance_margin": 150,
       "margin_usage": 0,
       "pair_setup_done": true
+    },
+    "polymarket": {
+      "address": "0xPolymarketMockAddress777",
+      "pusd": 5000
     }
   },
-  "positions": [],
-  "orders": [],
+  "positions": [
+    {
+      "id": "pair_10wis1a7l",
+      "type": "pair",
+      "longAsset": "ETH",
+      "shortAsset": "BTC",
+      "weightLong": 0.5,
+      "weightShort": 0.5,
+      "sizeUsd": 22,
+      "entryTime": "2026-06-26T19:10:21.655Z",
+      "entryPriceLong": 3404.9111125541344,
+      "entryPriceShort": 66451.38079968438,
+      "currentPriceLong": 3415.663595671637,
+      "currentPriceShort": 66593.48058656805
+    },
+    {
+      "id": "perp_ddu6etrh7",
+      "type": "perp",
+      "market": "BTC",
+      "direction": "long",
+      "size": 500,
+      "leverage": 5,
+      "entryPrice": 66451.38079968438,
+      "tp": null,
+      "sl": null,
+      "timestamp": "2026-06-26T19:10:21.775Z"
+    },
+    {
+      "id": "perp_4pq2v1mse",
+      "type": "perp",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 20,
+      "leverage": 2,
+      "entryPrice": 1.3393554581269709,
+      "tp": 1.5,
+      "sl": 1.1,
+      "timestamp": "2026-06-26T19:10:24.010Z"
+    },
+    {
+      "id": "perp_6mqpp8bak",
+      "type": "perp",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 20,
+      "leverage": 2,
+      "entryPrice": 1.3402392955802713,
+      "tp": 1.5,
+      "sl": 1.1,
+      "timestamp": "2026-06-26T19:10:54.584Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord_ob7pecrub",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "price": 1.3427,
+      "timestamp": "2026-06-26T19:10:21.757Z"
+    },
+    {
+      "id": "ord_xw8wvca7o",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "price": 1.3454,
+      "timestamp": "2026-06-26T19:10:22.268Z"
+    },
+    {
+      "id": "ord_rv2l1t2xg",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "price": 1.3306,
+      "timestamp": "2026-06-26T19:10:45.437Z"
+    },
+    {
+      "id": "ord_0gjyq52au",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "price": 1.3333,
+      "timestamp": "2026-06-26T19:10:45.888Z"
+    },
+    {
+      "id": "ord_p5fcyvtza",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "price": 1.3373,
+      "timestamp": "2026-06-26T19:11:01.744Z"
+    },
+    {
+      "id": "ord_71yj7hxhm",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "price": 1.34,
+      "timestamp": "2026-06-26T19:11:02.289Z"
+    },
+    {
+      "id": "ord_146evg3tc",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "price": 1.3448,
+      "timestamp": "2026-06-26T19:11:18.013Z"
+    },
+    {
+      "id": "ord_j0d3lt7hg",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "price": 1.3475,
+      "timestamp": "2026-06-26T19:11:18.829Z"
+    }
+  ],
   "history": [
     {
       "action": "pair_open",
@@ -651,13 +787,546 @@
       "action": "cancel_all_circuit_breaker",
       "returned_collateral": 230,
       "timestamp": "2026-06-26T18:50:45.078Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_ii6dhw40i",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 5,
+        "entryPrice": 66222.27247330126,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T18:58:05.636Z"
+      },
+      "timestamp": "2026-06-26T18:58:05.639Z"
+    },
+    {
+      "action": "pair_open",
+      "details": {
+        "id": "pair_os1awl8o4",
+        "type": "pair",
+        "longAsset": "ETH",
+        "shortAsset": "BTC",
+        "weightLong": 0.5,
+        "weightShort": 0.5,
+        "sizeUsd": 22,
+        "entryTime": "2026-06-26T18:58:05.704Z",
+        "entryPriceLong": 3395.290234870233,
+        "entryPriceShort": 66222.27247330126,
+        "currentPriceLong": 3395.290234870233,
+        "currentPriceShort": 66222.27247330126
+      },
+      "timestamp": "2026-06-26T18:58:05.706Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_pjg6qr1ds",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 66170.67892718737,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T18:58:23.961Z"
+      },
+      "timestamp": "2026-06-26T18:58:23.962Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_f4ea6ok5q",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.3091156317222747,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T18:58:54.020Z"
+      },
+      "timestamp": "2026-06-26T18:58:54.029Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_571zszvyh",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 66184.1245772775,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T18:59:53.970Z"
+      },
+      "timestamp": "2026-06-26T18:59:53.972Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_6cfzn4bsj",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 66087.255285759,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:00:24.080Z"
+      },
+      "timestamp": "2026-06-26T19:00:24.083Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_j4o89pczi",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 65845.88149365838,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:00:53.986Z"
+      },
+      "timestamp": "2026-06-26T19:00:53.988Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_3dnz65afx",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.3273237921568268,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T19:02:24.097Z"
+      },
+      "timestamp": "2026-06-26T19:02:24.099Z"
+    },
+    {
+      "action": "cancel_all_circuit_breaker",
+      "returned_collateral": 152,
+      "timestamp": "2026-06-26T19:03:08.830Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_1763iky4c",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "short",
+        "size": 50,
+        "leverage": 5,
+        "entryPrice": 65631.34888550724,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:03:17.804Z"
+      },
+      "timestamp": "2026-06-26T19:03:17.806Z"
+    },
+    {
+      "action": "pair_open",
+      "details": {
+        "id": "pair_b2z3oen5a",
+        "type": "pair",
+        "longAsset": "ETH",
+        "shortAsset": "BTC",
+        "weightLong": 0.5,
+        "weightShort": 0.5,
+        "sizeUsd": 22,
+        "entryTime": "2026-06-26T19:03:17.841Z",
+        "entryPriceLong": 3348.84335535622,
+        "entryPriceShort": 65631.34888550724,
+        "currentPriceLong": 3348.84335535622,
+        "currentPriceShort": 65631.34888550724
+      },
+      "timestamp": "2026-06-26T19:03:17.842Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_v6aahhwiv",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.3506324533515548,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T19:03:24.143Z"
+      },
+      "timestamp": "2026-06-26T19:03:24.145Z"
+    },
+    {
+      "action": "cancel_all_circuit_breaker",
+      "returned_collateral": 42,
+      "timestamp": "2026-06-26T19:03:24.670Z"
+    },
+    {
+      "action": "pair_open",
+      "details": {
+        "id": "pair_ioc8w7z2r",
+        "type": "pair",
+        "longAsset": "ETH",
+        "shortAsset": "BTC",
+        "weightLong": 0.5,
+        "weightShort": 0.5,
+        "sizeUsd": 22,
+        "entryTime": "2026-06-26T19:03:33.483Z",
+        "entryPriceLong": 3351.05965053872,
+        "entryPriceShort": 65783.04769960651,
+        "currentPriceLong": 3351.05965053872,
+        "currentPriceShort": 65783.04769960651
+      },
+      "timestamp": "2026-06-26T19:03:33.486Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_wf2ebv7v4",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 5,
+        "entryPrice": 65783.04769960651,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:03:33.506Z"
+      },
+      "timestamp": "2026-06-26T19:03:33.508Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_jp52wouqo",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 65795.50507789369,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:03:54.056Z"
+      },
+      "timestamp": "2026-06-26T19:03:54.058Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_uw2rgxcre",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 65719.92980448957,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:04:24.233Z"
+      },
+      "timestamp": "2026-06-26T19:04:24.235Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_rpmxchkzu",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.3339601865069572,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T19:05:54.262Z"
+      },
+      "timestamp": "2026-06-26T19:05:54.264Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_d2gzosq63",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.3357505264372003,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T19:06:24.164Z"
+      },
+      "timestamp": "2026-06-26T19:06:24.166Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_q8eii1k96",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 66075.26271470041,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:07:53.941Z"
+      },
+      "timestamp": "2026-06-26T19:07:53.943Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_0v8u3oadn",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.3411497655665723,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T19:08:24.055Z"
+      },
+      "timestamp": "2026-06-26T19:08:24.056Z"
+    },
+    {
+      "action": "cancel_all_circuit_breaker",
+      "returned_collateral": 137,
+      "timestamp": "2026-06-26T19:08:36.864Z"
+    },
+    {
+      "action": "pair_open",
+      "details": {
+        "id": "pair_3sjy09xoh",
+        "type": "pair",
+        "longAsset": "ETH",
+        "shortAsset": "BTC",
+        "weightLong": 0.5,
+        "weightShort": 0.5,
+        "sizeUsd": 22,
+        "entryTime": "2026-06-26T19:08:45.436Z",
+        "entryPriceLong": 3391.8075682169615,
+        "entryPriceShort": 66154.26904171435,
+        "currentPriceLong": 3391.8075682169615,
+        "currentPriceShort": 66154.26904171435
+      },
+      "timestamp": "2026-06-26T19:08:45.437Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_1q944y6yk",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "short",
+        "size": 500,
+        "leverage": 5,
+        "entryPrice": 66154.26904171435,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:08:45.479Z"
+      },
+      "timestamp": "2026-06-26T19:08:45.481Z"
+    },
+    {
+      "action": "cancel_all_circuit_breaker",
+      "returned_collateral": 122,
+      "timestamp": "2026-06-26T19:08:52.872Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_7vtfio8bf",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "long",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.3594274484150228,
+        "tp": 1.5,
+        "sl": 1.1,
+        "timestamp": "2026-06-26T19:08:54.028Z"
+      },
+      "timestamp": "2026-06-26T19:08:54.029Z"
+    },
+    {
+      "action": "pair_open",
+      "details": {
+        "id": "pair_d46a4yfxv",
+        "type": "pair",
+        "longAsset": "ETH",
+        "shortAsset": "BTC",
+        "weightLong": 0.5,
+        "weightShort": 0.5,
+        "sizeUsd": 22,
+        "entryTime": "2026-06-26T19:09:01.215Z",
+        "entryPriceLong": 3389.248024284968,
+        "entryPriceShort": 66037.43122809193,
+        "currentPriceLong": 3389.248024284968,
+        "currentPriceShort": 66037.43122809193
+      },
+      "timestamp": "2026-06-26T19:09:01.216Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_5mzmh4qy4",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 500,
+        "leverage": 5,
+        "entryPrice": 66032.861925383,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:09:09.427Z"
+      },
+      "timestamp": "2026-06-26T19:09:09.428Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_a9vmphern",
+        "type": "perp",
+        "market": "ETH",
+        "direction": "long",
+        "size": 100,
+        "leverage": 5,
+        "entryPrice": 3395.3330551942745,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:09:35.975Z"
+      },
+      "timestamp": "2026-06-26T19:09:35.977Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_vfw1g9g0k",
+        "type": "perp",
+        "market": "SPCX",
+        "direction": "long",
+        "size": 100,
+        "leverage": 5,
+        "entryPrice": 1.357910660131462,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:09:40.699Z"
+      },
+      "timestamp": "2026-06-26T19:09:40.705Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_8nezgy4um",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 66147.48391769409,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:09:54.031Z"
+      },
+      "timestamp": "2026-06-26T19:09:54.032Z"
+    },
+    {
+      "action": "cancel_all_circuit_breaker",
+      "returned_collateral": 197,
+      "timestamp": "2026-06-26T19:10:20.221Z"
+    },
+    {
+      "action": "pair_open",
+      "details": {
+        "id": "pair_10wis1a7l",
+        "type": "pair",
+        "longAsset": "ETH",
+        "shortAsset": "BTC",
+        "weightLong": 0.5,
+        "weightShort": 0.5,
+        "sizeUsd": 22,
+        "entryTime": "2026-06-26T19:10:21.655Z",
+        "entryPriceLong": 3404.9111125541344,
+        "entryPriceShort": 66451.38079968438,
+        "currentPriceLong": 3404.9111125541344,
+        "currentPriceShort": 66451.38079968438
+      },
+      "timestamp": "2026-06-26T19:10:21.656Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_ddu6etrh7",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 500,
+        "leverage": 5,
+        "entryPrice": 66451.38079968438,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T19:10:21.775Z"
+      },
+      "timestamp": "2026-06-26T19:10:21.777Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_4pq2v1mse",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "long",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.3393554581269709,
+        "tp": 1.5,
+        "sl": 1.1,
+        "timestamp": "2026-06-26T19:10:24.010Z"
+      },
+      "timestamp": "2026-06-26T19:10:24.011Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_6mqpp8bak",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "long",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.3402392955802713,
+        "tp": 1.5,
+        "sl": 1.1,
+        "timestamp": "2026-06-26T19:10:54.584Z"
+      },
+      "timestamp": "2026-06-26T19:10:54.585Z"
     }
   ],
   "prices": {
-    "BTC": 65934.64669225452,
-    "ETH": 3416.288708095817,
-    "SPCX": 1.290978556044009,
-    "SOL": 139.29463662301865,
-    "CHZ": 0.12331503965386839
+    "BTC": 66593.48058656805,
+    "ETH": 3415.663595671637,
+    "SPCX": 1.354619511921893,
+    "SOL": 139.92752265386798,
+    "CHZ": 0.11630118098414613
   }
 }
