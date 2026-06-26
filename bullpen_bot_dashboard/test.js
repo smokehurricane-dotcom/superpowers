@@ -10,6 +10,48 @@ const __dirname = path.dirname(__filename);
 const MOCK_CLI = path.join(__dirname, 'mock-bullpen.js');
 const STATE_FILE = path.join(__dirname, 'sim_state.json');
 
+function readState() {
+  let lastError;
+  for (let i = 0; i < 5; i++) {
+    try {
+      return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    } catch (e) {
+      lastError = e;
+      const start = Date.now();
+      while (Date.now() - start < 20) {}
+    }
+  }
+  throw lastError;
+}
+
+function writeState(state) {
+  const tempPath = STATE_FILE + '.tmp';
+  try {
+    fs.writeFileSync(tempPath, JSON.stringify(state, null, 2), 'utf8');
+    fs.renameSync(tempPath, STATE_FILE);
+  } catch (e) {
+    if (e.code === 'EPERM' || e.code === 'EBUSY') {
+      let success = false;
+      for (let i = 0; i < 10; i++) {
+        try {
+          const start = Date.now();
+          while (Date.now() - start < 10) {}
+          fs.renameSync(tempPath, STATE_FILE);
+          success = true;
+          break;
+        } catch (err) {
+          if (err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
+        }
+      }
+      if (!success) {
+        fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
+      }
+    } else {
+      throw e;
+    }
+  }
+}
+
 console.log("🚀 Starting Bullpen Trading Bot Verification Tests...\n");
 
 function runCommand(args) {
@@ -88,7 +130,7 @@ async function testShortTermPredictions() {
   console.log("🧪 Test 5: Short-Term Prediction Market Settle & Roll-over");
   
   // Simulate expired time
-  const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+  const state = readState();
   if (!state.polymarket_markets) {
     state.polymarket_markets = [];
   }
@@ -117,7 +159,7 @@ async function testShortTermPredictions() {
   // Force BTC price higher to trigger win
   state.prices.BTC = 65000; 
   
-  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
+  writeState(state);
   
   // Trigger mock resolution logic or execute CLI command to buy/sell
   const res = await runCommand("polymarket markets --output json");
@@ -128,24 +170,86 @@ async function testShortTermPredictions() {
   console.log("✅ Passed Short-Term Prediction Market Verification\n");
 }
 
+async function testPolymarketTakeProfit() {
+  console.log("🧪 Test 6: Polymarket Prediction Take Profit");
+
+  // Load state
+  const state = readState();
+
+  // Clear existing prediction positions & add our target test position
+  state.positions = state.positions.filter(p => p.type !== 'prediction');
+  const marketId = "will-btc-be-up-in-5-min";
+  
+  state.positions.push({
+    id: "poly_tp_test_123",
+    type: "prediction",
+    market: marketId,
+    outcome: "yes",
+    sizeUsd: 100,
+    shares: 200,
+    entryPrice: 0.50,
+    currentPrice: 0.80,
+    timestamp: new Date().toISOString()
+  });
+
+  // Make sure the market exists and set YES price high so PnL reaches TP target (e.g. $0.80 YES price, so PnL is 200 * (0.80 - 0.50) = $60, which is >= $50 TP target)
+  if (!state.polymarket_markets) state.polymarket_markets = [];
+  let testMarket = state.polymarket_markets.find(m => m.id === marketId);
+  if (!testMarket) {
+    testMarket = {
+      id: marketId,
+      asset: "BTC",
+      interval: 5,
+      startAssetPrice: 60000,
+      startTime: new Date().toISOString(),
+    };
+    state.polymarket_markets.push(testMarket);
+  }
+  testMarket.endTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  testMarket.currentYesPrice = 0.80;
+  testMarket.currentNoPrice = 0.20;
+
+  writeState(state);
+
+  // Verify that selling using mock CLI works
+  const sellRes = await runCommand("polymarket sell poly_tp_test_123 --yes --output json");
+  if (sellRes.code !== 0) {
+    console.error("sellRes failed:", sellRes);
+  }
+  assert.strictEqual(sellRes.code, 0);
+  const data = JSON.parse(sellRes.stdout);
+  assert.strictEqual(data.success, true);
+  assert.strictEqual(data.position_id, "poly_tp_test_123");
+  // Payout should be 200 shares * $0.80 current price = $160 pUSD
+  assert.strictEqual(data.payout_pusd, 160);
+
+  // Read state to verify position is removed and wallet is updated
+  const updatedState = readState();
+  const soldPos = updatedState.positions.find(p => p.id === "poly_tp_test_123");
+  assert.ok(!soldPos, "Position should be removed after sale");
+
+  console.log("✅ Passed Polymarket Prediction Take Profit Test\n");
+}
+
 async function runAll() {
   try {
     // Save original state
-    const originalState = fs.readFileSync(STATE_FILE, 'utf8');
+    const originalState = readState();
     
     // Ensure wallets are set up for pairs
-    const state = JSON.parse(originalState);
+    const state = readState();
     state.wallets.hyperliquid.pair_setup_done = true;
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
+    writeState(state);
 
     await testStatus();
     await testBalances();
     await testPearConstraints();
     await testReadOnlyMode();
     await testShortTermPredictions();
+    await testPolymarketTakeProfit();
 
     // Restore original state
-    fs.writeFileSync(STATE_FILE, originalState, 'utf8');
+    writeState(originalState);
     
     console.log("🎉 All Tests Completed Successfully!");
     process.exit(0);

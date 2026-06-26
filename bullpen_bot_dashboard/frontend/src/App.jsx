@@ -24,7 +24,7 @@ function App() {
     binaryMomentum: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 5, durationMinutes: 5 },
     weatherHedging: { enabled: false, targetAsset: "BTC", sizeUsd: 100, probabilityThreshold: 0.70 },
     sportsFanToken: { enabled: false, targetToken: "CHZ", sizeUsd: 150, probabilityShiftThreshold: 0.10 },
-    polymarketPredictions: { enabled: false, sizeUsd: 100, intervals: { "5min": true, "15min": true }, assets: { "BTC": true, "ETH": true, "SOL": true } }
+    polymarketPredictions: { enabled: false, sizeUsd: 100, takeProfitUsd: 50, intervals: { "5min": true, "15min": true }, assets: { "BTC": true, "ETH": true, "SOL": true } }
   });
 
   const [maxMarginUsage, setMaxMarginUsage] = useState(5000);
@@ -503,10 +503,14 @@ function App() {
                       <span className="slider"></span>
                     </label>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }} className="responsive-settings-grid">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '16px' }} className="responsive-settings-grid">
                     <div>
                       <label>Trade Size (pUSD)</label>
                       <input type="number" value={strategies.polymarketPredictions?.sizeUsd} onChange={(e) => handleParamChange('polymarketPredictions', 'sizeUsd', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Take Profit (pUSD)</label>
+                      <input type="number" value={strategies.polymarketPredictions?.takeProfitUsd} onChange={(e) => handleParamChange('polymarketPredictions', 'takeProfitUsd', e.target.value)} />
                     </div>
                     <div>
                       <label style={{ marginBottom: '6px', display: 'block' }}>Target Intervals</label>

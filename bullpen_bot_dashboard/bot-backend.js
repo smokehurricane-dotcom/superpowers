@@ -71,7 +71,7 @@ let botConfig = {
     binaryMomentum: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 5, durationMinutes: 5 },
     weatherHedging: { enabled: false, targetAsset: "BTC", sizeUsd: 100, probabilityThreshold: 0.70 },
     sportsFanToken: { enabled: false, targetToken: "CHZ", sizeUsd: 150, probabilityShiftThreshold: 0.10 },
-    polymarketPredictions: { enabled: false, sizeUsd: 100, intervals: { "5min": true, "15min": true }, assets: { "BTC": true, "ETH": true, "SOL": true } } // Direct pUSD strategy
+    polymarketPredictions: { enabled: false, sizeUsd: 100, takeProfitUsd: 50, intervals: { "5min": true, "15min": true }, assets: { "BTC": true, "ETH": true, "SOL": true } } // Direct pUSD strategy
   },
   risk: {
     maxMarginUsage: 5000,
@@ -533,6 +533,26 @@ async function runPolymarketPredictionStrategy() {
     // Fetch available markets from CLI
     const markets = await runCLI("polymarket markets --output json");
 
+    // 1. Check active prediction positions for Take Profit
+    if (pmConfig.takeProfitUsd && pmConfig.takeProfitUsd > 0) {
+      const activePredictionPositions = state.positions.filter(p => p.type === 'prediction');
+      for (const pos of activePredictionPositions) {
+        const activeM = markets.find(m => m.id === pos.market);
+        if (activeM) {
+          const curSharePrice = pos.outcome === 'yes' ? activeM.currentYesPrice : activeM.currentNoPrice;
+          const pnl = pos.shares * (curSharePrice - pos.entryPrice);
+          if (pnl >= pmConfig.takeProfitUsd) {
+            addSignal("POLY AUTOMATED", `Take Profit hit on ${pos.market} ($${pnl.toFixed(2)} >= $${pmConfig.takeProfitUsd.toFixed(2)}). Executing take profit sell...`, "success");
+            await runCLI(`polymarket sell ${pos.id} --yes --output json`);
+          }
+        }
+      }
+    }
+
+    // Reload state in case positions were sold
+    const updatedState = readState();
+
+    // 2. Scan and enter new positions
     for (const m of markets) {
       const assetName = m.asset;
       const intervalKey = `${m.interval}min`;
@@ -541,7 +561,7 @@ async function runPolymarketPredictionStrategy() {
       if (!pmConfig.assets[assetName] || !pmConfig.intervals[intervalKey]) continue;
 
       // Check if we already have an active position in this market
-      const hasPos = state.positions.some(p => p.type === 'prediction' && p.market === m.id);
+      const hasPos = updatedState.positions.some(p => p.type === 'prediction' && p.market === m.id);
       if (hasPos) continue;
 
       // Trend detection using priceHistory
