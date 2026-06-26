@@ -1,0 +1,26 @@
+{
+  "wallets": {
+    "solana": {
+      "address": "Sol1111111111111111111111111111111111111112",
+      "usdc": 10000.0,
+      "sol": 50.0
+    },
+    "hyperliquid": {
+      "address": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+      "usdc": 15000.0,
+      "spcx": 0.0,
+      "maintenance_margin": 150.0,
+      "margin_usage": 0.0,
+      "pair_setup_done": false
+    }
+  },
+  "positions": [],
+  "orders": [],
+  "history": [],
+  "prices": {
+    "BTC": 65000.0,
+    "ETH": 3500.0,
+    "SPCX": 1.25,
+    "SOL": 140.0
+  }
+}
