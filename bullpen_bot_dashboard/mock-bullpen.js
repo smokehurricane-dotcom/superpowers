@@ -11,7 +11,7 @@ const STATE_FILE = path.join(__dirname, 'sim_state.json');
 
 function readState() {
   let lastError;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 10; i++) {
     try {
       return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
     } catch (e) {
@@ -20,36 +20,42 @@ function readState() {
       while (Date.now() - start < 20) {}
     }
   }
-  console.error("Error reading state file after 5 attempts:", lastError);
+  console.error("Error reading state file after 10 attempts:", lastError);
   process.exit(1);
 }
 
 function writeState(state) {
-  const tempPath = STATE_FILE + '.tmp';
+  const tempPath = STATE_FILE + '.' + process.pid + '_' + Math.random().toString(36).substr(2, 9) + '.tmp';
   try {
     fs.writeFileSync(tempPath, JSON.stringify(state, null, 2), 'utf8');
-    fs.renameSync(tempPath, STATE_FILE);
-  } catch (e) {
-    if (e.code === 'EPERM' || e.code === 'EBUSY') {
-      let success = false;
-      for (let i = 0; i < 10; i++) {
-        try {
+    
+    let success = false;
+    let lastError;
+    for (let i = 0; i < 20; i++) {
+      try {
+        fs.renameSync(tempPath, STATE_FILE);
+        success = true;
+        break;
+      } catch (err) {
+        if (err.code === 'EPERM' || err.code === 'EBUSY') {
+          lastError = err;
+          const delay = 10 + i * 10;
           const start = Date.now();
-          while (Date.now() - start < 10) {}
-          fs.renameSync(tempPath, STATE_FILE);
-          success = true;
-          break;
-        } catch (err) {
-          if (err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
+          while (Date.now() - start < delay) {}
+        } else {
+          try { fs.unlinkSync(tempPath); } catch (_) {}
+          throw err;
         }
       }
-      if (!success) {
-        fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
-      }
-    } else {
-      console.error("Error writing state file:", e);
-      process.exit(1);
     }
+    
+    if (!success) {
+      try { fs.unlinkSync(tempPath); } catch (_) {}
+      throw lastError;
+    }
+  } catch (e) {
+    console.error("Error writing state file:", e);
+    process.exit(1);
   }
 }
 
