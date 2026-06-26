@@ -128,6 +128,70 @@ setInterval(() => {
       state.wallets.polymarket = { address: "0xPolymarketMockAddress777", pusd: 5000.0 };
     }
 
+    // Drift YES/NO prices of active prediction markets
+    state.polymarket_markets = (state.polymarket_markets || []).map(m => {
+      const curAssetPrice = state.prices[m.asset];
+      if (curAssetPrice && m.startAssetPrice) {
+        const dev = (curAssetPrice - m.startAssetPrice) / m.startAssetPrice;
+        // Maps a 1% price change to a 0.50 probability shift
+        const yesPrice = Math.max(0.05, Math.min(0.95, 0.50 + dev * 50));
+        return {
+          ...m,
+          currentYesPrice: parseFloat(yesPrice.toFixed(4)),
+          currentNoPrice: parseFloat((1.0 - yesPrice).toFixed(4))
+        };
+      }
+      return m;
+    });
+
+    // Detect expired markets, resolve, settle user positions, and roll over
+    const now = new Date();
+    state.polymarket_markets = (state.polymarket_markets || []).map(m => {
+      if (now >= new Date(m.endTime)) {
+        const finalPrice = state.prices[m.asset];
+        const resolvedOutcome = finalPrice > m.startAssetPrice ? 'yes' : 'no';
+        
+        // Settle user positions
+        state.positions = state.positions.filter(pos => {
+          if (pos.type === 'prediction' && pos.market === m.id) {
+            const isWin = pos.outcome === resolvedOutcome;
+            const payout = isWin ? pos.shares * 1.0 : 0.0;
+            if (!state.wallets.polymarket) {
+              state.wallets.polymarket = { address: "0xPolymarketMockAddress777", pusd: 5000.0 };
+            }
+            state.wallets.polymarket.pusd += payout;
+            
+            // Add signal notification
+            addSignal("POLY SETTLEMENT", `Market ${m.id} resolved to ${resolvedOutcome.toUpperCase()}. Position ${pos.id} settled. Payout: $${payout.toFixed(2)} pUSD.`, isWin ? "success" : "warning");
+            
+            state.history.push({
+              action: "polymarket_settlement",
+              market: m.id,
+              positionId: pos.id,
+              outcome: pos.outcome,
+              resolved: resolvedOutcome,
+              payout,
+              timestamp: new Date().toISOString()
+            });
+            return false; // remove position
+          }
+          return true;
+        });
+
+        // Roll over to new interval
+        const nextEndTime = new Date(Date.now() + m.interval * 60 * 1000);
+        return {
+          ...m,
+          startAssetPrice: finalPrice,
+          startTime: now.toISOString(),
+          endTime: nextEndTime.toISOString(),
+          currentYesPrice: 0.50,
+          currentNoPrice: 0.50
+        };
+      }
+      return m;
+    });
+
     state.positions = state.positions.map(p => {
       if (p.type === 'pair') {
         return {
@@ -136,13 +200,21 @@ setInterval(() => {
           currentPriceShort: state.prices[p.shortAsset]
         };
       } else if (p.type === 'prediction') {
-        // Drift YES token price
-        const drift = (Math.random() - 0.49) * 0.01;
-        const newPrice = Math.max(0.05, Math.min(0.95, p.currentPrice + drift));
-        return {
-          ...p,
-          currentPrice: newPrice
-        };
+        const m = state.polymarket_markets ? state.polymarket_markets.find(market => market.id === p.market) : null;
+        if (m) {
+          return {
+            ...p,
+            currentPrice: p.outcome === 'yes' ? m.currentYesPrice : m.currentNoPrice
+          };
+        } else {
+          // Drift YES token price (fallback for legacy or manual specific markets)
+          const drift = (Math.random() - 0.49) * 0.01;
+          const newPrice = Math.max(0.05, Math.min(0.95, p.currentPrice + drift));
+          return {
+            ...p,
+            currentPrice: newPrice
+          };
+        }
       }
       return p;
     });
