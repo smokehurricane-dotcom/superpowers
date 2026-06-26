@@ -91,6 +91,12 @@ if (cmdString.startsWith('portfolio balances')) {
   process.exit(0);
 }
 
+if (cmdString.startsWith('polymarket markets')) {
+  const state = readState();
+  printResult(state.polymarket_markets || []);
+  process.exit(0);
+}
+
 // Polymarket Prediction Trades
 if (cmdString.startsWith('polymarket buy')) {
   verifyNotReadOnly();
@@ -119,13 +125,17 @@ if (cmdString.startsWith('polymarket buy')) {
     process.exit(1);
   }
 
+  const activeMarket = state.polymarket_markets ? state.polymarket_markets.find(m => m.id === market) : null;
+  const executionPrice = activeMarket ? (outcome === 'yes' ? activeMarket.currentYesPrice : activeMarket.currentNoPrice) : 0.50;
+  const shares = amount / executionPrice;
+
   if (hasPreview) {
     printResult({
       preview: true,
       market,
       outcome,
       amount_pusd: amount,
-      estimated_shares: amount / 0.50,
+      estimated_shares: shares,
       fee_pusd: 0.0
     });
     process.exit(0);
@@ -134,7 +144,6 @@ if (cmdString.startsWith('polymarket buy')) {
   if (hasYes) {
     state.wallets.polymarket.pusd -= amount;
     const posId = "poly_" + Math.random().toString(36).substr(2, 9);
-    const shares = amount / 0.50; // simple mock execution price
     const newPosition = {
       id: posId,
       type: "prediction",
@@ -142,8 +151,8 @@ if (cmdString.startsWith('polymarket buy')) {
       outcome,
       sizeUsd: amount,
       shares,
-      entryPrice: 0.50,
-      currentPrice: 0.52,
+      entryPrice: executionPrice,
+      currentPrice: executionPrice,
       timestamp: new Date().toISOString()
     };
     state.positions.push(newPosition);
@@ -157,7 +166,7 @@ if (cmdString.startsWith('polymarket buy')) {
     printResult({
       success: true,
       position_id: posId,
-      msg: `Successfully bought ${shares} shares of ${outcome.toUpperCase()} on ${market} with pUSD.`,
+      msg: `Successfully bought ${shares.toFixed(1)} shares of ${outcome.toUpperCase()} on ${market} with pUSD.`,
       execution: newPosition
     });
   } else {
