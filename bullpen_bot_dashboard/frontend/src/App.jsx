@@ -4,7 +4,7 @@ function App() {
   const [wsConnected, setWsConnected] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'positions'
-  const [balances, setBalances] = useState({ solana: { USDC: 0, SOL: 0, CHZ: 0 }, hyperliquid: { USDC: 0, SPCX: 0 }, aggregated_balance_usd: 0 });
+  const [balances, setBalances] = useState({ solana: { USDC: 0, SOL: 0, CHZ: 0 }, hyperliquid: { USDC: 0, SPCX: 0 }, polymarket: { pUSD: 0 }, aggregated_balance_usd: 0 });
   const [pairStatus, setPairStatus] = useState({ setup_completed: false, positions: [], builder_fees_accrued: 0 });
   const [accountStatus, setAccountStatus] = useState({ maintenance_margin_usd: 0, margin_usage_usd: 0, available_margin_usd: 0, risk_level: 'LOW', positions_count: 0, open_orders_count: 0 });
   const [commandLogs, setCommandLogs] = useState([]);
@@ -23,7 +23,8 @@ function App() {
     smartMoney: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 2 },
     binaryMomentum: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 5, durationMinutes: 5 },
     weatherHedging: { enabled: false, targetAsset: "BTC", sizeUsd: 100, probabilityThreshold: 0.70 },
-    sportsFanToken: { enabled: false, targetToken: "CHZ", sizeUsd: 150, probabilityShiftThreshold: 0.10 }
+    sportsFanToken: { enabled: false, targetToken: "CHZ", sizeUsd: 150, probabilityShiftThreshold: 0.10 },
+    polymarketPredictions: { enabled: false, targetMarket: "will-btc-reach-100k-in-2026", outcome: "yes", sizeUsd: 100 }
   });
 
   const [maxMarginUsage, setMaxMarginUsage] = useState(5000);
@@ -43,6 +44,12 @@ function App() {
   const [manualTp, setManualTp] = useState('');
   const [manualSl, setManualSl] = useState('');
   const [tradeLoading, setTradeLoading] = useState(false);
+
+  // Manual Prediction Form
+  const [polyMarketSlug, setPolyMarketSlug] = useState('will-btc-reach-100k-in-2026');
+  const [polyOutcome, setPolyOutcome] = useState('yes');
+  const [polyAmount, setPolyAmount] = useState('250');
+  const [polyLoading, setPolyLoading] = useState(false);
 
   // Correlation deviation chart state
   const [devHistory, setDevHistory] = useState(Array(20).fill(0));
@@ -224,6 +231,32 @@ function App() {
     });
   };
 
+  const handlePolyTrade = (e) => {
+    e.preventDefault();
+    setPolyLoading(true);
+    fetch('http://127.0.0.1:3001/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'polymarket_buy',
+        params: {
+          market: polyMarketSlug,
+          outcome: polyOutcome,
+          amount: parseFloat(polyAmount)
+        }
+      })
+    })
+    .then(r => r.json())
+    .then(res => {
+      setPolyLoading(false);
+      if (res.error) alert(res.error);
+    })
+    .catch(err => {
+      setPolyLoading(false);
+      console.error(err);
+    });
+  };
+
   const handleCancelOrder = (orderId) => {
     fetch('http://127.0.0.1:3001/api/action', {
       method: 'POST',
@@ -232,12 +265,20 @@ function App() {
     });
   };
 
-  const handleClosePosition = (posId) => {
-    fetch('http://127.0.0.1:3001/api/action', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'hl_cancel_all' })
-    });
+  const handleClosePosition = (posId, type) => {
+    if (type === 'prediction') {
+      fetch('http://127.0.0.1:3001/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'polymarket_sell', params: { posId } })
+      });
+    } else {
+      fetch('http://127.0.0.1:3001/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'hl_cancel_all' })
+      });
+    }
   };
 
   const generateSvgPath = () => {
@@ -341,6 +382,10 @@ function App() {
             <div className="stat-card">
               <label>HL SPCX Spot</label>
               <div className="stat-value" style={{ fontSize: '16px' }}>{balances.hyperliquid.SPCX.toFixed(2)} SPCX</div>
+            </div>
+            <div className="stat-card" style={{ background: 'rgba(139, 92, 246, 0.03)' }}>
+              <label>Polymarket pUSD</label>
+              <div className="stat-value" style={{ color: 'var(--color-violet)' }}>${(balances.polymarket?.pUSD || 0.0).toFixed(2)}</div>
             </div>
           </div>
 
@@ -446,6 +491,37 @@ function App() {
               <h2>Automated Trading Strategies</h2>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '18px' }} className="responsive-strategies">
+                {/* NEW: Polymarket Direct pUSD Prediction Trading Strategy */}
+                <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.polymarketPredictions?.enabled ? 'var(--color-violet)' : 'var(--glass-border)'}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600', color: 'var(--color-text-main)' }}>Direct Polymarket pUSD Prediction Trader</h3>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Buys prediction market shares directly using pUSD balance based on news/alerts</p>
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" checked={strategies.polymarketPredictions?.enabled} onChange={() => handleStrategyToggle('polymarketPredictions')} />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label>Trade Size (pUSD)</label>
+                      <input type="number" value={strategies.polymarketPredictions?.sizeUsd} onChange={(e) => handleParamChange('polymarketPredictions', 'sizeUsd', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Target Market (Slug)</label>
+                      <input type="text" value={strategies.polymarketPredictions?.targetMarket} onChange={(e) => handleParamChange('polymarketPredictions', 'targetMarket', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Outcome</label>
+                      <select value={strategies.polymarketPredictions?.outcome} onChange={(e) => handleParamChange('polymarketPredictions', 'outcome', e.target.value)}>
+                        <option value="yes">YES</option>
+                        <option value="no">NO</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
                 {/* 1. Pear Pair Trading */}
                 <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.pearPair.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -474,7 +550,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* NEW: Weather Hedging Strategy */}
+                {/* Weather Hedging Strategy */}
                 <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.weatherHedging.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
@@ -506,7 +582,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* NEW: Sports Fan Token Strategy */}
+                {/* Sports Fan Token Strategy */}
                 <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.sportsFanToken.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
@@ -725,51 +801,81 @@ function App() {
         ) : (
           /* Tab: Positions & Manual Orders */
           <>
-            {/* Manual Trade Execution Form */}
-            <div className="panel">
-              <h2>Manual Perp Execution (Hyperliquid)</h2>
-              <form onSubmit={handleManualTrade} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  <div>
-                    <label>Asset</label>
-                    <select value={manualAsset} onChange={(e) => setManualAsset(e.target.value)}>
-                      <option value="BTC">BTC</option>
-                      <option value="ETH">ETH</option>
-                      <option value="SPCX">SPCX</option>
-                    </select>
+            {/* Manual Trade Execution Forms */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }} className="manual-grids">
+              {/* Manual Perp Form */}
+              <div className="panel">
+                <h2>Manual Perp Execution (Hyperliquid)</h2>
+                <form onSubmit={handleManualTrade} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label>Asset</label>
+                      <select value={manualAsset} onChange={(e) => setManualAsset(e.target.value)}>
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="SPCX">SPCX</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label>Direction</label>
+                      <select value={manualDirection} onChange={(e) => setManualDirection(e.target.value)}>
+                        <option value="long">LONG (Up)</option>
+                        <option value="short">SHORT (Down)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label>Notional Size (USD)</label>
+                      <input type="number" value={manualSize} onChange={(e) => setManualSize(e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Leverage</label>
+                      <input type="number" value={manualLeverage} onChange={(e) => setManualLeverage(e.target.value)} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label>Take Profit (TP Price)</label>
+                      <input type="number" step="0.01" placeholder="Optional" value={manualTp} onChange={(e) => setManualTp(e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Stop Loss (SL Price)</label>
+                      <input type="number" step="0.01" placeholder="Optional" value={manualSl} onChange={(e) => setManualSl(e.target.value)} />
+                    </div>
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{ marginTop: '6px' }} disabled={tradeLoading}>
+                    {tradeLoading ? 'Routing Order...' : `Open Manual Perp (${manualDirection.toUpperCase()})`}
+                  </button>
+                </form>
+              </div>
+
+              {/* NEW: Manual Polymarket Prediction Form */}
+              <div className="panel" style={{ borderLeft: '3px solid var(--color-violet)' }}>
+                <h2>Manual Prediction Order (Polymarket pUSD)</h2>
+                <form onSubmit={handlePolyTrade} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label>Market (Slug / ID)</label>
+                      <input type="text" value={polyMarketSlug} onChange={(e) => setPolyMarketSlug(e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Outcome</label>
+                      <select value={polyOutcome} onChange={(e) => setPolyOutcome(e.target.value)}>
+                        <option value="yes">YES (Up)</option>
+                        <option value="no">NO (Down)</option>
+                      </select>
+                    </div>
                   </div>
                   <div>
-                    <label>Direction</label>
-                    <select value={manualDirection} onChange={(e) => setManualDirection(e.target.value)}>
-                      <option value="long">LONG (Up)</option>
-                      <option value="short">SHORT (Down)</option>
-                    </select>
+                    <label>Amount (pUSD)</label>
+                    <input type="number" value={polyAmount} onChange={(e) => setPolyAmount(e.target.value)} />
                   </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  <div>
-                    <label>Notional Size (USD)</label>
-                    <input type="number" value={manualSize} onChange={(e) => setManualSize(e.target.value)} />
-                  </div>
-                  <div>
-                    <label>Leverage</label>
-                    <input type="number" value={manualLeverage} onChange={(e) => setManualLeverage(e.target.value)} />
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  <div>
-                    <label>Take Profit (TP Price)</label>
-                    <input type="number" step="0.01" placeholder="Optional" value={manualTp} onChange={(e) => setManualTp(e.target.value)} />
-                  </div>
-                  <div>
-                    <label>Stop Loss (SL Price)</label>
-                    <input type="number" step="0.01" placeholder="Optional" value={manualSl} onChange={(e) => setManualSl(e.target.value)} />
-                  </div>
-                </div>
-                <button type="submit" className="btn btn-primary" style={{ marginTop: '6px' }} disabled={tradeLoading}>
-                  {tradeLoading ? 'Routing Order...' : `Open Manual Perp (${manualDirection.toUpperCase()})`}
-                </button>
-              </form>
+                  <button type="submit" className="btn btn-primary" style={{ marginTop: '6px', background: 'var(--color-violet)', color: '#fff' }} disabled={polyLoading}>
+                    {polyLoading ? 'Submitting pUSD order...' : `Buy Polymarket prediction (${polyOutcome.toUpperCase()})`}
+                  </button>
+                </form>
+              </div>
             </div>
 
             {/* Positions Table */}
@@ -784,7 +890,7 @@ function App() {
                       <th>Type</th>
                       <th>Direction / Details</th>
                       <th>Size</th>
-                      <th>Lev</th>
+                      <th>Lev / Shares</th>
                       <th>Entry Price</th>
                       <th>Current Price</th>
                       <th>Live PnL</th>
@@ -805,6 +911,11 @@ function App() {
                           pnl = pos.sizeUsd * curDev;
                           isUp = pnl >= 0;
                           details = `Long ${pos.longAsset} / Short ${pos.shortAsset}`;
+                        } else if (pos.type === 'prediction') {
+                          // Direct prediction positions
+                          pnl = pos.shares * (pos.currentPrice - pos.entryPrice);
+                          isUp = pnl >= 0;
+                          details = `${pos.outcome.toUpperCase()} prediction`;
                         } else {
                           const curPrice = simState.prices[pos.market.replace('xyz:', '')] || pos.entryPrice;
                           const ratio = (curPrice - pos.entryPrice) / pos.entryPrice;
@@ -819,23 +930,23 @@ function App() {
                             <td>{pos.market || 'BTC/ETH'}</td>
                             <td>
                               <span className="badge" style={{ 
-                                background: pos.type === 'pair' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(0, 240, 255, 0.1)', 
-                                color: pos.type === 'pair' ? 'var(--color-violet)' : 'var(--color-cyan)', 
-                                border: pos.type === 'pair' ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid rgba(0, 240, 255, 0.3)' 
+                                background: pos.type === 'pair' ? 'rgba(139, 92, 246, 0.1)' : pos.type === 'prediction' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(0, 240, 255, 0.1)', 
+                                color: pos.type === 'pair' ? 'var(--color-violet)' : pos.type === 'prediction' ? 'var(--color-violet)' : 'var(--color-cyan)', 
+                                border: pos.type === 'pair' ? '1px solid rgba(139, 92, 246, 0.3)' : pos.type === 'prediction' ? '1px solid var(--color-violet)' : '1px solid rgba(0, 240, 255, 0.3)' 
                               }}>
                                 {pos.type.toUpperCase()}
                               </span>
                             </td>
                             <td><span style={{ fontWeight: '600' }}>{details}</span></td>
                             <td>${pos.sizeUsd || pos.size}</td>
-                            <td>{pos.leverage || '1'}x</td>
-                            <td>${(pos.entryPriceLong || pos.entryPrice || 0).toLocaleString()}</td>
-                            <td>${(pos.currentPriceLong || simState.prices[pos.market.replace('xyz:', '')] || pos.entryPrice || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                            <td>{pos.type === 'prediction' ? `${pos.shares.toFixed(1)} shares` : `${pos.leverage || '1'}x`}</td>
+                            <td>${(pos.entryPriceLong || pos.entryPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
+                            <td>${(pos.currentPriceLong || pos.currentPrice || simState.prices[pos.market.replace('xyz:', '')] || pos.entryPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
                             <td className={isUp ? 'up' : 'down'} style={{ fontWeight: '700' }}>
                               ${pnl.toFixed(2)}
                             </td>
                             <td>
-                              <button className="btn btn-danger" style={{ fontSize: '11px', padding: '4px 8px' }} onClick={() => handleClosePosition(pos.id)}>
+                              <button className="btn btn-danger" style={{ fontSize: '11px', padding: '4px 8px' }} onClick={() => handleClosePosition(pos.id, pos.type)}>
                                 Close
                               </button>
                             </td>
