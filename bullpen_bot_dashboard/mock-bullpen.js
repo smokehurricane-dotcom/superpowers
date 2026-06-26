@@ -29,10 +29,8 @@ function writeState(state) {
 
 const args = process.argv.slice(2);
 
-// Check read-only environment variable
 const isReadOnlyEnv = process.env.BULLPEN_READ_ONLY === '1';
 
-// Global options
 const hasOutputJson = args.includes('--output') && args[args.indexOf('--output') + 1] === 'json';
 const hasReadOnlyFlag = args.includes('--read-only');
 const isReadOnly = isReadOnlyEnv || hasReadOnlyFlag;
@@ -43,7 +41,6 @@ function printResult(data) {
   if (hasOutputJson) {
     console.log(JSON.stringify(data, null, 2));
   } else {
-    // Human readable fallback
     console.log(data);
   }
 }
@@ -55,7 +52,6 @@ function verifyNotReadOnly() {
   }
 }
 
-// Simple CLI command parser
 const cmdString = args.join(' ');
 
 if (cmdString.startsWith('status')) {
@@ -125,7 +121,6 @@ if (cmdString.startsWith('hl pair open')) {
     process.exit(1);
   }
 
-  // Parse longs and shorts
   let longParam = "";
   let shortParam = "";
   let sizeUsd = 0;
@@ -152,7 +147,7 @@ if (cmdString.startsWith('hl pair open')) {
     process.exit(1);
   }
 
-  const legsCount = 2; // Long & Short
+  const legsCount = 2;
   const minNotional = 11 * legsCount;
   if (sizeUsd < minNotional) {
     console.error(JSON.stringify({ error: `Pear v1 constraints violated: Notional value ($${sizeUsd}) must satisfy Notional >= 11 * Legs ($${minNotional}).` }));
@@ -375,6 +370,7 @@ if (cmdString.startsWith('hl long') || cmdString.startsWith('hl short')) {
         size,
         leverage,
         postOnly: isAlo,
+        price: limitPrice || null,
         timestamp: new Date().toISOString()
       };
       state.orders.push(newOrder);
@@ -394,7 +390,7 @@ if (cmdString.startsWith('hl long') || cmdString.startsWith('hl short')) {
         direction,
         size,
         leverage,
-        entryPrice: state.prices.SPCX || 1.25,
+        entryPrice: state.prices[market.replace('xyz:', '')] || 1.25,
         tp,
         sl,
         timestamp: new Date().toISOString()
@@ -418,6 +414,35 @@ if (cmdString.startsWith('hl long') || cmdString.startsWith('hl short')) {
     console.error("Execution blocked. Use --yes or --preview.");
     process.exit(1);
   }
+  process.exit(0);
+}
+
+// Cancel individual order
+if (cmdString.startsWith('hl cancel') && !cmdString.includes('cancel-all')) {
+  verifyNotReadOnly();
+  const state = readState();
+  const orderId = args[args.indexOf('cancel') + 1];
+
+  const orderIndex = state.orders.findIndex(o => o.id === orderId);
+  if (orderIndex === -1) {
+    console.error(JSON.stringify({ error: `Order ${orderId} not found.` }));
+    process.exit(1);
+  }
+
+  const order = state.orders[orderIndex];
+  state.orders.splice(orderIndex, 1);
+  
+  // Refund cost if Solana limit buy
+  if (order.market.startsWith('solana:')) {
+    state.wallets.solana.usdc += order.size * order.price;
+  }
+
+  writeState(state);
+  printResult({
+    success: true,
+    order_id: orderId,
+    msg: `Order ${orderId} cancelled successfully.`
+  });
   process.exit(0);
 }
 

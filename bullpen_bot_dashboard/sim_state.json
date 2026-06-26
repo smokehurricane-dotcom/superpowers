@@ -7,20 +7,733 @@
     },
     "hyperliquid": {
       "address": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-      "usdc": 15000,
+      "usdc": 14663,
       "spcx": 0,
       "maintenance_margin": 150,
       "margin_usage": 0,
-      "pair_setup_done": false
+      "pair_setup_done": true
     }
   },
-  "positions": [],
-  "orders": [],
-  "history": [],
+  "positions": [
+    {
+      "id": "pair_u885x2cnf",
+      "type": "pair",
+      "longAsset": "ETH",
+      "shortAsset": "BTC",
+      "weightLong": 0.5,
+      "weightShort": 0.5,
+      "sizeUsd": 22,
+      "entryTime": "2026-06-26T18:30:38.026Z",
+      "entryPriceLong": 3483.708612290746,
+      "entryPriceShort": 65962.21540314236,
+      "currentPriceLong": 3472.3089045119364,
+      "currentPriceShort": 65940.30155094263
+    },
+    {
+      "id": "perp_ijb3nfqjl",
+      "type": "perp",
+      "market": "BTC",
+      "direction": "long",
+      "size": 50,
+      "leverage": 2,
+      "entryPrice": 1.2839027798667948,
+      "tp": null,
+      "sl": null,
+      "timestamp": "2026-06-26T18:31:44.761Z"
+    },
+    {
+      "id": "perp_sb8q367oi",
+      "type": "perp",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 20,
+      "leverage": 2,
+      "entryPrice": 1.2790793254201431,
+      "tp": 1.5,
+      "sl": 1.1,
+      "timestamp": "2026-06-26T18:32:15.055Z"
+    },
+    {
+      "id": "perp_u9bq7rwdb",
+      "type": "perp",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 20,
+      "leverage": 2,
+      "entryPrice": 1.2852343617090303,
+      "tp": 1,
+      "sl": 1.4,
+      "timestamp": "2026-06-26T18:33:14.856Z"
+    },
+    {
+      "id": "perp_79dxxy03d",
+      "type": "perp",
+      "market": "BTC",
+      "direction": "long",
+      "size": 50,
+      "leverage": 2,
+      "entryPrice": 1.280244848397221,
+      "tp": null,
+      "sl": null,
+      "timestamp": "2026-06-26T18:33:44.845Z"
+    },
+    {
+      "id": "perp_fts1fsld6",
+      "type": "perp",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 20,
+      "leverage": 2,
+      "entryPrice": 1.263894620624684,
+      "tp": 1,
+      "sl": 1.4,
+      "timestamp": "2026-06-26T18:34:44.905Z"
+    },
+    {
+      "id": "perp_dpk3w1qee",
+      "type": "perp",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 20,
+      "leverage": 2,
+      "entryPrice": 1.2637411040885111,
+      "tp": 1.5,
+      "sl": 1.1,
+      "timestamp": "2026-06-26T18:35:14.987Z"
+    },
+    {
+      "id": "perp_p8gvik55e",
+      "type": "perp",
+      "market": "BTC",
+      "direction": "long",
+      "size": 50,
+      "leverage": 2,
+      "entryPrice": 1.258405104669593,
+      "tp": null,
+      "sl": null,
+      "timestamp": "2026-06-26T18:35:44.864Z"
+    },
+    {
+      "id": "perp_7xh7ut2en",
+      "type": "perp",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 200,
+      "leverage": 4,
+      "entryPrice": 1.279615379061513,
+      "tp": 1,
+      "sl": 1.4,
+      "timestamp": "2026-06-26T18:36:15.057Z"
+    },
+    {
+      "id": "perp_hpmb9e1z2",
+      "type": "perp",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 200,
+      "leverage": 4,
+      "entryPrice": 1.2682917995434315,
+      "tp": 1.5,
+      "sl": 1.1,
+      "timestamp": "2026-06-26T18:36:44.895Z"
+    },
+    {
+      "id": "perp_7ejiu3equ",
+      "type": "perp",
+      "market": "BTC",
+      "direction": "long",
+      "size": 50,
+      "leverage": 2,
+      "entryPrice": 1.2707012563742528,
+      "tp": null,
+      "sl": null,
+      "timestamp": "2026-06-26T18:37:14.975Z"
+    },
+    {
+      "id": "perp_q8gr9xgnb",
+      "type": "perp",
+      "market": "BTC",
+      "direction": "long",
+      "size": 50,
+      "leverage": 2,
+      "entryPrice": 1.274228247806128,
+      "tp": null,
+      "sl": null,
+      "timestamp": "2026-06-26T18:37:45.011Z"
+    },
+    {
+      "id": "perp_our0snmst",
+      "type": "perp",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 200,
+      "leverage": 4,
+      "entryPrice": 1.270182862286039,
+      "tp": 1,
+      "sl": 1.4,
+      "timestamp": "2026-06-26T18:38:14.969Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord_p0ws2af6i",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:31:10.007Z"
+    },
+    {
+      "id": "ord_3npwossn3",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:31:10.715Z"
+    },
+    {
+      "id": "ord_1syu0evf8",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:31:17.983Z"
+    },
+    {
+      "id": "ord_6l4efxlxh",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:31:18.837Z"
+    },
+    {
+      "id": "ord_657m9ccot",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:31:26.114Z"
+    },
+    {
+      "id": "ord_y1i3htnrg",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:31:26.733Z"
+    },
+    {
+      "id": "ord_bi3risfpn",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:31:41.832Z"
+    },
+    {
+      "id": "ord_4dipebcph",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:31:42.449Z"
+    },
+    {
+      "id": "ord_oouoz59pw",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:32:06.515Z"
+    },
+    {
+      "id": "ord_2jfuu4czq",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:32:07.396Z"
+    },
+    {
+      "id": "ord_3u3x6y0xs",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:32:14.382Z"
+    },
+    {
+      "id": "ord_1s6gap592",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:32:15.346Z"
+    },
+    {
+      "id": "ord_bn6lxwsvt",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:32:22.561Z"
+    },
+    {
+      "id": "ord_4uxelow2x",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:32:23.286Z"
+    },
+    {
+      "id": "ord_psdafom9s",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:32:54.026Z"
+    },
+    {
+      "id": "ord_t0550jvc6",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:32:54.507Z"
+    },
+    {
+      "id": "ord_huvrhafhe",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:09.946Z"
+    },
+    {
+      "id": "ord_4rgrnr5s6",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:10.515Z"
+    },
+    {
+      "id": "ord_gctfx13a7",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:26.070Z"
+    },
+    {
+      "id": "ord_999ja1o0q",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:26.622Z"
+    },
+    {
+      "id": "ord_magm9xkt3",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:34.060Z"
+    },
+    {
+      "id": "ord_gik5eb7et",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:34.559Z"
+    },
+    {
+      "id": "ord_sqq2t3jj1",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:50.208Z"
+    },
+    {
+      "id": "ord_1pob6tx4p",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:50.842Z"
+    },
+    {
+      "id": "ord_162mjqs6y",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:58.009Z"
+    },
+    {
+      "id": "ord_ldnvz5x2n",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:33:58.568Z"
+    },
+    {
+      "id": "ord_oxgm1wy4u",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:34:14.522Z"
+    },
+    {
+      "id": "ord_5m0wp670g",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:34:15.308Z"
+    },
+    {
+      "id": "ord_tlvaj8ngj",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:34:22.041Z"
+    },
+    {
+      "id": "ord_84b0u5d6x",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:34:22.774Z"
+    },
+    {
+      "id": "ord_t8ysdg0sp",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:34:30.011Z"
+    },
+    {
+      "id": "ord_i6vwexwd0",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:34:30.497Z"
+    },
+    {
+      "id": "ord_yt5k5sp7o",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:34:46.124Z"
+    },
+    {
+      "id": "ord_bvig062tn",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:34:46.690Z"
+    },
+    {
+      "id": "ord_kv5uv9sfa",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:35:18.103Z"
+    },
+    {
+      "id": "ord_etjhckkf5",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:35:18.584Z"
+    },
+    {
+      "id": "ord_fje5xb0q0",
+      "market": "xyz:SPCX",
+      "direction": "long",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:35:50.091Z"
+    },
+    {
+      "id": "ord_a2fjib41e",
+      "market": "xyz:SPCX",
+      "direction": "short",
+      "size": 15,
+      "leverage": 1,
+      "postOnly": true,
+      "timestamp": "2026-06-26T18:35:50.689Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "pair_open",
+      "details": {
+        "id": "pair_u885x2cnf",
+        "type": "pair",
+        "longAsset": "ETH",
+        "shortAsset": "BTC",
+        "weightLong": 0.5,
+        "weightShort": 0.5,
+        "sizeUsd": 22,
+        "entryTime": "2026-06-26T18:30:38.026Z",
+        "entryPriceLong": 3483.708612290746,
+        "entryPriceShort": 65962.21540314236,
+        "currentPriceLong": 3483.708612290746,
+        "currentPriceShort": 65962.21540314236
+      },
+      "timestamp": "2026-06-26T18:30:38.029Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_ijb3nfqjl",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 1.2839027798667948,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T18:31:44.761Z"
+      },
+      "timestamp": "2026-06-26T18:31:44.763Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_sb8q367oi",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "long",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.2790793254201431,
+        "tp": 1.5,
+        "sl": 1.1,
+        "timestamp": "2026-06-26T18:32:15.055Z"
+      },
+      "timestamp": "2026-06-26T18:32:15.057Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_u9bq7rwdb",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.2852343617090303,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T18:33:14.856Z"
+      },
+      "timestamp": "2026-06-26T18:33:14.857Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_79dxxy03d",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 1.280244848397221,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T18:33:44.845Z"
+      },
+      "timestamp": "2026-06-26T18:33:44.848Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_fts1fsld6",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.263894620624684,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T18:34:44.905Z"
+      },
+      "timestamp": "2026-06-26T18:34:44.907Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_dpk3w1qee",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "long",
+        "size": 20,
+        "leverage": 2,
+        "entryPrice": 1.2637411040885111,
+        "tp": 1.5,
+        "sl": 1.1,
+        "timestamp": "2026-06-26T18:35:14.987Z"
+      },
+      "timestamp": "2026-06-26T18:35:14.988Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_p8gvik55e",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 1.258405104669593,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T18:35:44.864Z"
+      },
+      "timestamp": "2026-06-26T18:35:44.865Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_7xh7ut2en",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 200,
+        "leverage": 4,
+        "entryPrice": 1.279615379061513,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T18:36:15.057Z"
+      },
+      "timestamp": "2026-06-26T18:36:15.059Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_hpmb9e1z2",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "long",
+        "size": 200,
+        "leverage": 4,
+        "entryPrice": 1.2682917995434315,
+        "tp": 1.5,
+        "sl": 1.1,
+        "timestamp": "2026-06-26T18:36:44.895Z"
+      },
+      "timestamp": "2026-06-26T18:36:44.896Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_7ejiu3equ",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 1.2707012563742528,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T18:37:14.975Z"
+      },
+      "timestamp": "2026-06-26T18:37:14.977Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_q8gr9xgnb",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "long",
+        "size": 50,
+        "leverage": 2,
+        "entryPrice": 1.274228247806128,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-26T18:37:45.011Z"
+      },
+      "timestamp": "2026-06-26T18:37:45.014Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_our0snmst",
+        "type": "perp",
+        "market": "xyz:SPCX",
+        "direction": "short",
+        "size": 200,
+        "leverage": 4,
+        "entryPrice": 1.270182862286039,
+        "tp": 1,
+        "sl": 1.4,
+        "timestamp": "2026-06-26T18:38:14.969Z"
+      },
+      "timestamp": "2026-06-26T18:38:14.971Z"
+    }
+  ],
   "prices": {
-    "BTC": 65803.0976484846,
-    "ETH": 3466.56356684304,
-    "SPCX": 1.279953262031969,
-    "SOL": 140.62438660981508
+    "BTC": 65940.30155094263,
+    "ETH": 3472.3089045119364,
+    "SPCX": 1.2641052482587503,
+    "SOL": 141.05868349090642
   }
 }

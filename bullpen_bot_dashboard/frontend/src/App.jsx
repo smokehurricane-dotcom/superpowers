@@ -3,18 +3,21 @@ import React, { useState, useEffect, useRef } from 'react';
 function App() {
   const [wsConnected, setWsConnected] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'positions'
   const [balances, setBalances] = useState({ solana: { USDC: 0, SOL: 0 }, hyperliquid: { USDC: 0, SPCX: 0 }, aggregated_balance_usd: 0 });
   const [pairStatus, setPairStatus] = useState({ setup_completed: false, positions: [], builder_fees_accrued: 0 });
   const [accountStatus, setAccountStatus] = useState({ maintenance_margin_usd: 0, margin_usage_usd: 0, available_margin_usd: 0, risk_level: 'LOW', positions_count: 0, open_orders_count: 0 });
   const [commandLogs, setCommandLogs] = useState([]);
   const [signalFeed, setSignalFeed] = useState([]);
+  const [simState, setSimState] = useState(null);
   
   // Strategy Configurations
   const [strategies, setStrategies] = useState({
     pearPair: { enabled: false, sizeUsd: 22, targetPair: "BTC/ETH", baseRatio: 18.57, deviationThreshold: 0.015 },
     spreadFarming: { enabled: false, targetMarket: "xyz:SPCX", sizeUsd: 15, spreadThreshold: 0.004 },
     momentum: { enabled: false, targetMarket: "xyz:SPCX", notional: 20, leverage: 2, tpPct: 15, slPct: 10 },
-    smartMoney: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 2 }
+    smartMoney: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 2 },
+    binaryMomentum: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 5, durationMinutes: 5 } // New 5-Min Up/Down strategy
   });
 
   const [maxMarginUsage, setMaxMarginUsage] = useState(5000);
@@ -25,6 +28,15 @@ function App() {
   const [swapTokenB, setSwapTokenB] = useState('SOL');
   const [swapAmount, setSwapAmount] = useState('100');
   const [swapLoading, setSwapLoading] = useState(false);
+
+  // Manual Position Opener
+  const [manualAsset, setManualAsset] = useState('BTC');
+  const [manualDirection, setManualDirection] = useState('long');
+  const [manualSize, setManualSize] = useState('100');
+  const [manualLeverage, setManualLeverage] = useState('5');
+  const [manualTp, setManualTp] = useState('');
+  const [manualSl, setManualSl] = useState('');
+  const [tradeLoading, setTradeLoading] = useState(false);
 
   // Correlation deviation chart state
   const [devHistory, setDevHistory] = useState(Array(20).fill(0));
@@ -47,7 +59,6 @@ function App() {
 
     ws.current.onclose = () => {
       setWsConnected(false);
-      // Reconnect after 3 seconds
       setTimeout(connectWS, 3000);
     };
 
@@ -67,21 +78,19 @@ function App() {
         setCommandLogs(msg.data);
       } else if (msg.type === 'SIGNAL_FEED') {
         setSignalFeed(msg.data);
+      } else if (msg.type === 'FULL_STATE') {
+        setSimState(msg.data);
       }
     };
   };
 
-  // Simulate a rolling chart deviation line
   useEffect(() => {
     const timer = setInterval(() => {
-      // Simulate minor price deviation for the visual chart
       setDevHistory(prev => {
         const next = [...prev.slice(1)];
-        // Create an organic wave
         const lastVal = prev[prev.length - 1];
         const change = (Math.random() - 0.5) * 0.004;
         let nextVal = lastVal + change;
-        // Clamp between -3.0% and +3.0%
         nextVal = Math.max(-0.03, Math.min(0.03, nextVal));
         next.push(nextVal);
         return next;
@@ -176,26 +185,59 @@ function App() {
     });
   };
 
-  const handleClosePosition = (posId) => {
+  const handleManualTrade = (e) => {
+    e.preventDefault();
+    setTradeLoading(true);
     fetch('http://localhost:3001/api/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'hl_cancel_all' // Simplified manual cancel for mock demo
+        action: 'manual_trade',
+        params: {
+          asset: manualAsset,
+          direction: manualDirection,
+          notional: parseFloat(manualSize),
+          leverage: parseFloat(manualLeverage),
+          tp: manualTp ? parseFloat(manualTp) : null,
+          sl: manualSl ? parseFloat(manualSl) : null
+        }
       })
+    })
+    .then(r => r.json())
+    .then(res => {
+      setTradeLoading(false);
+      if (res.error) alert(res.error);
+    })
+    .catch(err => {
+      setTradeLoading(false);
+      console.error(err);
     });
   };
 
-  // Convert deviation history to SVG path
+  const handleCancelOrder = (orderId) => {
+    fetch('http://localhost:3001/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'cancel_order', params: { orderId } })
+    });
+  };
+
+  const handleClosePosition = (posId) => {
+    fetch('http://localhost:3001/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'hl_cancel_all' })
+    });
+  };
+
   const generateSvgPath = () => {
     const width = 360;
     const height = 120;
     const xStep = width / (devHistory.length - 1);
-    const yScale = height / 0.06; // Max range -3% to +3% (total 6%)
+    const yScale = height / 0.06;
     
     return devHistory.map((val, index) => {
       const x = index * xStep;
-      // Center of chart is height / 2. Up is subtract, Down is add
       const y = (height / 2) - (val * yScale);
       return `${index === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
     }).join(' ');
@@ -209,18 +251,36 @@ function App() {
           <h1>Bullpen Dashboard</h1>
           <span className="badge">Agent Kit v1.2</span>
         </div>
+
+        {/* Tab Selection */}
+        <div style={{ display: 'flex', gap: '8px', background: 'rgba(0,0,0,0.2)', padding: '4px', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
+          <button 
+            onClick={() => setActiveTab('dashboard')} 
+            className={`btn ${activeTab === 'dashboard' ? 'btn-primary' : 'btn-secondary'}`}
+            style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '13px' }}
+          >
+            📈 Control Center
+          </button>
+          <button 
+            onClick={() => setActiveTab('positions')} 
+            className={`btn ${activeTab === 'positions' ? 'btn-primary' : 'btn-secondary'}`}
+            style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '13px' }}
+          >
+            💼 Open Positions & Orders
+          </button>
+        </div>
         
         <div className="system-status">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className={`status-dot ${wsConnected ? 'active' : ''}`}></div>
             <span style={{ fontSize: '13px', color: 'var(--color-text-muted)', fontWeight: '500' }}>
-              {wsConnected ? 'Connected to Bot Backend' : 'Reconnecting...'}
+              {wsConnected ? 'Connected' : 'Offline'}
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '13px', color: readOnly ? 'var(--color-amber)' : 'var(--color-green)', fontWeight: '600' }}>
-              {readOnly ? 'READ-ONLY ACTIVE' : 'LIVE TRADING'}
+              {readOnly ? 'READ-ONLY' : 'LIVE'}
             </span>
             <button 
               className="btn btn-secondary" 
@@ -231,7 +291,7 @@ function App() {
               }}
               style={{ fontSize: '12px', padding: '6px 12px' }}
             >
-              Toggle Mode
+              Mode
             </button>
             <button className="btn btn-danger" onClick={triggerCircuitBreaker}>
               🚨 EMERGENCY STOP
@@ -301,7 +361,7 @@ function App() {
             <div className="switch-container">
               <div className="switch-label">
                 <span style={{ fontSize: '13px', fontWeight: '500' }}>Preview-First Paradigm</span>
-                <span className="switch-subtext">Runs CLI --preview before signing trades</span>
+                <span className="switch-subtext">Runs CLI --preview before trades</span>
               </div>
               <label className="switch">
                 <input 
@@ -363,257 +423,411 @@ function App() {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {/* Strategy Control Panel */}
-        <div className="panel full-width">
-          <h2>Automated Trading Strategies</h2>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '18px' }} className="responsive-strategies">
-            {/* 1. Pear Pair Trading */}
-            <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.pearPair.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Pear Pair Trading</h3>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Marktneutrale Arbitrage BTC/ETH</p>
+        {activeTab === 'dashboard' ? (
+          <>
+            {/* Strategy Control Panel */}
+            <div className="panel full-width">
+              <h2>Automated Trading Strategies</h2>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '18px' }} className="responsive-strategies">
+                {/* 1. Pear Pair Trading */}
+                <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.pearPair.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
+                  <div style={{ display: 'flex', justifycontent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Pear Pair Trading</h3>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Marktneutrale Arbitrage BTC/ETH</p>
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" checked={strategies.pearPair.enabled} onChange={() => handleStrategyToggle('pearPair')} />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label>Position Size (USD)</label>
+                      <input type="number" value={strategies.pearPair.sizeUsd} onChange={(e) => handleParamChange('pearPair', 'sizeUsd', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Deviation Entry (%)</label>
+                      <input type="number" step="0.001" value={strategies.pearPair.deviationThreshold} onChange={(e) => handleParamChange('pearPair', 'deviationThreshold', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Base Correlation Ratio</label>
+                      <input type="number" step="0.01" value={strategies.pearPair.baseRatio} onChange={(e) => handleParamChange('pearPair', 'baseRatio', e.target.value)} />
+                    </div>
+                  </div>
                 </div>
-                <label className="switch">
-                  <input type="checkbox" checked={strategies.pearPair.enabled} onChange={() => handleStrategyToggle('pearPair')} />
-                  <span className="slider"></span>
-                </label>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
-                <div>
-                  <label>Position Size (USD)</label>
-                  <input type="number" value={strategies.pearPair.sizeUsd} onChange={(e) => handleParamChange('pearPair', 'sizeUsd', e.target.value)} />
+
+                {/* 5. 5-Min Binary Momentum Strategy (New Up/Down Trend Strategy) */}
+                <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.binaryMomentum.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600' }}>5-Minute Binary Momentum (Up/Down Trend)</h3>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Trades short-term 5-min price momentum swings (Long/Short)</p>
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" checked={strategies.binaryMomentum.enabled} onChange={() => handleStrategyToggle('binaryMomentum')} />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label>Trade Size (USD)</label>
+                      <input type="number" value={strategies.binaryMomentum.notional} onChange={(e) => handleParamChange('binaryMomentum', 'notional', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Leverage</label>
+                      <input type="number" value={strategies.binaryMomentum.leverage} onChange={(e) => handleParamChange('binaryMomentum', 'leverage', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Exit Duration (Mins)</label>
+                      <input type="number" value={strategies.binaryMomentum.durationMinutes} onChange={(e) => handleParamChange('binaryMomentum', 'durationMinutes', e.target.value)} />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label>Deviation Entry (%)</label>
-                  <input type="number" step="0.001" value={strategies.pearPair.deviationThreshold} onChange={(e) => handleParamChange('pearPair', 'deviationThreshold', e.target.value)} />
+
+                {/* 2. Spread Farming */}
+                <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.spreadFarming.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600' }}>HIP-3 & Spot Spread Farming</h3>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Limit Order Maker spread capture on SPCX</p>
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" checked={strategies.spreadFarming.enabled} onChange={() => handleStrategyToggle('spreadFarming')} />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label>Maker Size (USD)</label>
+                      <input type="number" value={strategies.spreadFarming.sizeUsd} onChange={(e) => handleParamChange('spreadFarming', 'sizeUsd', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Target Spread (%)</label>
+                      <input type="number" step="0.001" value={strategies.spreadFarming.spreadThreshold} onChange={(e) => handleParamChange('spreadFarming', 'spreadThreshold', e.target.value)} />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label>Base Correlation Ratio</label>
-                  <input type="number" step="0.01" value={strategies.pearPair.baseRatio} onChange={(e) => handleParamChange('pearPair', 'baseRatio', e.target.value)} />
+
+                {/* 3. Momentum & News-driven */}
+                <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.momentum.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Momentum & News Trading</h3>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Solana/Hyperliquid aggressive news-driven IOC purchases</p>
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" checked={strategies.momentum.enabled} onChange={() => handleStrategyToggle('momentum')} />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label>Size (USDC)</label>
+                      <input type="number" value={strategies.momentum.notional} onChange={(e) => handleParamChange('momentum', 'notional', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Leverage</label>
+                      <input type="number" value={strategies.momentum.leverage} onChange={(e) => handleParamChange('momentum', 'leverage', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Take Profit (%)</label>
+                      <input type="number" value={strategies.momentum.tpPct} onChange={(e) => handleParamChange('momentum', 'tpPct', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Stop Loss (%)</label>
+                      <input type="number" value={strategies.momentum.slPct} onChange={(e) => handleParamChange('momentum', 'slPct', e.target.value)} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Smart Money Tracking */}
+                <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.smartMoney.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Smart Money Copy Trading</h3>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Copy trade Polymarket whale transaction feeds on Hyperliquid</p>
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" checked={strategies.smartMoney.enabled} onChange={() => handleStrategyToggle('smartMoney')} />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label>Copy Trade Size</label>
+                      <input type="number" value={strategies.smartMoney.notional} onChange={(e) => handleParamChange('smartMoney', 'notional', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Leverage</label>
+                      <input type="number" value={strategies.smartMoney.leverage} onChange={(e) => handleParamChange('smartMoney', 'leverage', e.target.value)} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* 2. Spread Farming */}
-            <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.spreadFarming.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ fontSize: '15px', fontWeight: '600' }}>HIP-3 & Spot Spread Farming</h3>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Limit Order Maker spread capture on SPCX</p>
-                </div>
-                <label className="switch">
-                  <input type="checkbox" checked={strategies.spreadFarming.enabled} onChange={() => handleStrategyToggle('spreadFarming')} />
-                  <span className="slider"></span>
-                </label>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
-                <div>
-                  <label>Maker Size (USD)</label>
-                  <input type="number" value={strategies.spreadFarming.sizeUsd} onChange={(e) => handleParamChange('spreadFarming', 'sizeUsd', e.target.value)} />
-                </div>
-                <div>
-                  <label>Target Spread (%)</label>
-                  <input type="number" step="0.001" value={strategies.spreadFarming.spreadThreshold} onChange={(e) => handleParamChange('spreadFarming', 'spreadThreshold', e.target.value)} />
+            {/* Real-time ratio chart */}
+            <div className="panel">
+              <h2>BTC/ETH Ratio Deviation</h2>
+              <div className="chart-container">
+                <svg width="360" height="120" style={{ overflow: 'visible' }}>
+                  <line x1="0" y1="60" x2="360" y2="60" className="chart-center" />
+                  <line x1="0" y1="30" x2="360" y2="30" className="chart-threshold" />
+                  <line x1="0" y1="90" x2="360" y2="90" className="chart-threshold" />
+                  <text x="5" y="25" fill="var(--color-red)" fontSize="10" opacity="0.6">Upper Threshold (+1.5%)</text>
+                  <text x="5" y="115" fill="var(--color-red)" fontSize="10" opacity="0.6">Lower Threshold (-1.5%)</text>
+                  <path d={generateSvgPath()} className="chart-line" />
+                </svg>
+                <div style={{ position: 'absolute', bottom: '8px', right: '12px', fontSize: '11px', color: 'var(--color-text-muted)', display: 'flex', gap: '8px' }}>
+                  <span>Live Deviation:</span>
+                  <span className={devHistory[devHistory.length-1] >= 0 ? 'up' : 'down'} style={{ fontWeight: '700' }}>
+                    {(devHistory[devHistory.length-1] * 100).toFixed(3)}%
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* 3. Momentum & News-driven */}
-            <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.momentum.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Momentum & News Trading</h3>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Solana/Hyperliquid aggressive news-driven IOC purchases</p>
-                </div>
-                <label className="switch">
-                  <input type="checkbox" checked={strategies.momentum.enabled} onChange={() => handleStrategyToggle('momentum')} />
-                  <span className="slider"></span>
-                </label>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
-                <div>
-                  <label>Size (USDC)</label>
-                  <input type="number" value={strategies.momentum.notional} onChange={(e) => handleParamChange('momentum', 'notional', e.target.value)} />
-                </div>
-                <div>
-                  <label>Leverage</label>
-                  <input type="number" value={strategies.momentum.leverage} onChange={(e) => handleParamChange('momentum', 'leverage', e.target.value)} />
-                </div>
-                <div>
-                  <label>Take Profit (%)</label>
-                  <input type="number" value={strategies.momentum.tpPct} onChange={(e) => handleParamChange('momentum', 'tpPct', e.target.value)} />
-                </div>
-                <div>
-                  <label>Stop Loss (%)</label>
-                  <input type="number" value={strategies.momentum.slPct} onChange={(e) => handleParamChange('momentum', 'slPct', e.target.value)} />
-                </div>
+            {/* Live Signal Feed */}
+            <div className="panel">
+              <h2>News Alerts & Polymarket Signals</h2>
+              <div className="signal-list">
+                {signalFeed.length > 0 ? (
+                  signalFeed.map(sig => (
+                    <div key={sig.id} className={`signal-card ${sig.impact}`}>
+                      <div className="signal-meta">
+                        <span className="signal-source">{sig.source}</span>
+                        <span>{new Date(sig.timestamp).toLocaleTimeString()}</span>
+                      </div>
+                      <div className="signal-text">{sig.text}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '24px' }}>
+                    Waiting for signals and whale alerts...
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* 4. Smart Money Tracking */}
-            <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.smartMoney.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Smart Money Copy Trading</h3>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Copy trade Polymarket whale transaction feeds on Hyperliquid</p>
-                </div>
-                <label className="switch">
-                  <input type="checkbox" checked={strategies.smartMoney.enabled} onChange={() => handleStrategyToggle('smartMoney')} />
-                  <span className="slider"></span>
-                </label>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
-                <div>
-                  <label>Copy Trade Size</label>
-                  <input type="number" value={strategies.smartMoney.notional} onChange={(e) => handleParamChange('smartMoney', 'notional', e.target.value)} />
-                </div>
-                <div>
-                  <label>Leverage</label>
-                  <input type="number" value={strategies.smartMoney.leverage} onChange={(e) => handleParamChange('smartMoney', 'leverage', e.target.value)} />
-                </div>
+            {/* Live CLI Console */}
+            <div className="panel full-width">
+              <h2>Bullpen CLI Process Log</h2>
+              <div className="terminal">
+                {commandLogs.length > 0 ? (
+                  commandLogs.map((log, index) => (
+                    <div key={index} className="terminal-entry">
+                      <div className="terminal-header">
+                        <span>{log.command}</span>
+                        <span>{log.duration_ms}ms | exit: {log.exitCode}</span>
+                      </div>
+                      {log.stdout && (
+                        <div className="terminal-body">
+                          {log.stdout}
+                        </div>
+                      )}
+                      {log.stderr && (
+                        <div className="terminal-body terminal-stderr">
+                          {log.stderr}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>
+                    Console initialized. Waiting for CLI commands to execute...
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </div>
+          </>
+        ) : (
+          /* Tab: Positions & Manual Orders */
+          <>
+            {/* Manual Trade Execution Form */}
+            <div className="panel">
+              <h2>Manual Perp Execution (Hyperliquid)</h2>
+              <form onSubmit={handleManualTrade} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label>Asset</label>
+                    <select value={manualAsset} onChange={(e) => setManualAsset(e.target.value)}>
+                      <option value="BTC">BTC</option>
+                      <option value="ETH">ETH</option>
+                      <option value="SPCX">SPCX</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Direction</label>
+                    <select value={manualDirection} onChange={(e) => setManualDirection(e.target.value)}>
+                      <option value="long">LONG (Up)</option>
+                      <option value="short">SHORT (Down)</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label>Notional Size (USD)</label>
+                    <input type="number" value={manualSize} onChange={(e) => setManualSize(e.target.value)} />
+                  </div>
+                  <div>
+                    <label>Leverage</label>
+                    <input type="number" value={manualLeverage} onChange={(e) => setManualLeverage(e.target.value)} />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label>Take Profit (TP Price)</label>
+                    <input type="number" step="0.01" placeholder="Optional" value={manualTp} onChange={(e) => setManualTp(e.target.value)} />
+                  </div>
+                  <div>
+                    <label>Stop Loss (SL Price)</label>
+                    <input type="number" step="0.01" placeholder="Optional" value={manualSl} onChange={(e) => setManualSl(e.target.value)} />
+                  </div>
+                </div>
+                <button type="submit" className="btn btn-primary" style={{ marginTop: '6px' }} disabled={tradeLoading}>
+                  {tradeLoading ? 'Routing Order...' : `Open Manual Perp (${manualDirection.toUpperCase()})`}
+                </button>
+              </form>
+            </div>
 
-        {/* Positions & Real-time chart */}
-        <div className="panel">
-          <h2>Active Positions & Margin Details</h2>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Type</th>
-                  <th>Details</th>
-                  <th>Size</th>
-                  <th>Leverage</th>
-                  <th>PnL</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pairStatus.positions && pairStatus.positions.length > 0 ? (
-                  pairStatus.positions.map(pos => {
-                    const dev = (pos.currentPriceLong / pos.currentPriceShort);
-                    const base = pos.longAsset === 'BTC' ? (pos.entryPriceLong / pos.entryPriceShort) : (pos.entryPriceShort / pos.entryPriceLong);
-                    const curDev = (dev - base) / base;
-                    return (
-                      <tr key={pos.id}>
-                        <td><span style={{ fontFamily: 'JetBrains Mono', fontSize: '11px' }}>{pos.id}</span></td>
-                        <td><span className="badge" style={{ background: 'rgba(139, 92, 246, 0.1)', color: 'var(--color-violet)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>Pair Trade</span></td>
-                        <td>
-                          <span style={{ fontWeight: '500' }}>Long {pos.longAsset} / Short {pos.shortAsset}</span>
-                          <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                            Entry ratio: {base.toFixed(3)} | Current: {dev.toFixed(3)}
-                          </div>
-                        </td>
-                        <td>${pos.sizeUsd}</td>
-                        <td>1x</td>
-                        <td className={curDev >= 0 ? 'up' : 'down'} style={{ fontWeight: '700' }}>
-                          ${(pos.sizeUsd * curDev).toFixed(2)}
-                        </td>
-                        <td>
-                          <button className="btn btn-danger" style={{ fontSize: '11px', padding: '4px 8px' }} onClick={() => handleClosePosition(pos.id)}>
-                            Close (TWAP)
-                          </button>
+            {/* Positions Table */}
+            <div className="panel full-width">
+              <h2>Open Positions</h2>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Market</th>
+                      <th>Type</th>
+                      <th>Direction / Details</th>
+                      <th>Size</th>
+                      <th>Lev</th>
+                      <th>Entry Price</th>
+                      <th>Current Price</th>
+                      <th>Live PnL</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {simState?.positions && simState.positions.length > 0 ? (
+                      simState.positions.map(pos => {
+                        let isUp = true;
+                        let pnl = 0;
+                        let details = "";
+                        
+                        if (pos.type === 'pair') {
+                          const dev = (pos.currentPriceLong / pos.currentPriceShort);
+                          const base = pos.longAsset === 'BTC' ? (pos.entryPriceLong / pos.entryPriceShort) : (pos.entryPriceShort / pos.entryPriceLong);
+                          const curDev = (dev - base) / base;
+                          pnl = pos.sizeUsd * curDev;
+                          isUp = pnl >= 0;
+                          details = `Long ${pos.longAsset} / Short ${pos.shortAsset}`;
+                        } else {
+                          // Perp calculations
+                          const curPrice = simState.prices[pos.market.replace('xyz:', '')] || pos.entryPrice;
+                          const ratio = (curPrice - pos.entryPrice) / pos.entryPrice;
+                          pnl = pos.size * ratio * (pos.direction === 'long' ? 1 : -1);
+                          isUp = pnl >= 0;
+                          details = pos.direction.toUpperCase();
+                        }
+
+                        return (
+                          <tr key={pos.id}>
+                            <td><span style={{ fontFamily: 'JetBrains Mono', fontSize: '11px' }}>{pos.id}</span></td>
+                            <td>{pos.market || 'BTC/ETH'}</td>
+                            <td>
+                              <span className="badge" style={{ 
+                                background: pos.type === 'pair' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(0, 240, 255, 0.1)', 
+                                color: pos.type === 'pair' ? 'var(--color-violet)' : 'var(--color-cyan)', 
+                                border: pos.type === 'pair' ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid rgba(0, 240, 255, 0.3)' 
+                              }}>
+                                {pos.type.toUpperCase()}
+                              </span>
+                            </td>
+                            <td><span style={{ fontWeight: '600' }}>{details}</span></td>
+                            <td>${pos.sizeUsd || pos.size}</td>
+                            <td>{pos.leverage || '1'}x</td>
+                            <td>${(pos.entryPriceLong || pos.entryPrice || 0).toLocaleString()}</td>
+                            <td>${(pos.currentPriceLong || simState.prices[pos.market.replace('xyz:', '')] || pos.entryPrice || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                            <td className={isUp ? 'up' : 'down'} style={{ fontWeight: '700' }}>
+                              ${pnl.toFixed(2)}
+                            </td>
+                            <td>
+                              <button className="btn btn-danger" style={{ fontSize: '11px', padding: '4px 8px' }} onClick={() => handleClosePosition(pos.id)}>
+                                Close
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="10" style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '24px' }}>
+                          No active positions found in ledger.
                         </td>
                       </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '24px' }}>
-                      No active market-neutral pairs or perpetual positions open.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Live SVG Deviation Chart */}
-        <div className="panel">
-          <h2>BTC/ETH Ratio Deviation</h2>
-          <div className="chart-container">
-            <svg width="360" height="120" style={{ overflow: 'visible' }}>
-              {/* Reference Gridlines */}
-              <line x1="0" y1="60" x2="360" y2="60" className="chart-center" />
-              {/* Positive threshold line at 1.5% */}
-              <line x1="0" y1="30" x2="360" y2="30" className="chart-threshold" />
-              {/* Negative threshold line at -1.5% */}
-              <line x1="0" y1="90" x2="360" y2="90" className="chart-threshold" />
-              
-              <text x="5" y="25" fill="var(--color-red)" fontSize="10" opacity="0.6">Upper Threshold (+1.5%)</text>
-              <text x="5" y="115" fill="var(--color-red)" fontSize="10" opacity="0.6">Lower Threshold (-1.5%)</text>
-              
-              {/* Path */}
-              <path d={generateSvgPath()} className="chart-line" />
-            </svg>
-            <div style={{ position: 'absolute', bottom: '8px', right: '12px', fontSize: '11px', color: 'var(--color-text-muted)', display: 'flex', gap: '8px' }}>
-              <span>Live Deviation:</span>
-              <span className={devHistory[devHistory.length-1] >= 0 ? 'up' : 'down'} style={{ fontWeight: '700' }}>
-                {(devHistory[devHistory.length-1] * 100).toFixed(3)}%
-              </span>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Live Signal Feed */}
-        <div className="panel">
-          <h2>News Alerts & Polymarket Signals</h2>
-          <div className="signal-list">
-            {signalFeed.length > 0 ? (
-              signalFeed.map(sig => (
-                <div key={sig.id} className={`signal-card ${sig.impact}`}>
-                  <div className="signal-meta">
-                    <span className="signal-source">{sig.source}</span>
-                    <span>{new Date(sig.timestamp).toLocaleTimeString()}</span>
-                  </div>
-                  <div className="signal-text">{sig.text}</div>
-                </div>
-              ))
-            ) : (
-              <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '24px' }}>
-                Waiting for signals and whale alerts...
+            {/* Active Limit Orders */}
+            <div className="panel full-width">
+              <h2>Open Limit Orders</h2>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Market</th>
+                      <th>Direction</th>
+                      <th>Size (USDC)</th>
+                      <th>Limit Price / Rules</th>
+                      <th>Created</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {simState?.orders && simState.orders.length > 0 ? (
+                      simState.orders.map(ord => (
+                        <tr key={ord.id}>
+                          <td><span style={{ fontFamily: 'JetBrains Mono', fontSize: '11px' }}>{ord.id}</span></td>
+                          <td>{ord.market}</td>
+                          <td>
+                            <span style={{ color: ord.direction === 'long' || ord.direction === 'buy' ? 'var(--color-green)' : 'var(--color-red)', fontWeight: '700' }}>
+                              {ord.direction.toUpperCase()}
+                            </span>
+                          </td>
+                          <td>${ord.size}</td>
+                          <td>
+                            {ord.price ? `$${ord.price}` : 'Midpoint Market'}
+                            {ord.postOnly && <span className="badge" style={{ marginLeft: '8px', fontSize: '10px' }}>ALO</span>}
+                          </td>
+                          <td>{new Date(ord.timestamp).toLocaleTimeString()}</td>
+                          <td>
+                            <button className="btn btn-danger" style={{ fontSize: '11px', padding: '4px 8px' }} onClick={() => handleCancelOrder(ord.id)}>
+                              Cancel
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="7" style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '24px' }}>
+                          No pending limit orders on the book.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Live CLI Console */}
-        <div className="panel">
-          <h2>Bullpen CLI Process Log</h2>
-          <div className="terminal">
-            {commandLogs.length > 0 ? (
-              commandLogs.map((log, index) => (
-                <div key={index} className="terminal-entry">
-                  <div className="terminal-header">
-                    <span>{log.command}</span>
-                    <span>{log.duration_ms}ms | exit: {log.exitCode}</span>
-                  </div>
-                  {log.stdout && (
-                    <div className="terminal-body">
-                      {log.stdout}
-                    </div>
-                  )}
-                  {log.stderr && (
-                    <div className="terminal-body terminal-stderr">
-                      {log.stderr}
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>
-                Console initialized. Waiting for CLI commands to execute...
-              </div>
-            )}
-          </div>
-        </div>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
