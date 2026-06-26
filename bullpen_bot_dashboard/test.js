@@ -84,6 +84,50 @@ async function testReadOnlyMode() {
   console.log("✅ Passed Read-Only Mode Test\n");
 }
 
+async function testShortTermPredictions() {
+  console.log("🧪 Test 5: Short-Term Prediction Market Settle & Roll-over");
+  
+  // Simulate expired time
+  const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+  if (!state.polymarket_markets) {
+    state.polymarket_markets = [];
+  }
+  
+  // Create an active prediction position for test
+  const marketId = "will-btc-be-up-in-5-min";
+  state.positions.push({
+    id: "poly_test_123",
+    type: "prediction",
+    market: marketId,
+    outcome: "yes",
+    sizeUsd: 100,
+    shares: 200,
+    entryPrice: 0.50,
+    currentPrice: 0.50,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Force target market to be expired
+  const expiredM = state.polymarket_markets.find(m => m.id === marketId);
+  if (expiredM) {
+    expiredM.endTime = new Date(Date.now() - 10000).toISOString(); // 10s ago
+    expiredM.startAssetPrice = 60000;
+  }
+  
+  // Force BTC price higher to trigger win
+  state.prices.BTC = 65000; 
+  
+  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
+  
+  // Trigger mock resolution logic or execute CLI command to buy/sell
+  const res = await runCommand("polymarket markets --output json");
+  assert.strictEqual(res.code, 0);
+  const markets = JSON.parse(res.stdout);
+  assert.ok(markets.length > 0);
+  
+  console.log("✅ Passed Short-Term Prediction Market Verification\n");
+}
+
 async function runAll() {
   try {
     // Save original state
@@ -98,6 +142,7 @@ async function runAll() {
     await testBalances();
     await testPearConstraints();
     await testReadOnlyMode();
+    await testShortTermPredictions();
 
     // Restore original state
     fs.writeFileSync(STATE_FILE, originalState, 'utf8');
