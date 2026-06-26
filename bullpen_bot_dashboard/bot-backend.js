@@ -29,7 +29,7 @@ let botConfig = {
     binaryMomentum: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 5, durationMinutes: 5 },
     weatherHedging: { enabled: false, targetAsset: "BTC", sizeUsd: 100, probabilityThreshold: 0.70 },
     sportsFanToken: { enabled: false, targetToken: "CHZ", sizeUsd: 150, probabilityShiftThreshold: 0.10 },
-    polymarketPredictions: { enabled: false, targetMarket: "will-btc-reach-100k-in-2026", outcome: "yes", sizeUsd: 100 } // Direct pUSD strategy
+    polymarketPredictions: { enabled: false, sizeUsd: 100, intervals: { "5min": true, "15min": true }, assets: { "BTC": true, "ETH": true, "SOL": true } } // Direct pUSD strategy
   },
   risk: {
     maxMarginUsage: 5000,
@@ -41,6 +41,11 @@ let commandLogs = [];
 let signalFeed = [];
 let weatherProbability = 0.50;
 let sportsProbability = 0.50;
+let priceHistory = {
+  BTC: [],
+  ETH: [],
+  SOL: []
+};
 
 function addSignal(source, text, impact = "info") {
   const signal = {
@@ -119,6 +124,12 @@ setInterval(() => {
     state.prices.ETH += (Math.random() - 0.5) * 10;
     state.prices.SPCX += (Math.random() - 0.495) * 0.01;
     state.prices.SOL += (Math.random() - 0.5) * 0.5;
+
+    ['BTC', 'ETH', 'SOL'].forEach(asset => {
+      if (!priceHistory[asset]) priceHistory[asset] = [];
+      priceHistory[asset].push(state.prices[asset]);
+      if (priceHistory[asset].length > 10) priceHistory[asset].shift();
+    });
     
     if (!state.prices.CHZ) state.prices.CHZ = 0.12;
     state.prices.CHZ += (Math.random() - 0.5) * 0.002;
@@ -474,33 +485,47 @@ async function runPolymarketPredictionStrategy() {
   if (!botConfig.strategies.polymarketPredictions.enabled) return;
 
   try {
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
     const pmConfig = botConfig.strategies.polymarketPredictions;
-    
-    // Check active prediction positions
-    const activePredictions = state.positions.filter(p => p.type === 'prediction' && p.market === pmConfig.targetMarket);
+    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
 
-    if (activePredictions.length === 0) {
-      // Simulate copy signal: if news alerts trigger smart-money yes buy
-      addSignal("POLY DIRECT", `Smart money signal detected for ${pmConfig.targetMarket}. Executing direct pUSD buy on YES token...`, "info");
+    // Fetch available markets from CLI
+    const markets = await runCLI("polymarket markets --output json");
 
-      if (botConfig.risk.previewFirst) {
-        await runCLI(`polymarket buy --market ${pmConfig.targetMarket} --outcome ${pmConfig.outcome} --amount ${pmConfig.sizeUsd} --preview --output json`);
-      }
+    for (const m of markets) {
+      const assetName = m.asset;
+      const intervalKey = `${m.interval}min`;
 
-      const res = await runCLI(`polymarket buy --market ${pmConfig.targetMarket} --outcome ${pmConfig.outcome} --amount ${pmConfig.sizeUsd} --yes --output json`);
-      addSignal("POLY DIRECT", `Direct YES prediction bought successfully. Shares: ${res.execution.shares.toFixed(1)} | ID: ${res.position_id}`, "success");
-    } else {
-      // Monitor exits: if position value increases by 10% (price > 0.55), take profits
-      for (const pos of activePredictions) {
-        if (pos.currentPrice >= 0.55) {
-          addSignal("POLY DIRECT", `Target profit reached on prediction shares (current YES price: $${pos.currentPrice.toFixed(2)}). Selling shares...`, "info");
-          await runCLI(`polymarket sell ${pos.id} --yes --output json`);
-          addSignal("POLY DIRECT", `Direct YES prediction position sold. Payout completed in pUSD.`, "success");
+      // Check if config allows this asset and interval
+      if (!pmConfig.assets[assetName] || !pmConfig.intervals[intervalKey]) continue;
+
+      // Check if we already have an active position in this market
+      const hasPos = state.positions.some(p => p.type === 'prediction' && p.market === m.id);
+      if (hasPos) continue;
+
+      // Trend detection using priceHistory
+      const history = priceHistory[assetName] || [];
+      if (history.length < 3) continue; // need some data points
+
+      const avgPrice = history.reduce((a,b)=>a+b,0) / history.length;
+      const currentPrice = state.prices[assetName];
+      const trend = currentPrice - avgPrice;
+
+      // Trigger entry if there's clear momentum
+      if (Math.abs(trend) > 0.0) {
+        const outcome = trend > 0 ? 'yes' : 'no';
+        
+        addSignal("POLY AUTOMATED", `Short-term momentum detected on ${assetName} (${trend > 0 ? 'UP' : 'DOWN'}). Executing automated prediction order...`, "info");
+
+        if (botConfig.risk.previewFirst) {
+          await runCLI(`polymarket buy --market ${m.id} --outcome ${outcome} --amount ${pmConfig.sizeUsd} --preview --output json`);
         }
+
+        const res = await runCLI(`polymarket buy --market ${m.id} --outcome ${outcome} --amount ${pmConfig.sizeUsd} --yes --output json`);
+        addSignal("POLY AUTOMATED", `Direct prediction bought: ${outcome.toUpperCase()} on ${m.id}. Shares: ${res.execution.shares.toFixed(1)} | ID: ${res.position_id}`, "success");
       }
     }
   } catch (e) {
+    addSignal("POLY AUTOMATED", `Strategy execution error: ${e.message || e}`, "danger");
     console.error("Polymarket Prediction Strategy error:", e);
   }
 }
