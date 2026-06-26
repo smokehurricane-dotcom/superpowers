@@ -24,7 +24,7 @@ function App() {
     binaryMomentum: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 5, durationMinutes: 5 },
     weatherHedging: { enabled: false, targetAsset: "BTC", sizeUsd: 100, probabilityThreshold: 0.70 },
     sportsFanToken: { enabled: false, targetToken: "CHZ", sizeUsd: 150, probabilityShiftThreshold: 0.10 },
-    polymarketPredictions: { enabled: false, targetMarket: "will-btc-reach-100k-in-2026", outcome: "yes", sizeUsd: 100 }
+    polymarketPredictions: { enabled: false, sizeUsd: 100, intervals: { "5min": true, "15min": true }, assets: { "BTC": true, "ETH": true, "SOL": true } }
   });
 
   const [maxMarginUsage, setMaxMarginUsage] = useState(5000);
@@ -496,28 +496,59 @@ function App() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <h3 style={{ fontSize: '15px', fontWeight: '600', color: 'var(--color-text-main)' }}>Direct Polymarket pUSD Prediction Trader</h3>
-                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Buys prediction market shares directly using pUSD balance based on news/alerts</p>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Scans short-term crypto up/down markets and trades based on price momentum</p>
                     </div>
                     <label className="switch">
                       <input type="checkbox" checked={strategies.polymarketPredictions?.enabled} onChange={() => handleStrategyToggle('polymarketPredictions')} />
                       <span className="slider"></span>
                     </label>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }} className="responsive-settings-grid">
                     <div>
                       <label>Trade Size (pUSD)</label>
                       <input type="number" value={strategies.polymarketPredictions?.sizeUsd} onChange={(e) => handleParamChange('polymarketPredictions', 'sizeUsd', e.target.value)} />
                     </div>
                     <div>
-                      <label>Target Market (Slug)</label>
-                      <input type="text" value={strategies.polymarketPredictions?.targetMarket} onChange={(e) => handleParamChange('polymarketPredictions', 'targetMarket', e.target.value)} />
+                      <label style={{ marginBottom: '6px', display: 'block' }}>Target Intervals</label>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={strategies.polymarketPredictions?.intervals?.["5min"]} 
+                            onChange={(e) => {
+                              const nextIntervals = { ...strategies.polymarketPredictions.intervals, "5min": e.target.checked };
+                              handleParamChange('polymarketPredictions', 'intervals', nextIntervals);
+                            }}
+                          /> 5 Min
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={strategies.polymarketPredictions?.intervals?.["15min"]} 
+                            onChange={(e) => {
+                              const nextIntervals = { ...strategies.polymarketPredictions.intervals, "15min": e.target.checked };
+                              handleParamChange('polymarketPredictions', 'intervals', nextIntervals);
+                            }}
+                          /> 15 Min
+                        </label>
+                      </div>
                     </div>
                     <div>
-                      <label>Outcome</label>
-                      <select value={strategies.polymarketPredictions?.outcome} onChange={(e) => handleParamChange('polymarketPredictions', 'outcome', e.target.value)}>
-                        <option value="yes">YES</option>
-                        <option value="no">NO</option>
-                      </select>
+                      <label style={{ marginBottom: '6px', display: 'block' }}>Crypto Assets</label>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        {["BTC", "ETH", "SOL"].map(asset => (
+                          <label key={asset} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
+                            <input 
+                              type="checkbox" 
+                              checked={strategies.polymarketPredictions?.assets?.[asset]} 
+                              onChange={(e) => {
+                                const nextAssets = { ...strategies.polymarketPredictions.assets, [asset]: e.target.checked };
+                                  handleParamChange('polymarketPredictions', 'assets', nextAssets);
+                              }}
+                            /> {asset}
+                          </label>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -915,7 +946,17 @@ function App() {
                           // Direct prediction positions
                           pnl = pos.shares * (pos.currentPrice - pos.entryPrice);
                           isUp = pnl >= 0;
-                          details = `${pos.outcome.toUpperCase()} prediction`;
+                          const activeM = simState?.polymarket_markets?.find(m => m.id === pos.market);
+                          let remainingText = "Resolving...";
+                          if (activeM) {
+                            const diffMs = new Date(activeM.endTime).getTime() - Date.now();
+                            if (diffMs > 0) {
+                              const min = Math.floor(diffMs / 60000);
+                              const sec = Math.floor((diffMs % 60000) / 1000);
+                              remainingText = `${min}m ${sec}s left`;
+                            }
+                          }
+                          details = `${pos.outcome.toUpperCase()} prediction (${remainingText})`;
                         } else {
                           const curPrice = simState.prices[pos.market.replace('xyz:', '')] || pos.entryPrice;
                           const ratio = (curPrice - pos.entryPrice) / pos.entryPrice;
@@ -940,8 +981,30 @@ function App() {
                             <td><span style={{ fontWeight: '600' }}>{details}</span></td>
                             <td>${pos.sizeUsd || pos.size}</td>
                             <td>{pos.type === 'prediction' ? `${pos.shares.toFixed(1)} shares` : `${pos.leverage || '1'}x`}</td>
-                            <td>${(pos.entryPriceLong || pos.entryPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
-                            <td>${(pos.currentPriceLong || pos.currentPrice || simState.prices[pos.market.replace('xyz:', '')] || pos.entryPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
+                            <td>
+                              {pos.type === 'prediction' ? (
+                                <>
+                                  <div>Entry Share: ${pos.entryPrice.toFixed(2)}</div>
+                                  <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>
+                                    Start Asset: ${(simState?.polymarket_markets?.find(m => m.id === pos.market)?.startAssetPrice || 0).toFixed(2)}
+                                  </div>
+                                </>
+                              ) : (
+                                `$${(pos.entryPriceLong || pos.entryPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`
+                              )}
+                            </td>
+                            <td>
+                              {pos.type === 'prediction' ? (
+                                <>
+                                  <div>Cur Share: ${pos.currentPrice.toFixed(2)}</div>
+                                  <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>
+                                    Cur Asset: ${(simState?.prices?.[simState?.polymarket_markets?.find(m => m.id === pos.market)?.asset] || 0).toFixed(2)}
+                                  </div>
+                                </>
+                              ) : (
+                                `$${(pos.currentPriceLong || pos.currentPrice || simState.prices[pos.market.replace('xyz:', '')] || pos.entryPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`
+                              )}
+                            </td>
                             <td className={isUp ? 'up' : 'down'} style={{ fontWeight: '700' }}>
                               ${pnl.toFixed(2)}
                             </td>
