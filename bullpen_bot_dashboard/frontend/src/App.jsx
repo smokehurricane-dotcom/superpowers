@@ -4,20 +4,26 @@ function App() {
   const [wsConnected, setWsConnected] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'positions'
-  const [balances, setBalances] = useState({ solana: { USDC: 0, SOL: 0 }, hyperliquid: { USDC: 0, SPCX: 0 }, aggregated_balance_usd: 0 });
+  const [balances, setBalances] = useState({ solana: { USDC: 0, SOL: 0, CHZ: 0 }, hyperliquid: { USDC: 0, SPCX: 0 }, aggregated_balance_usd: 0 });
   const [pairStatus, setPairStatus] = useState({ setup_completed: false, positions: [], builder_fees_accrued: 0 });
   const [accountStatus, setAccountStatus] = useState({ maintenance_margin_usd: 0, margin_usage_usd: 0, available_margin_usd: 0, risk_level: 'LOW', positions_count: 0, open_orders_count: 0 });
   const [commandLogs, setCommandLogs] = useState([]);
   const [signalFeed, setSignalFeed] = useState([]);
   const [simState, setSimState] = useState(null);
   
+  // Simulated probabilities from WebSocket
+  const [weatherProb, setWeatherProb] = useState(0.50);
+  const [sportsProb, setSportsProb] = useState(0.50);
+
   // Strategy Configurations
   const [strategies, setStrategies] = useState({
     pearPair: { enabled: false, sizeUsd: 22, targetPair: "BTC/ETH", baseRatio: 18.57, deviationThreshold: 0.015 },
     spreadFarming: { enabled: false, targetMarket: "xyz:SPCX", sizeUsd: 15, spreadThreshold: 0.004 },
     momentum: { enabled: false, targetMarket: "xyz:SPCX", notional: 20, leverage: 2, tpPct: 15, slPct: 10 },
     smartMoney: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 2 },
-    binaryMomentum: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 5, durationMinutes: 5 } // New 5-Min Up/Down strategy
+    binaryMomentum: { enabled: false, targetAsset: "BTC", notional: 50, leverage: 5, durationMinutes: 5 },
+    weatherHedging: { enabled: false, targetAsset: "BTC", sizeUsd: 100, probabilityThreshold: 0.70 },
+    sportsFanToken: { enabled: false, targetToken: "CHZ", sizeUsd: 150, probabilityShiftThreshold: 0.10 }
   });
 
   const [maxMarginUsage, setMaxMarginUsage] = useState(5000);
@@ -80,6 +86,10 @@ function App() {
         setSignalFeed(msg.data);
       } else if (msg.type === 'FULL_STATE') {
         setSimState(msg.data);
+      } else if (msg.type === 'WEATHER_FORECAST') {
+        setWeatherProb(msg.data.probability);
+      } else if (msg.type === 'SPORTS_PROBABILITY') {
+        setSportsProb(msg.data.probability);
       }
     };
   };
@@ -321,6 +331,10 @@ function App() {
               <div className="stat-value" style={{ fontSize: '16px' }}>{balances.solana.SOL.toFixed(2)} SOL</div>
             </div>
             <div className="stat-card">
+              <label>Solana CHZ Fan</label>
+              <div className="stat-value" style={{ fontSize: '16px' }}>{(balances.solana.CHZ || 0.0).toFixed(1)} CHZ</div>
+            </div>
+            <div className="stat-card">
               <label>Hyperliquid USDC</label>
               <div className="stat-value">${balances.hyperliquid.USDC.toFixed(2)}</div>
             </div>
@@ -400,6 +414,7 @@ function App() {
                 <select value={swapTokenA} onChange={(e) => setSwapTokenA(e.target.value)}>
                   <option value="USDC">USDC</option>
                   <option value="SOL">SOL</option>
+                  <option value="CHZ">CHZ</option>
                 </select>
               </div>
               <div>
@@ -407,6 +422,7 @@ function App() {
                 <select value={swapTokenB} onChange={(e) => setSwapTokenB(e.target.value)}>
                   <option value="SOL">SOL</option>
                   <option value="USDC">USDC</option>
+                  <option value="CHZ">CHZ</option>
                 </select>
               </div>
             </div>
@@ -432,7 +448,7 @@ function App() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '18px' }} className="responsive-strategies">
                 {/* 1. Pear Pair Trading */}
                 <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.pearPair.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
-                  <div style={{ display: 'flex', justifycontent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Pear Pair Trading</h3>
                       <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Marktneutrale Arbitrage BTC/ETH</p>
@@ -458,7 +474,71 @@ function App() {
                   </div>
                 </div>
 
-                {/* 5. 5-Min Binary Momentum Strategy (New Up/Down Trend Strategy) */}
+                {/* NEW: Weather Hedging Strategy */}
+                <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.weatherHedging.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Polymarket Weather Hedger</h3>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Shorts BTC perps when Heatwave risk rises to hedge miner power curtailment</p>
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" checked={strategies.weatherHedging.enabled} onChange={() => handleStrategyToggle('weatherHedging')} />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label>Hedge Size (USDC)</label>
+                      <input type="number" value={strategies.weatherHedging.sizeUsd} onChange={(e) => handleParamChange('weatherHedging', 'sizeUsd', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Heatwave Trigger Prob (%)</label>
+                      <input type="number" step="0.01" value={strategies.weatherHedging.probabilityThreshold} onChange={(e) => handleParamChange('weatherHedging', 'probabilityThreshold', e.target.value)} />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.1)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
+                      <div>
+                        <label style={{ fontSize: '10px' }}>Miami Heatwave Prob</label>
+                        <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--color-amber)', fontFamily: 'JetBrains Mono' }}>
+                          {(weatherProb * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* NEW: Sports Fan Token Strategy */}
+                <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.sportsFanToken.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Sports Sentiment & Fan Tokens</h3>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Swaps Solana USDC into Fan Tokens (CHZ) on rapid Polymarket win probability shifts</p>
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" checked={strategies.sportsFanToken.enabled} onChange={() => handleStrategyToggle('sportsFanToken')} />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                    <div>
+                      <label>Swap Size (USDC)</label>
+                      <input type="number" value={strategies.sportsFanToken.sizeUsd} onChange={(e) => handleParamChange('sportsFanToken', 'sizeUsd', e.target.value)} />
+                    </div>
+                    <div>
+                      <label>Shift Trigger (%)</label>
+                      <input type="number" step="0.01" value={strategies.sportsFanToken.probabilityShiftThreshold} onChange={(e) => handleParamChange('sportsFanToken', 'probabilityShiftThreshold', e.target.value)} />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.1)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
+                      <div>
+                        <label style={{ fontSize: '10px' }}>Real Madrid Win Prob</label>
+                        <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--color-cyan)', fontFamily: 'JetBrains Mono' }}>
+                          {(sportsProb * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. 5-Min Binary Momentum Strategy */}
                 <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderLeft: `4px solid ${strategies.binaryMomentum.enabled ? 'var(--color-cyan)' : 'var(--glass-border)'}` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
@@ -726,7 +806,6 @@ function App() {
                           isUp = pnl >= 0;
                           details = `Long ${pos.longAsset} / Short ${pos.shortAsset}`;
                         } else {
-                          // Perp calculations
                           const curPrice = simState.prices[pos.market.replace('xyz:', '')] || pos.entryPrice;
                           const ratio = (curPrice - pos.entryPrice) / pos.entryPrice;
                           pnl = pos.size * ratio * (pos.direction === 'long' ? 1 : -1);

@@ -74,13 +74,14 @@ if (cmdString.startsWith('portfolio balances')) {
   printResult({
     solana: {
       USDC: state.wallets.solana.usdc,
-      SOL: state.wallets.solana.sol
+      SOL: state.wallets.solana.sol,
+      CHZ: state.wallets.solana.chz || 0.0
     },
     hyperliquid: {
       USDC: state.wallets.hyperliquid.usdc,
       SPCX: state.wallets.hyperliquid.spcx
     },
-    aggregated_balance_usd: state.wallets.solana.usdc + state.wallets.hyperliquid.usdc + (state.wallets.solana.sol * state.prices.SOL) + (state.wallets.hyperliquid.spcx * state.prices.SPCX)
+    aggregated_balance_usd: state.wallets.solana.usdc + state.wallets.hyperliquid.usdc + (state.wallets.solana.sol * state.prices.SOL) + (state.wallets.hyperliquid.spcx * state.prices.SPCX) + ((state.wallets.solana.chz || 0.0) * (state.prices.CHZ || 0.12))
   });
   process.exit(0);
 }
