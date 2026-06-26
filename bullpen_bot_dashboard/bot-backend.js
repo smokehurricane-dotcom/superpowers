@@ -18,6 +18,48 @@ app.use(express.json());
 const STATE_FILE = path.join(__dirname, 'sim_state.json');
 const MOCK_CLI_PATH = path.join(__dirname, 'mock-bullpen.js');
 
+function readState() {
+  let lastError;
+  for (let i = 0; i < 5; i++) {
+    try {
+      return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    } catch (e) {
+      lastError = e;
+      const start = Date.now();
+      while (Date.now() - start < 20) {}
+    }
+  }
+  throw lastError;
+}
+
+function writeState(state) {
+  const tempPath = STATE_FILE + '.tmp';
+  try {
+    fs.writeFileSync(tempPath, JSON.stringify(state, null, 2), 'utf8');
+    fs.renameSync(tempPath, STATE_FILE);
+  } catch (e) {
+    if (e.code === 'EPERM' || e.code === 'EBUSY') {
+      let success = false;
+      for (let i = 0; i < 10; i++) {
+        try {
+          const start = Date.now();
+          while (Date.now() - start < 10) {}
+          fs.renameSync(tempPath, STATE_FILE);
+          success = true;
+          break;
+        } catch (err) {
+          if (err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
+        }
+      }
+      if (!success) {
+        fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
+      }
+    } else {
+      throw e;
+    }
+  }
+}
+
 // Bot config and run-time state
 let botConfig = {
   readOnly: false,
@@ -118,7 +160,7 @@ function broadcast(msgObj) {
 setInterval(() => {
   try {
     if (!fs.existsSync(STATE_FILE)) return;
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const state = readState();
     
     state.prices.BTC += (Math.random() - 0.5) * 150;
     state.prices.ETH += (Math.random() - 0.5) * 10;
@@ -230,7 +272,7 @@ setInterval(() => {
       return p;
     });
 
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf8');
+    writeState(state);
     
     syncPortfolioState();
   } catch (e) {
@@ -244,7 +286,7 @@ async function syncPortfolioState() {
     const pairStatus = await runCLI("hl pair status --output json");
     const accountStatus = await runCLI("hl status --all-dexes --output json");
     
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const state = readState();
 
     broadcast({
       type: 'PORTFOLIO_STATE',
@@ -298,7 +340,7 @@ async function runPearPairStrategy() {
   if (!botConfig.strategies.pearPair.enabled) return;
   
   try {
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const state = readState();
     const pConfig = botConfig.strategies.pearPair;
 
     const ratio = state.prices.BTC / state.prices.ETH;
@@ -378,7 +420,7 @@ async function runBinaryMomentumStrategy() {
   if (!botConfig.strategies.binaryMomentum.enabled) return;
 
   try {
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const state = readState();
     const bmConfig = botConfig.strategies.binaryMomentum;
     const activePositions = state.positions.filter(p => p.type === 'perp' && p.market === bmConfig.targetAsset);
 
@@ -415,7 +457,7 @@ async function runWeatherHedgingStrategy() {
 
   try {
     const wConfig = botConfig.strategies.weatherHedging;
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const state = readState();
     const activePositions = state.positions.filter(p => p.type === 'perp' && p.market === wConfig.targetAsset && p.direction === 'short');
 
     weatherProbability += (Math.random() - 0.5) * 0.08;
@@ -452,7 +494,7 @@ async function runSportsFanTokenStrategy() {
 
   try {
     const sConfig = botConfig.strategies.sportsFanToken;
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const state = readState();
 
     const oldProb = sportsProbability;
     sportsProbability += (Math.random() - 0.5) * 0.15;
@@ -486,7 +528,7 @@ async function runPolymarketPredictionStrategy() {
 
   try {
     const pmConfig = botConfig.strategies.polymarketPredictions;
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const state = readState();
 
     // Fetch available markets from CLI
     const markets = await runCLI("polymarket markets --output json");
@@ -595,7 +637,7 @@ async function triggerSmartMoneyTrade(asset) {
 
 app.get('/api/status', (req, res) => {
   try {
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const state = readState();
     res.json({
       botConfig,
       state,
