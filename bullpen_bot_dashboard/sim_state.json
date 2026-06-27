@@ -8,7 +8,7 @@
     },
     "hyperliquid": {
       "address": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-      "usdc": 14685.333333333407,
+      "usdc": 14698.666666666739,
       "spcx": 0,
       "maintenance_margin": 150,
       "margin_usage": 0,
@@ -16,161 +16,145 @@
     },
     "polymarket": {
       "address": "0xPolymarketMockAddress777",
-      "pusd": 14897.186908053773
+      "pusd": 14497.186908053773
     }
   },
   "positions": [
     {
-      "id": "perp_9hr47v8nc",
+      "id": "poly_vbjws0fh9",
+      "type": "prediction",
+      "market": "will-btc-be-up-in-5-min",
+      "outcome": "yes",
+      "sizeUsd": 100,
+      "shares": 218.77050973528767,
+      "entryPrice": 0.4571,
+      "currentPrice": 0.4767,
+      "timestamp": "2026-06-27T02:35:57.880Z"
+    },
+    {
+      "id": "poly_bgrdscv1w",
+      "type": "prediction",
+      "market": "will-eth-be-up-in-5-min",
+      "outcome": "no",
+      "sizeUsd": 100,
+      "shares": 126.00806451612904,
+      "entryPrice": 0.7936,
+      "currentPrice": 0.9315,
+      "timestamp": "2026-06-27T02:36:00.704Z"
+    },
+    {
+      "id": "poly_4kidbj97t",
+      "type": "prediction",
+      "market": "will-sol-be-up-in-5-min",
+      "outcome": "yes",
+      "sizeUsd": 100,
+      "shares": 220.4099625303064,
+      "entryPrice": 0.4537,
+      "currentPrice": 0.2696,
+      "timestamp": "2026-06-27T02:36:03.489Z"
+    },
+    {
+      "id": "perp_0ldleqsgz",
       "type": "perp",
       "market": "BTC",
       "direction": "short",
       "size": 100,
       "leverage": 75,
-      "entryPrice": 62347.28714649468,
+      "entryPrice": 62421.15013068783,
       "tp": null,
       "sl": null,
-      "timestamp": "2026-06-27T02:32:53.209Z"
+      "timestamp": "2026-06-27T02:36:05.779Z"
     },
     {
-      "id": "pair_w5rswwf5l",
+      "id": "pair_ndaq0gza0",
       "type": "pair",
       "longAsset": "ETH",
       "shortAsset": "BTC",
       "weightLong": 0.5,
       "weightShort": 0.5,
       "sizeUsd": 300,
-      "entryTime": "2026-06-27T02:33:00.678Z",
-      "entryPriceLong": 3412.740662971294,
-      "entryPriceShort": 62388.54518900833,
-      "currentPriceLong": 3368.025603602985,
-      "currentPriceShort": 62433.166653099746
+      "entryTime": "2026-06-27T02:36:05.810Z",
+      "entryPriceLong": 3360.5959058376498,
+      "entryPriceShort": 62421.15013068783,
+      "currentPriceLong": 3352.5429213387874,
+      "currentPriceShort": 62431.46549007895
     },
     {
-      "id": "perp_otx99s4du",
-      "type": "perp",
-      "market": "xyz:SPCX",
-      "direction": "long",
-      "size": 200,
-      "leverage": 75,
-      "entryPrice": 1.9312375103590256,
-      "tp": 1.5,
-      "sl": 1.1,
-      "timestamp": "2026-06-27T02:33:03.725Z"
-    },
-    {
-      "id": "perp_rgmbvunau",
-      "type": "perp",
-      "market": "xyz:SPCX",
-      "direction": "long",
-      "size": 200,
-      "leverage": 75,
-      "entryPrice": 1.944809495818392,
-      "tp": 1.5,
-      "sl": 1.1,
-      "timestamp": "2026-06-27T02:33:33.465Z"
-    },
-    {
-      "id": "perp_hiscrm8y8",
-      "type": "perp",
-      "market": "xyz:SPCX",
-      "direction": "short",
-      "size": 200,
-      "leverage": 75,
-      "entryPrice": 1.9520612459527948,
-      "tp": 1,
-      "sl": 1.4,
-      "timestamp": "2026-06-27T02:34:03.787Z"
-    },
-    {
-      "id": "poly_avpsiuf9v",
+      "id": "poly_pb6b8eci8",
       "type": "prediction",
       "market": "will-btc-be-up-in-15-min",
       "outcome": "yes",
       "sizeUsd": 100,
-      "shares": 181.35654697134567,
-      "entryPrice": 0.5514,
-      "currentPrice": 0.5818,
-      "timestamp": "2026-06-27T02:34:29.244Z"
+      "shares": 174.76406850751485,
+      "entryPrice": 0.5722,
+      "currentPrice": 0.5804,
+      "timestamp": "2026-06-27T02:36:06.826Z"
     },
     {
-      "id": "poly_xm9ujz4zn",
+      "id": "poly_2zvlgozlf",
       "type": "prediction",
-      "market": "will-sol-be-up-in-15-min",
+      "market": "will-btc-be-up-in-15-min",
       "outcome": "yes",
       "sizeUsd": 100,
-      "shares": 225.78460149017837,
-      "entryPrice": 0.4429,
-      "currentPrice": 0.4686,
-      "timestamp": "2026-06-27T02:34:33.096Z"
+      "shares": 174.76406850751485,
+      "entryPrice": 0.5722,
+      "currentPrice": 0.5804,
+      "timestamp": "2026-06-27T02:36:07.319Z"
     },
     {
-      "id": "perp_qt4nyp69t",
-      "type": "perp",
-      "market": "xyz:SPCX",
-      "direction": "long",
-      "size": 200,
-      "leverage": 75,
-      "entryPrice": 1.9576917233192261,
-      "tp": 1.5,
-      "sl": 1.1,
-      "timestamp": "2026-06-27T02:34:33.640Z"
-    },
-    {
-      "id": "poly_diwz9nqcz",
+      "id": "poly_t2tpe2exk",
       "type": "prediction",
-      "market": "will-btc-be-up-in-5-min",
+      "market": "will-eth-be-up-in-15-min",
       "outcome": "yes",
       "sizeUsd": 100,
-      "shares": 200.0400080016003,
-      "entryPrice": 0.4999,
-      "currentPrice": 0.4781,
-      "timestamp": "2026-06-27T02:34:37.069Z"
+      "shares": 636.5372374283896,
+      "entryPrice": 0.1571,
+      "currentPrice": 0.05,
+      "timestamp": "2026-06-27T02:36:09.457Z"
     },
     {
-      "id": "poly_ra7esjp4j",
+      "id": "poly_mq0d2fik8",
       "type": "prediction",
       "market": "will-eth-be-up-in-15-min",
       "outcome": "no",
       "sizeUsd": 100,
-      "shares": 139.33398355858995,
-      "entryPrice": 0.7177,
-      "currentPrice": 0.7428,
-      "timestamp": "2026-06-27T02:34:45.783Z"
+      "shares": 118.63803535413454,
+      "entryPrice": 0.8429,
+      "currentPrice": 0.95,
+      "timestamp": "2026-06-27T02:36:09.847Z"
     },
     {
-      "id": "poly_76k58cear",
+      "id": "poly_8swqa745u",
       "type": "prediction",
-      "market": "will-eth-be-up-in-5-min",
+      "market": "will-sol-be-up-in-15-min",
+      "outcome": "yes",
+      "sizeUsd": 100,
+      "shares": 266.95141484249865,
+      "entryPrice": 0.3746,
+      "currentPrice": 0.2128,
+      "timestamp": "2026-06-27T02:36:12.108Z"
+    },
+    {
+      "id": "poly_ndu3aprid",
+      "type": "prediction",
+      "market": "will-sol-be-up-in-15-min",
       "outcome": "no",
       "sizeUsd": 100,
-      "shares": 145.39110206455365,
-      "entryPrice": 0.6878,
-      "currentPrice": 0.7026,
-      "timestamp": "2026-06-27T02:34:53.834Z"
+      "shares": 159.8976654940838,
+      "entryPrice": 0.6254,
+      "currentPrice": 0.7872,
+      "timestamp": "2026-06-27T02:36:12.338Z"
     },
     {
-      "id": "perp_g6knkywb4",
-      "type": "perp",
-      "market": "xyz:SPCX",
-      "direction": "short",
-      "size": 200,
-      "leverage": 75,
-      "entryPrice": 1.962557677141814,
-      "tp": 1,
-      "sl": 1.4,
-      "timestamp": "2026-06-27T02:35:03.579Z"
-    },
-    {
-      "id": "poly_rqvkk08g0",
+      "id": "poly_taob1luan",
       "type": "prediction",
-      "market": "will-sol-be-up-in-5-min",
+      "market": "will-sol-be-up-in-15-min",
       "outcome": "no",
       "sizeUsd": 100,
-      "shares": 152.7417137620284,
-      "entryPrice": 0.6547,
-      "currentPrice": 0.4743,
-      "timestamp": "2026-06-27T02:35:26.246Z"
+      "shares": 149.03129657228018,
+      "entryPrice": 0.671,
+      "currentPrice": 0.7872,
+      "timestamp": "2026-06-27T02:36:14.467Z"
     }
   ],
   "orders": [],
@@ -24855,6 +24839,195 @@
         "timestamp": "2026-06-27T02:35:26.246Z"
       },
       "timestamp": "2026-06-27T02:35:26.247Z"
+    },
+    {
+      "action": "cancel_all_circuit_breaker",
+      "returned_collateral": 914.6666666666666,
+      "timestamp": "2026-06-27T02:35:55.698Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_vbjws0fh9",
+        "type": "prediction",
+        "market": "will-btc-be-up-in-5-min",
+        "outcome": "yes",
+        "sizeUsd": 100,
+        "shares": 218.77050973528767,
+        "entryPrice": 0.4571,
+        "currentPrice": 0.4571,
+        "timestamp": "2026-06-27T02:35:57.880Z"
+      },
+      "timestamp": "2026-06-27T02:35:57.881Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_bgrdscv1w",
+        "type": "prediction",
+        "market": "will-eth-be-up-in-5-min",
+        "outcome": "no",
+        "sizeUsd": 100,
+        "shares": 126.00806451612904,
+        "entryPrice": 0.7936,
+        "currentPrice": 0.7936,
+        "timestamp": "2026-06-27T02:36:00.704Z"
+      },
+      "timestamp": "2026-06-27T02:36:00.706Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_4kidbj97t",
+        "type": "prediction",
+        "market": "will-sol-be-up-in-5-min",
+        "outcome": "yes",
+        "sizeUsd": 100,
+        "shares": 220.4099625303064,
+        "entryPrice": 0.4537,
+        "currentPrice": 0.4537,
+        "timestamp": "2026-06-27T02:36:03.489Z"
+      },
+      "timestamp": "2026-06-27T02:36:03.491Z"
+    },
+    {
+      "action": "perp_open",
+      "details": {
+        "id": "perp_0ldleqsgz",
+        "type": "perp",
+        "market": "BTC",
+        "direction": "short",
+        "size": 100,
+        "leverage": 75,
+        "entryPrice": 62421.15013068783,
+        "tp": null,
+        "sl": null,
+        "timestamp": "2026-06-27T02:36:05.779Z"
+      },
+      "timestamp": "2026-06-27T02:36:05.781Z"
+    },
+    {
+      "action": "pair_open",
+      "details": {
+        "id": "pair_ndaq0gza0",
+        "type": "pair",
+        "longAsset": "ETH",
+        "shortAsset": "BTC",
+        "weightLong": 0.5,
+        "weightShort": 0.5,
+        "sizeUsd": 300,
+        "entryTime": "2026-06-27T02:36:05.810Z",
+        "entryPriceLong": 3360.5959058376498,
+        "entryPriceShort": 62421.15013068783,
+        "currentPriceLong": 3360.5959058376498,
+        "currentPriceShort": 62421.15013068783
+      },
+      "timestamp": "2026-06-27T02:36:05.811Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_pb6b8eci8",
+        "type": "prediction",
+        "market": "will-btc-be-up-in-15-min",
+        "outcome": "yes",
+        "sizeUsd": 100,
+        "shares": 174.76406850751485,
+        "entryPrice": 0.5722,
+        "currentPrice": 0.5722,
+        "timestamp": "2026-06-27T02:36:06.826Z"
+      },
+      "timestamp": "2026-06-27T02:36:06.830Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_2zvlgozlf",
+        "type": "prediction",
+        "market": "will-btc-be-up-in-15-min",
+        "outcome": "yes",
+        "sizeUsd": 100,
+        "shares": 174.76406850751485,
+        "entryPrice": 0.5722,
+        "currentPrice": 0.5722,
+        "timestamp": "2026-06-27T02:36:07.319Z"
+      },
+      "timestamp": "2026-06-27T02:36:07.321Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_t2tpe2exk",
+        "type": "prediction",
+        "market": "will-eth-be-up-in-15-min",
+        "outcome": "yes",
+        "sizeUsd": 100,
+        "shares": 636.5372374283896,
+        "entryPrice": 0.1571,
+        "currentPrice": 0.1571,
+        "timestamp": "2026-06-27T02:36:09.457Z"
+      },
+      "timestamp": "2026-06-27T02:36:09.458Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_mq0d2fik8",
+        "type": "prediction",
+        "market": "will-eth-be-up-in-15-min",
+        "outcome": "no",
+        "sizeUsd": 100,
+        "shares": 118.63803535413454,
+        "entryPrice": 0.8429,
+        "currentPrice": 0.8429,
+        "timestamp": "2026-06-27T02:36:09.847Z"
+      },
+      "timestamp": "2026-06-27T02:36:09.848Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_8swqa745u",
+        "type": "prediction",
+        "market": "will-sol-be-up-in-15-min",
+        "outcome": "yes",
+        "sizeUsd": 100,
+        "shares": 266.95141484249865,
+        "entryPrice": 0.3746,
+        "currentPrice": 0.3746,
+        "timestamp": "2026-06-27T02:36:12.108Z"
+      },
+      "timestamp": "2026-06-27T02:36:12.110Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_ndu3aprid",
+        "type": "prediction",
+        "market": "will-sol-be-up-in-15-min",
+        "outcome": "no",
+        "sizeUsd": 100,
+        "shares": 159.8976654940838,
+        "entryPrice": 0.6254,
+        "currentPrice": 0.6254,
+        "timestamp": "2026-06-27T02:36:12.338Z"
+      },
+      "timestamp": "2026-06-27T02:36:12.340Z"
+    },
+    {
+      "action": "polymarket_buy",
+      "details": {
+        "id": "poly_taob1luan",
+        "type": "prediction",
+        "market": "will-sol-be-up-in-15-min",
+        "outcome": "no",
+        "sizeUsd": 100,
+        "shares": 149.03129657228018,
+        "entryPrice": 0.671,
+        "currentPrice": 0.671,
+        "timestamp": "2026-06-27T02:36:14.467Z"
+      },
+      "timestamp": "2026-06-27T02:36:14.469Z"
     }
   ],
   "polymarket_markets": [
@@ -24865,8 +25038,8 @@
       "startAssetPrice": 62460.509627193824,
       "startTime": "2026-06-27T02:34:31.177Z",
       "endTime": "2026-06-27T02:39:31.177Z",
-      "currentYesPrice": 0.4781,
-      "currentNoPrice": 0.5219
+      "currentYesPrice": 0.4767,
+      "currentNoPrice": 0.5233
     },
     {
       "id": "will-eth-be-up-in-5-min",
@@ -24875,8 +25048,8 @@
       "startAssetPrice": 3381.7251435153535,
       "startTime": "2026-06-27T02:34:31.177Z",
       "endTime": "2026-06-27T02:39:31.177Z",
-      "currentYesPrice": 0.2974,
-      "currentNoPrice": 0.7026
+      "currentYesPrice": 0.0685,
+      "currentNoPrice": 0.9315
     },
     {
       "id": "will-sol-be-up-in-5-min",
@@ -24885,8 +25058,8 @@
       "startAssetPrice": 143.31342605904837,
       "startTime": "2026-06-27T02:34:31.177Z",
       "endTime": "2026-06-27T02:39:31.177Z",
-      "currentYesPrice": 0.5257,
-      "currentNoPrice": 0.4743
+      "currentYesPrice": 0.2696,
+      "currentNoPrice": 0.7304
     },
     {
       "id": "will-btc-be-up-in-15-min",
@@ -24895,8 +25068,8 @@
       "startAssetPrice": 62331.19394651015,
       "startTime": "2026-06-27T02:34:25.164Z",
       "endTime": "2026-06-27T02:49:25.164Z",
-      "currentYesPrice": 0.5818,
-      "currentNoPrice": 0.4182
+      "currentYesPrice": 0.5804,
+      "currentNoPrice": 0.4196
     },
     {
       "id": "will-eth-be-up-in-15-min",
@@ -24905,8 +25078,8 @@
       "startAssetPrice": 3384.4595853561386,
       "startTime": "2026-06-27T02:34:25.164Z",
       "endTime": "2026-06-27T02:49:25.165Z",
-      "currentYesPrice": 0.2572,
-      "currentNoPrice": 0.7428
+      "currentYesPrice": 0.05,
+      "currentNoPrice": 0.95
     },
     {
       "id": "will-sol-be-up-in-15-min",
@@ -24915,15 +25088,15 @@
       "startAssetPrice": 143.47717899080584,
       "startTime": "2026-06-27T02:34:25.164Z",
       "endTime": "2026-06-27T02:49:25.165Z",
-      "currentYesPrice": 0.4686,
-      "currentNoPrice": 0.5314
+      "currentYesPrice": 0.2128,
+      "currentNoPrice": 0.7872
     }
   ],
   "prices": {
-    "BTC": 62433.166653099746,
-    "ETH": 3368.025603602985,
-    "SPCX": 1.9598303241962984,
-    "SOL": 143.38702115260375,
-    "CHZ": 0.1471742966298898
+    "BTC": 62431.46549007895,
+    "ETH": 3352.5429213387874,
+    "SPCX": 1.9602723221870815,
+    "SOL": 142.65292642353032,
+    "CHZ": 0.145390033770471
   }
 }
