@@ -43,8 +43,8 @@
       "entryTime": "2026-06-27T02:33:00.678Z",
       "entryPriceLong": 3412.740662971294,
       "entryPriceShort": 62388.54518900833,
-      "currentPriceLong": 3375.1920802916084,
-      "currentPriceShort": 62404.052623361
+      "currentPriceLong": 3368.025603602985,
+      "currentPriceShort": 62433.166653099746
     },
     {
       "id": "perp_otx99s4du",
@@ -90,7 +90,7 @@
       "sizeUsd": 100,
       "shares": 181.35654697134567,
       "entryPrice": 0.5514,
-      "currentPrice": 0.5584,
+      "currentPrice": 0.5818,
       "timestamp": "2026-06-27T02:34:29.244Z"
     },
     {
@@ -101,7 +101,7 @@
       "sizeUsd": 100,
       "shares": 225.78460149017837,
       "entryPrice": 0.4429,
-      "currentPrice": 0.4183,
+      "currentPrice": 0.4686,
       "timestamp": "2026-06-27T02:34:33.096Z"
     },
     {
@@ -124,7 +124,7 @@
       "sizeUsd": 100,
       "shares": 200.0400080016003,
       "entryPrice": 0.4999,
-      "currentPrice": 0.4548,
+      "currentPrice": 0.4781,
       "timestamp": "2026-06-27T02:34:37.069Z"
     },
     {
@@ -135,7 +135,7 @@
       "sizeUsd": 100,
       "shares": 139.33398355858995,
       "entryPrice": 0.7177,
-      "currentPrice": 0.6369,
+      "currentPrice": 0.7428,
       "timestamp": "2026-06-27T02:34:45.783Z"
     },
     {
@@ -146,7 +146,7 @@
       "sizeUsd": 100,
       "shares": 145.39110206455365,
       "entryPrice": 0.6878,
-      "currentPrice": 0.5966,
+      "currentPrice": 0.7026,
       "timestamp": "2026-06-27T02:34:53.834Z"
     },
     {
@@ -169,7 +169,7 @@
       "sizeUsd": 100,
       "shares": 152.7417137620284,
       "entryPrice": 0.6547,
-      "currentPrice": 0.5246,
+      "currentPrice": 0.4743,
       "timestamp": "2026-06-27T02:35:26.246Z"
     }
   ],
@@ -24865,8 +24865,8 @@
       "startAssetPrice": 62460.509627193824,
       "startTime": "2026-06-27T02:34:31.177Z",
       "endTime": "2026-06-27T02:39:31.177Z",
-      "currentYesPrice": 0.4548,
-      "currentNoPrice": 0.5452
+      "currentYesPrice": 0.4781,
+      "currentNoPrice": 0.5219
     },
     {
       "id": "will-eth-be-up-in-5-min",
@@ -24875,8 +24875,8 @@
       "startAssetPrice": 3381.7251435153535,
       "startTime": "2026-06-27T02:34:31.177Z",
       "endTime": "2026-06-27T02:39:31.177Z",
-      "currentYesPrice": 0.4034,
-      "currentNoPrice": 0.5966
+      "currentYesPrice": 0.2974,
+      "currentNoPrice": 0.7026
     },
     {
       "id": "will-sol-be-up-in-5-min",
@@ -24885,8 +24885,8 @@
       "startAssetPrice": 143.31342605904837,
       "startTime": "2026-06-27T02:34:31.177Z",
       "endTime": "2026-06-27T02:39:31.177Z",
-      "currentYesPrice": 0.4754,
-      "currentNoPrice": 0.5246
+      "currentYesPrice": 0.5257,
+      "currentNoPrice": 0.4743
     },
     {
       "id": "will-btc-be-up-in-15-min",
@@ -24895,8 +24895,8 @@
       "startAssetPrice": 62331.19394651015,
       "startTime": "2026-06-27T02:34:25.164Z",
       "endTime": "2026-06-27T02:49:25.164Z",
-      "currentYesPrice": 0.5584,
-      "currentNoPrice": 0.4416
+      "currentYesPrice": 0.5818,
+      "currentNoPrice": 0.4182
     },
     {
       "id": "will-eth-be-up-in-15-min",
@@ -24905,8 +24905,8 @@
       "startAssetPrice": 3384.4595853561386,
       "startTime": "2026-06-27T02:34:25.164Z",
       "endTime": "2026-06-27T02:49:25.165Z",
-      "currentYesPrice": 0.3631,
-      "currentNoPrice": 0.6369
+      "currentYesPrice": 0.2572,
+      "currentNoPrice": 0.7428
     },
     {
       "id": "will-sol-be-up-in-15-min",
@@ -24915,15 +24915,15 @@
       "startAssetPrice": 143.47717899080584,
       "startTime": "2026-06-27T02:34:25.164Z",
       "endTime": "2026-06-27T02:49:25.165Z",
-      "currentYesPrice": 0.4183,
-      "currentNoPrice": 0.5817
+      "currentYesPrice": 0.4686,
+      "currentNoPrice": 0.5314
     }
   ],
   "prices": {
-    "BTC": 62404.052623361,
-    "ETH": 3375.1920802916084,
-    "SPCX": 1.9622085996346752,
-    "SOL": 143.242797783815,
-    "CHZ": 0.14803429779804878
+    "BTC": 62433.166653099746,
+    "ETH": 3368.025603602985,
+    "SPCX": 1.9598303241962984,
+    "SOL": 143.38702115260375,
+    "CHZ": 0.1471742966298898
   }
 }
