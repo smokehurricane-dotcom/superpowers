@@ -1,0 +1,71 @@
+<!-- Custom Wazuh rules for Active Directory attack detection (Phase 4) -->
+<group name="windows,windows_security,active_directory,">
+
+  <!-- 100300: Kerberoasting -->
+  <!-- Triggered by Security event 4769 with a weak (RC4/DES) service ticket for a non-computer account -->
+  <rule id="100300" level="12">
+    <if_group>windows_security</if_group>
+    <field name="win.system.eventID">^4769$</field>
+    <field name="win.eventdata.ticketEncryptionType">^0x1$|^0x3$|^0x11$|^0x17$</field>
+    <field name="win.eventdata.serviceName" negate="yes">^.+\$$</field>
+    <description>Kerberoasting: weakly encrypted service ticket requested for user account $(win.eventdata.serviceName) by $(win.eventdata.targetUserName)</description>
+    <mitre>
+      <id>T1558.003</id>
+    </mitre>
+  </rule>
+
+  <!-- 100301: AS-REP roasting -->
+  <!-- Triggered by Security event 4768 with status 0x0 and pre-authentication type 0 -->
+  <rule id="100301" level="12">
+    <if_group>windows_security</if_group>
+    <field name="win.system.eventID">^4768$</field>
+    <field name="win.eventdata.status">^0x0$</field>
+    <field name="win.eventdata.preAuthType">^0$</field>
+    <field name="win.eventdata.targetUserName" negate="yes">^.+\$$</field>
+    <description>AS-REP roasting: Kerberos TGT requested without pre-authentication for $(win.eventdata.targetUserName)</description>
+    <mitre>
+      <id>T1558.004</id>
+    </mitre>
+  </rule>
+
+  <!-- 100302: NTLM network logon from the Kali attack host -->
+  <!-- Triggered by Security event 4624 logon type 3 using NTLM from the known attack host -->
+  <rule id="100302" level="8">
+    <if_group>windows_security</if_group>
+    <field name="win.system.eventID">^4624$</field>
+    <field name="win.eventdata.logonType">^3$</field>
+    <field name="win.eventdata.authenticationPackageName">^NTLM$</field>
+    <field name="win.eventdata.ipAddress">^10\.30\.0\.1$</field>
+    <description>NTLM network logon from external subnet via router $(win.eventdata.ipAddress) for $(win.eventdata.targetDomainName)\$(win.eventdata.targetUserName)</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+  </rule>
+
+  <!-- 100305: single failed NTLM network logon from the Kali attack host -->
+  <!-- Triggered by Security event 4625 logon type 3 using NTLM from the known attack host -->
+  <rule id="100305" level="4">
+    <if_group>windows_security</if_group>
+    <field name="win.system.eventID">^4625$</field>
+    <field name="win.eventdata.logonType">^3$</field>
+    <field name="win.eventdata.authenticationPackageName">^NTLM$</field>
+    <field name="win.eventdata.ipAddress">^10\.30\.0\.1$</field>
+    <description>Failed NTLM network logon from external subnet via router $(win.eventdata.ipAddress) for $(win.eventdata.targetUserName)</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+  </rule>
+
+  <!-- 100303: SMB brute-force threshold -->
+  <!-- Fires when five rule 100305 events are seen from the same source IP within 60 seconds -->
+  <rule id="100303" level="12" frequency="5" timeframe="60">
+    <if_matched_sid>100305</if_matched_sid>
+    <same_field>win.eventdata.ipAddress</same_field>
+    <description>SMB brute-force: 5 failed NTLM logons from the same IP within 60 seconds</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+  </rule>
+
+
+</group>

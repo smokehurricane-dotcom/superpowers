@@ -6,6 +6,13 @@ Import-Module ActiveDirectory
 $Domain = "purple.lab"
 $BasePath = "DC=purple,DC=lab"
 
+# Identify ADNet adapter for static routes
+$adapter = Get-NetAdapter | Where-Object {
+    (Get-NetIPAddress -InterfaceAlias $_.Name -AddressFamily IPv4 -ErrorAction SilentlyContinue |
+        Where-Object { $_.IPAddress -like '10.30.0.*' })
+}
+$ifAlias = $adapter.Name
+
 # Add the local vagrant account to Domain Admins so it can join other machines
 Add-ADGroupMember -Identity "Domain Admins" -Members "vagrant" -ErrorAction SilentlyContinue
 
@@ -46,7 +53,6 @@ Set-ADUser -Identity "svc_sql" -ServicePrincipalNames @{Add="MSSQLSvc/dc01.purpl
 Set-ADAccountControl -Identity "bob" -DoesNotRequirePreAuth $true -ErrorAction SilentlyContinue
 
 # Add an unconstrained delegation-like setup on a fake IIS server account (disabled for safety)
-# This is a teaching-only AD weakness. We only create the account but do not enable delegation.
 New-LabUser -Name "svc_web" -OU $SvcOU -Password "WebSvc2024!"
 
 # Create a file share with overly permissive ACLs
@@ -58,6 +64,10 @@ $acl.SetAccessRule($rule)
 Set-Acl $SharePath $acl
 New-SmbShare -Name "Public" -Path $SharePath -FullAccess "Everyone" -ErrorAction SilentlyContinue
 
+# Routes back to the other lab segments via the ADNet gateway (NAT remains default gateway)
+New-NetRoute -DestinationPrefix "10.10.0.0/24" -NextHop "10.30.0.2" -InterfaceAlias $ifAlias -RouteMetric 1 -ErrorAction SilentlyContinue | Out-Null
+New-NetRoute -DestinationPrefix "10.20.0.0/24" -NextHop "10.30.0.2" -InterfaceAlias $ifAlias -RouteMetric 1 -ErrorAction SilentlyContinue | Out-Null
+
 # Install Wazuh agent (version must match manager)
 $WazuhVersion = "4.10.1"
 $MsiPath = "C:\Windows\Temp\wazuh-agent-$WazuhVersion-1.msi"
@@ -68,9 +78,5 @@ $arg = "/i `"$MsiPath`" /q WAZUH_MANAGER=`"10.10.0.30`" WAZUH_AGENT_NAME=`"dc01`
 Start-Process -FilePath "msiexec.exe" -ArgumentList $arg -Wait
 Start-Service -Name "WazuhSvc" -ErrorAction SilentlyContinue
 Set-Service -Name "WazuhSvc" -StartupType Automatic -ErrorAction SilentlyContinue
-
-# Routes back to the other lab segments (NAT remains default gateway)
-route -p add 10.10.0.0 mask 255.255.255.0 10.30.0.2 -ErrorAction SilentlyContinue | Out-Null
-route -p add 10.20.0.0 mask 255.255.255.0 10.30.0.2 -ErrorAction SilentlyContinue | Out-Null
 
 Write-Host "DC step 2 complete. Domain $Domain is configured."
