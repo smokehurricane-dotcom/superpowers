@@ -2,7 +2,80 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  # Phase 1: attack VM + first vulnerable target on a single private network.
+  # Phase 2 network:
+  #   Lab-Internal: 10.10.0.0/24  (Kali, SIEM, router inside)
+  #   TargetNet:    10.20.0.0/24  (Juice Shop target, router target-side)
+
+  config.vm.define "router" do |router|
+    router.vm.box = "ubuntu/jammy64"
+    router.vm.hostname = "lab-router"
+    router.vm.network "private_network", ip: "10.10.0.2"
+    router.vm.network "private_network", ip: "10.20.0.2"
+    router.vm.provider "virtualbox" do |vb|
+      vb.name = "lab-router"
+      vb.memory = 1536
+      vb.cpus = 1
+      vb.gui = false
+    end
+    router.vm.provision "shell", inline: <<-SHELL
+      set -e
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y iptables-persistent net-tools curl
+
+      # Enable IP forwarding
+      sysctl -w net.ipv4.ip_forward=1
+      echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.d/99-lab-router.conf
+
+      # Determine WAN interface (default route)
+      WAN=$(ip route | awk '/^default/ {print $5; exit}')
+
+      # Allow forwarding between lab segments
+      iptables -A FORWARD -s 10.10.0.0/24 -d 10.20.0.0/24 -j ACCEPT
+      iptables -A FORWARD -s 10.20.0.0/24 -d 10.10.0.0/24 -j ACCEPT
+      # Allow established/related back in
+      iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+      # NAT for outbound traffic on WAN (so target can reach internet through router)
+      iptables -t nat -A POSTROUTING -o "$WAN" -j MASQUERADE
+
+      netfilter-persistent save
+      echo "Router ready: 10.10.0.2 / 10.20.0.2"
+    SHELL
+  end
+
+  config.vm.define "siem" do |siem|
+    siem.vm.box = "ubuntu/jammy64"
+    siem.vm.hostname = "lab-siem"
+    siem.vm.network "private_network", ip: "10.10.0.30"
+    siem.vm.provider "virtualbox" do |vb|
+      vb.name = "lab-siem"
+      vb.memory = 4096
+      vb.cpus = 2
+      vb.gui = false
+    end
+    siem.vm.provision "shell", inline: <<-SHELL
+      set -e
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y curl git docker.io docker-compose
+      systemctl enable --now docker
+
+      # Route to target subnet via router
+      ip route add 10.20.0.0/24 via 10.10.0.2 || true
+
+      # Wazuh single-node deployment
+      if [ ! -d /opt/wazuh-docker ]; then
+        git clone --depth 1 --branch v4.13.0 https://github.com/wazuh/wazuh-docker.git /opt/wazuh-docker
+      fi
+      cd /opt/wazuh-docker/single-node
+      # Generate certs if not present
+      if [ ! -f config/wazuh-indexer/wazuh.indexer.pem ]; then
+        docker-compose -f generate-indexer-certs.yml run --rm generator
+      fi
+      docker-compose up -d
+      echo "Wazuh dashboard: https://10.10.0.30"
+    SHELL
+  end
 
   config.vm.define "kali" do |kali|
     kali.vm.box = "kalilinux/rolling"
@@ -10,7 +83,7 @@ Vagrant.configure("2") do |config|
     kali.vm.network "private_network", ip: "10.10.0.10"
     kali.vm.provider "virtualbox" do |vb|
       vb.name = "lab-kali"
-      vb.memory = 4096
+      vb.memory = 3072
       vb.cpus = 2
       vb.gui = false
     end
@@ -18,8 +91,9 @@ Vagrant.configure("2") do |config|
       set -e
       echo "Updating Kali..."
       apt-get update -y
-      apt-get upgrade -y
-      apt-get install -y bloodhound.py netexec ligolo-ng
+      apt-get install -y bloodhound.py netexec ligolo-ng wazuh-agent
+      # Route to target subnet via router
+      ip route add 10.20.0.0/24 via 10.10.0.2 || true
       echo "Kali ready at 10.10.0.10"
     SHELL
   end
@@ -27,10 +101,10 @@ Vagrant.configure("2") do |config|
   config.vm.define "target" do |target|
     target.vm.box = "ubuntu/jammy64"
     target.vm.hostname = "juice-shop"
-    target.vm.network "private_network", ip: "10.10.0.20"
+    target.vm.network "private_network", ip: "10.20.0.20"
     target.vm.provider "virtualbox" do |vb|
       vb.name = "lab-juice-shop"
-      vb.memory = 2048
+      vb.memory = 1536
       vb.cpus = 1
       vb.gui = false
     end
@@ -38,11 +112,13 @@ Vagrant.configure("2") do |config|
       set -e
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y
-      apt-get install -y docker.io
+      apt-get install -y docker.io wazuh-agent
       systemctl enable --now docker
+      # Route to lab subnet via router
+      ip route add 10.10.0.0/24 via 10.20.0.2 || true
       docker pull bkimminich/juice-shop:latest
       docker run -d --name juice-shop -p 3000:3000 --restart=unless-stopped bkimminich/juice-shop:latest
-      echo "Juice Shop ready at http://10.10.0.20:3000"
+      echo "Juice Shop ready at http://10.20.0.20:3000"
     SHELL
   end
 end
