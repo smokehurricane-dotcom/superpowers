@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
     router.vm.network "private_network", ip: "10.20.0.2"
     router.vm.provider "virtualbox" do |vb|
       vb.name = "lab-router"
-      vb.memory = 1536
+      vb.memory = 1024
       vb.cpus = 1
       vb.gui = false
     end
@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
 
       # Enable IP forwarding
       sysctl -w net.ipv4.ip_forward=1
-      echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.d/99-lab-router.conf
+      echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/99-lab-router.conf
 
       # Determine WAN interface (default route)
       WAN=$(ip route | awk '/^default/ {print $5; exit}')
@@ -33,9 +33,8 @@ Vagrant.configure("2") do |config|
       # Allow forwarding between lab segments
       iptables -A FORWARD -s 10.10.0.0/24 -d 10.20.0.0/24 -j ACCEPT
       iptables -A FORWARD -s 10.20.0.0/24 -d 10.10.0.0/24 -j ACCEPT
-      # Allow established/related back in
       iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
-      # NAT for outbound traffic on WAN (so target can reach internet through router)
+      # NAT for outbound traffic on WAN
       iptables -t nat -A POSTROUTING -o "$WAN" -j MASQUERADE
 
       netfilter-persistent save
@@ -49,7 +48,7 @@ Vagrant.configure("2") do |config|
     siem.vm.network "private_network", ip: "10.10.0.30"
     siem.vm.provider "virtualbox" do |vb|
       vb.name = "lab-siem"
-      vb.memory = 4096
+      vb.memory = 6144
       vb.cpus = 2
       vb.gui = false
     end
@@ -63,9 +62,14 @@ Vagrant.configure("2") do |config|
       # Route to target subnet via router
       ip route add 10.20.0.0/24 via 10.10.0.2 || true
 
+      # Wazuh needs this for the indexer
+      sysctl -w vm.max_map_count=262144
+      echo 'vm.max_map_count=262144' > /etc/sysctl.d/99-wazuh.conf
+
       # Wazuh single-node deployment
+      WAZUH_BRANCH="v4.10.1"
       if [ ! -d /opt/wazuh-docker ]; then
-        git clone --depth 1 --branch v4.13.0 https://github.com/wazuh/wazuh-docker.git /opt/wazuh-docker
+        git clone --depth 1 --branch "$WAZUH_BRANCH" https://github.com/wazuh/wazuh-docker.git /opt/wazuh-docker
       fi
       cd /opt/wazuh-docker/single-node
       # Generate certs if not present
@@ -73,7 +77,7 @@ Vagrant.configure("2") do |config|
         docker-compose -f generate-indexer-certs.yml run --rm generator
       fi
       docker-compose up -d
-      echo "Wazuh dashboard: https://10.10.0.30"
+      echo "Wazuh dashboard: https://10.10.0.30 (admin / SecretPassword)"
     SHELL
   end
 
@@ -83,15 +87,14 @@ Vagrant.configure("2") do |config|
     kali.vm.network "private_network", ip: "10.10.0.10"
     kali.vm.provider "virtualbox" do |vb|
       vb.name = "lab-kali"
-      vb.memory = 3072
+      vb.memory = 2048
       vb.cpus = 2
       vb.gui = false
     end
     kali.vm.provision "shell", inline: <<-SHELL
       set -e
-      echo "Updating Kali..."
       apt-get update -y
-      apt-get install -y bloodhound.py netexec ligolo-ng wazuh-agent
+      apt-get install -y bloodhound.py netexec ligolo-ng
       # Route to target subnet via router
       ip route add 10.20.0.0/24 via 10.10.0.2 || true
       echo "Kali ready at 10.10.0.10"
@@ -112,7 +115,7 @@ Vagrant.configure("2") do |config|
       set -e
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -y
-      apt-get install -y docker.io wazuh-agent
+      apt-get install -y docker.io
       systemctl enable --now docker
       # Route to lab subnet via router
       ip route add 10.10.0.0/24 via 10.20.0.2 || true
