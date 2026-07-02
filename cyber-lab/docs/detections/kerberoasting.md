@@ -6,11 +6,13 @@ Kerberoasting requests service tickets for user accounts that have Service Princ
 
 ## Verified attack command
 
+> Replace `<LAB_ALICE_PW>` with the value you set for `LAB_ALICE_PW` in `.env`.
+
 From the Kali attack host (`10.10.0.10`):
 
 ```bash
 python3 /usr/share/doc/python3-impacket/examples/GetUserSPNs.py \
-  purple.lab/alice:Password123! -dc-ip 10.30.0.10 -request
+  purple.lab/alice:<LAB_ALICE_PW> -dc-ip 10.30.0.10 -request
 ```
 
 A successful run returns a `$krb5tgs$23$*` hash for the `svc_sql` account.
@@ -75,7 +77,16 @@ The rule fires when a 4769 event for a non-computer account uses a weak ticket e
 }
 ```
 
-## Preventive hardening
+## Verification
+
+On the SIEM host, confirm rule `100300` fired:
+
+```bash
+sudo docker exec single-node_wazuh.manager_1 \
+  grep -E '"id":"100300"' /var/ossec/logs/alerts/alerts.json
+```
+
+## Prevention
 
 * Set service accounts to support only AES encryption:
   * Open **Active Directory Users and Computers** → account properties → **Account** tab → check **"This account supports Kerberos AES 128 bit encryption"** and **"AES 256 bit encryption"** and clear any RC4/DES options.

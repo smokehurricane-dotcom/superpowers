@@ -37,23 +37,36 @@ function New-LabUser($Name, $OU, $Password) {
         -ErrorAction SilentlyContinue
 }
 
+function Get-RequiredEnv($Name) {
+    $Value = [Environment]::GetEnvironmentVariable($Name)
+    if (-not $Value) { throw "Missing required environment variable: $Name" }
+    return $Value
+}
+
+# Read account passwords from environment variables
+$AlicePw   = Get-RequiredEnv 'LAB_ALICE_PW'
+$BobPw     = Get-RequiredEnv 'LAB_BOB_PW'
+$CarolPw   = Get-RequiredEnv 'LAB_CAROL_PW'
+$SvcSqlPw  = Get-RequiredEnv 'LAB_SVC_SQL_PW'
+$SvcWebPw  = Get-RequiredEnv 'LAB_SVC_WEB_PW'
+
 # Create regular users
-New-LabUser -Name "alice" -OU $UsersOU -Password "Password123!"
-New-LabUser -Name "bob" -OU $UsersOU -Password "Summer2024!"
-New-LabUser -Name "carol" -OU $UsersOU -Password "Password123!"
+New-LabUser -Name "alice" -OU $UsersOU -Password $AlicePw
+New-LabUser -Name "bob" -OU $UsersOU -Password $BobPw
+New-LabUser -Name "carol" -OU $UsersOU -Password $CarolPw
 
 # Make alice a member of Domain Admins (intentional over-privilege)
 Add-ADGroupMember -Identity "Domain Admins" -Members "alice" -ErrorAction SilentlyContinue
 
 # Create a service account with a weak password and an SPN -> Kerberoastable
-New-LabUser -Name "svc_sql" -OU $SvcOU -Password "SqlSvc123!"
+New-LabUser -Name "svc_sql" -OU $SvcOU -Password $SvcSqlPw
 Set-ADUser -Identity "svc_sql" -ServicePrincipalNames @{Add="MSSQLSvc/dc01.purple.lab:1433"} -ErrorAction SilentlyContinue
 
 # AS-REP roasting target: bob does not require Kerberos preauthentication
 Set-ADAccountControl -Identity "bob" -DoesNotRequirePreAuth $true -ErrorAction SilentlyContinue
 
 # Add an unconstrained delegation-like setup on a fake IIS server account (disabled for safety)
-New-LabUser -Name "svc_web" -OU $SvcOU -Password "WebSvc2024!"
+New-LabUser -Name "svc_web" -OU $SvcOU -Password $SvcWebPw
 
 # Create a file share with overly permissive ACLs
 $SharePath = "C:\Shares\Public"

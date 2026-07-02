@@ -1,6 +1,22 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# Load optional .env file for lab secrets. .env is gitignored; see .env.example.
+def load_lab_env(path = '.env')
+  env = {}
+  if File.exist?(path)
+    File.readlines(path).each do |line|
+      line.strip!
+      next if line.empty? || line.start_with?('#')
+      key, value = line.split('=', 2)
+      env[key.strip] = value.strip if key && value
+    end
+  end
+  env
+end
+
+LAB_ENV = load_lab_env
+
 Vagrant.configure("2") do |config|
   # Phase 3 network:
   #   Lab-Internal: 10.10.0.0/24  (Kali, SIEM, router inside)
@@ -100,7 +116,7 @@ Vagrant.configure("2") do |config|
         docker exec single-node_wazuh.manager_1 /var/ossec/bin/wazuh-control restart
       fi
 
-      echo "Wazuh dashboard: https://10.10.0.30 (admin / SecretPassword)"
+      echo "Wazuh dashboard: https://10.10.0.30 (admin / #{LAB_ENV.fetch('LAB_WAZUH_DASHBOARD_PW')})"
     SHELL
   end
 
@@ -187,7 +203,7 @@ Vagrant.configure("2") do |config|
     dc.vm.network "private_network", ip: "10.30.0.10"
 
     dc.winrm.username = "vagrant"
-    dc.winrm.password = "vagrant"
+    dc.winrm.password = LAB_ENV.fetch('LAB_VAGRANT_PW')
     dc.winrm.transport = :plaintext
     dc.winrm.basic_auth_only = true
     dc.vm.boot_timeout = 1800
@@ -202,9 +218,23 @@ Vagrant.configure("2") do |config|
       vb.gui = false
     end
 
-    dc.vm.provision "shell", path: "scripts/provision-dc-step1.ps1", powershell_args: "-ExecutionPolicy Bypass -NoProfile"
+    dc.vm.provision "shell",
+      path: "scripts/provision-dc-step1.ps1",
+      powershell_args: "-ExecutionPolicy Bypass -NoProfile",
+      env: {
+        "LAB_DSRM_PW" => LAB_ENV.fetch('LAB_DSRM_PW')
+      }
     dc.vm.provision :reload
-    dc.vm.provision "shell", path: "scripts/provision-dc-step2.ps1", powershell_args: "-ExecutionPolicy Bypass -NoProfile"
+    dc.vm.provision "shell",
+      path: "scripts/provision-dc-step2.ps1",
+      powershell_args: "-ExecutionPolicy Bypass -NoProfile",
+      env: {
+        "LAB_ALICE_PW"   => LAB_ENV.fetch('LAB_ALICE_PW'),
+        "LAB_BOB_PW"     => LAB_ENV.fetch('LAB_BOB_PW'),
+        "LAB_CAROL_PW"   => LAB_ENV.fetch('LAB_CAROL_PW'),
+        "LAB_SVC_SQL_PW" => LAB_ENV.fetch('LAB_SVC_SQL_PW'),
+        "LAB_SVC_WEB_PW" => LAB_ENV.fetch('LAB_SVC_WEB_PW')
+      }
   end
 
   # Windows 10 domain client
@@ -217,7 +247,7 @@ Vagrant.configure("2") do |config|
     win10.vm.network "private_network", ip: "10.30.0.11"
 
     win10.winrm.username = "vagrant"
-    win10.winrm.password = "vagrant"
+    win10.winrm.password = LAB_ENV.fetch('LAB_VAGRANT_PW')
     win10.winrm.transport = :plaintext
     win10.winrm.basic_auth_only = true
     win10.vm.boot_timeout = 1800
@@ -232,8 +262,18 @@ Vagrant.configure("2") do |config|
       vb.gui = false
     end
 
-    win10.vm.provision "shell", path: "scripts/provision-win10-step1.ps1", powershell_args: "-ExecutionPolicy Bypass -NoProfile"
+    win10.vm.provision "shell",
+      path: "scripts/provision-win10-step1.ps1",
+      powershell_args: "-ExecutionPolicy Bypass -NoProfile",
+      env: {
+        "LAB_VAGRANT_PW" => LAB_ENV.fetch('LAB_VAGRANT_PW')
+      }
     win10.vm.provision :reload
-    win10.vm.provision "shell", path: "scripts/provision-win10-step2.ps1", powershell_args: "-ExecutionPolicy Bypass -NoProfile"
+    win10.vm.provision "shell",
+      path: "scripts/provision-win10-step2.ps1",
+      powershell_args: "-ExecutionPolicy Bypass -NoProfile",
+      env: {
+        "LAB_VAGRANT_PW" => LAB_ENV.fetch('LAB_VAGRANT_PW')
+      }
   end
 end

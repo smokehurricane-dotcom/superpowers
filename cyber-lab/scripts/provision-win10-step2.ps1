@@ -1,6 +1,12 @@
 # Phase 3 - Windows 10 step 2: post-domain-join hardening/visibility
 $ErrorActionPreference = "Stop"
 
+function Get-RequiredEnv($Name) {
+    $Value = [Environment]::GetEnvironmentVariable($Name)
+    if (-not $Value) { throw "Missing required environment variable: $Name" }
+    return $Value
+}
+
 # Disable Windows Firewall consistently across all profiles
 Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled False
 
@@ -20,7 +26,8 @@ New-NetRoute -DestinationPrefix "10.10.0.0/24" -NextHop "10.30.0.2" -InterfaceAl
 New-NetRoute -DestinationPrefix "10.20.0.0/24" -NextHop "10.30.0.2" -InterfaceAlias $ifAlias -RouteMetric 1 -ErrorAction SilentlyContinue | Out-Null
 
 # Ensure the domain secure channel is healthy before starting services that query AD
-$password = ConvertTo-SecureString "vagrant" -AsPlainText -Force
+$VagrantPw = Get-RequiredEnv 'LAB_VAGRANT_PW'
+$password = ConvertTo-SecureString $VagrantPw -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential("purple.lab\vagrant", $password)
 if (-not (Test-ComputerSecureChannel -Server "dc01.purple.lab" -ErrorAction SilentlyContinue)) {
     Write-Host "Repairing domain secure channel..."

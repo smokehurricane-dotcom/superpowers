@@ -6,12 +6,14 @@ SMB is commonly abused for credential validation, password spraying, and brute-f
 
 ## Verified attack commands
 
+> Replace `<LAB_ALICE_PW>` with the value you set for `LAB_ALICE_PW` in `.env`.
+
 From the Kali attack host (`10.10.0.10`):
 
 ### Successful SMB authentication
 
 ```bash
-netexec smb 10.30.0.10 -u alice -p 'Password123!'
+netexec smb 10.30.0.10 -u alice -p '<LAB_ALICE_PW>'
 ```
 
 ### SMB brute-force (failed logons)
@@ -137,7 +139,16 @@ The IP filter is set to `10.30.0.1` because the lab router performs MASQUERADE f
 }
 ```
 
-## Preventive hardening
+## Verification
+
+On the SIEM host, confirm rules `100302`, `100303`, and/or `100305` fired:
+
+```bash
+sudo docker exec single-node_wazuh.manager_1 \
+  grep -E '"id":"10030[2-5]"' /var/ossec/logs/alerts/alerts.json
+```
+
+## Prevention
 
 * Raise the LAN Manager authentication level to **"Send NTLMv2 response only. Refuse LM & NTLM"** where feasible.
 * Enforce **SMB signing** on all domain members to prevent relay attacks.

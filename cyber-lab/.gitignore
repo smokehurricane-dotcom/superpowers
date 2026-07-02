@@ -1,6 +1,8 @@
 .vagrant/
 tools/venv/
 recon-output/
+output/
+.env
 *.html
 !templates/*.html
 *.log

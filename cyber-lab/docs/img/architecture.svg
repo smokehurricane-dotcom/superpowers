@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520">
+  <style>
+    .segment { fill: #f5f7fa; stroke: #cbd5e1; stroke-width: 2; rx: 8; }
+    .host { fill: #ffffff; stroke: #64748b; stroke-width: 1.5; rx: 4; }
+    .router { fill: #e2e8f0; stroke: #475569; stroke-width: 2; rx: 6; }
+    .text { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; fill: #1e293b; }
+    .label { font-size: 14px; font-weight: 600; fill: #0f172a; }
+    .ip { font-size: 10px; fill: #475569; }
+    .title { font-size: 18px; font-weight: 700; fill: #0f172a; }
+    .arrow { stroke: #94a3b8; stroke-width: 2; fill: none; stroke-dasharray: 6,4; }
+  </style>
+
+  <text x="400" y="28" text-anchor="middle" class="title">Cyber Lab Architecture</text>
+
+  <!-- Router -->
+  <rect x="340" y="220" width="120" height="60" class="router"/>
+  <text x="400" y="245" text-anchor="middle" class="label">lab-router</text>
+  <text x="400" y="263" text-anchor="middle" class="ip">10.10.0.2 / 10.20.0.2 / 10.30.0.2</text>
+
+  <!-- Lab-Internal -->
+  <rect x="40" y="80" width="260" height="160" class="segment"/>
+  <text x="170" y="105" text-anchor="middle" class="label">Lab-Internal 10.10.0.0/24</text>
+
+  <rect x="70" y="125" width="90" height="50" class="host"/>
+  <text x="115" y="148" text-anchor="middle" class="text">kali-lab</text>
+  <text x="115" y="162" text-anchor="middle" class="ip">10.10.0.10</text>
+
+  <rect x="180" y="125" width="90" height="50" class="host"/>
+  <text x="225" y="148" text-anchor="middle" class="text">lab-siem</text>
+  <text x="225" y="162" text-anchor="middle" class="ip">10.10.0.30</text>
+
+  <text x="170" y="205" text-anchor="middle" class="ip">attack host + Wazuh SIEM</text>
+
+  <!-- TargetNet -->
+  <rect x="500" y="80" width="260" height="160" class="segment"/>
+  <text x="630" y="105" text-anchor="middle" class="label">TargetNet 10.20.0.0/24</text>
+
+  <rect x="585" y="135" width="90" height="50" class="host"/>
+  <text x="630" y="158" text-anchor="middle" class="text">juice-shop</text>
+  <text x="630" y="172" text-anchor="middle" class="ip">10.20.0.20</text>
+
+  <text x="630" y="205" text-anchor="middle" class="ip">vulnerable web target</text>
+
+  <!-- ADNet -->
+  <rect x="270" y="320" width="260" height="160" class="segment"/>
+  <text x="400" y="345" text-anchor="middle" class="label">ADNet 10.30.0.0/24</text>
+
+  <rect x="300" y="370" width="90" height="50" class="host"/>
+  <text x="345" y="393" text-anchor="middle" class="text">dc01</text>
+  <text x="345" y="407" text-anchor="middle" class="ip">10.30.0.10</text>
+
+  <rect x="410" y="370" width="90" height="50" class="host"/>
+  <text x="455" y="393" text-anchor="middle" class="text">win10-1</text>
+  <text x="455" y="407" text-anchor="middle" class="ip">10.30.0.11</text>
+
+  <text x="400" y="450" text-anchor="middle" class="ip">purple.lab Active Directory</text>
+
+  <!-- Connections -->
+  <line x1="300" y1="160" x2="340" y2="230" class="arrow"/>
+  <line x1="500" y1="160" x2="460" y2="230" class="arrow"/>
+  <line x1="400" y1="280" x2="400" y2="320" class="arrow"/>
+
+  <text x="400" y="490" text-anchor="middle" class="ip">router NATs + forwards between all three segments</text>
+</svg>

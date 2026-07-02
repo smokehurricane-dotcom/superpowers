@@ -1,6 +1,12 @@
 # Phase 3 - Windows 10 step 1: prepare and join domain
 $ErrorActionPreference = "Stop"
 
+function Get-RequiredEnv($Name) {
+    $Value = [Environment]::GetEnvironmentVariable($Name)
+    if (-not $Value) { throw "Missing required environment variable: $Name" }
+    return $Value
+}
+
 # Disable Windows Firewall for lab use
 Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled False
 
@@ -24,7 +30,8 @@ if (-not $existing) {
 Set-DnsClientServerAddress -InterfaceAlias $ifAlias -ServerAddresses @('10.30.0.10') -Confirm:$false
 
 # Join domain using the vagrant account (added to Domain Admins in DC step 2)
-$password = ConvertTo-SecureString "vagrant" -AsPlainText -Force
+$VagrantPw = Get-RequiredEnv 'LAB_VAGRANT_PW'
+$password = ConvertTo-SecureString $VagrantPw -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential("purple.lab\vagrant", $password)
 Add-Computer -DomainName "purple.lab" -Credential $credential -Force
 

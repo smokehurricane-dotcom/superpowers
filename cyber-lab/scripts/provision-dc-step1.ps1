@@ -5,7 +5,13 @@ Start-Transcript -Path C:\Windows\Temp\provision-dc-step1.log -Force
 
 $DomainName = "purple.lab"
 $NetbiosName = "PURPLE"
-$SafeModePassword = "P@ssw0rd1234!"
+function Get-RequiredEnv($Name) {
+    $Value = [Environment]::GetEnvironmentVariable($Name)
+    if (-not $Value) { throw "Missing required environment variable: $Name" }
+    return $Value
+}
+
+$SafeModePassword = Get-RequiredEnv 'LAB_DSRM_PW'
 
 Write-Host "Step 1: disabling firewall for lab use..."
 Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled False

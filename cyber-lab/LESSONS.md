@@ -22,8 +22,8 @@ The gusztavvargadr and StefanScherer boxes used in this lab connect reliably onl
 config.vm.communicator = "winrm"
 config.winrm.transport = :plaintext
 config.winrm.basic_auth_only = true
-config.winrm.username = "vagrant"
-config.winrm.password = "vagrant"
+config.winrm.username = ENV.fetch("LAB_VAGRANT_USER", "vagrant")
+config.winrm.password = ENV.fetch("LAB_VAGRANT_PW")
 ```
 
 ### Windows Server AD promotion is silent and slow
@@ -59,7 +59,7 @@ The Kali VM is on Lab-Internal and does not use the DC as its DNS server. `blood
    ```
 2. Or use the `-ns` flag:
    ```bash
-   bloodhound-python -d purple.lab -u alice -p 'Password123!' \
+   bloodhound-python -d purple.lab -u alice -p '<LAB_ALICE_PW>' \
      -ns 10.30.0.10 -dc dc01.purple.lab -c All --zip
    ```
 
@@ -72,7 +72,7 @@ vagrant plugin install vagrant-reload
 
 ### Snapshot naming convention
 Use `clean-phase<N>` for the known-good snapshot after each phase.  
-Phase 3 restore: `vagrant snapshot restore <vm> clean-phase3`.
+Phase 4 restore: `vagrant snapshot restore <vm> clean-phase4`.
 
 ## Phase 4
 

@@ -16,14 +16,16 @@ The `lab-router` VM connects all three segments and performs NAT/MASQUERADE for 
 
 | System        | Account                 | Password          | Notes                              |
 |---------------|-------------------------|-------------------|------------------------------------|
-| DC01 / Win10  | `vagrant` (local)       | `vagrant`         | Vagrant box default                |
-| Domain admin  | `purple.lab\vagrant`    | `vagrant`         | Added to Domain Admins during step 2 |
-| DSRM          | n/a                     | `P@ssw0rd1234!`   | Directory Services Restore Mode      |
-| alice         | `purple.lab\alice`      | `Password123!`    | Domain Admin (intentional weakness)  |
-| bob           | `purple.lab\bob`        | `Summer2024!`     | AS-REP roastable (no pre-auth)      |
-| carol         | `purple.lab\carol`      | `Password123!`    | Regular user, password reuse        |
-| svc_sql       | `purple.lab\svc_sql`    | `SqlSvc123!`      | Service account with SPN (Kerberoast) |
-| svc_web       | `purple.lab\svc_web`    | `WebSvc2024!`     | Service account (no delegation enabled) |
+| Account       | Username                | Password            | Notes                                |
+|---------------|-------------------------|---------------------|--------------------------------------|
+| DC01 / Win10  | `vagrant` (local)       | `<LAB_VAGRANT_PW>`  | Vagrant box default                  |
+| Domain admin  | `purple.lab\vagrant`    | `<LAB_VAGRANT_PW>`  | Added to Domain Admins during step 2 |
+| DSRM          | n/a                     | `<LAB_DSRM_PW>`     | Directory Services Restore Mode      |
+| alice         | `purple.lab\alice`      | `<LAB_ALICE_PW>`    | Domain Admin (intentional weakness)  |
+| bob           | `purple.lab\bob`        | `<LAB_BOB_PW>`      | AS-REP roastable (no pre-auth)       |
+| carol         | `purple.lab\carol`      | `<LAB_CAROL_PW>`    | Regular user, password reuse         |
+| svc_sql       | `purple.lab\svc_sql`    | `<LAB_SVC_SQL_PW>`  | Service account with SPN (Kerberoast)|
+| svc_web       | `purple.lab\svc_web`    | `<LAB_SVC_WEB_PW>`  | Service account (no delegation)      |
 
 ## Built-in attack paths / purple-team scenarios
 
@@ -32,14 +34,14 @@ The `lab-router` VM connects all three segments and performs NAT/MASQUERADE for 
    Expected open ports: 53, 88, 135, 139, 445, 389, 636, 3268, 3389, etc.
 
 2. **Kerberoasting**  
-   `bloodhound.py -d purple.lab -u alice -p 'Password123!' -dc dc01.purple.lab -c All`  
-   `GetUserSPNs.py purple.lab/alice:Password123! -dc-ip 10.30.0.10 -request`
+   `bloodhound.py -d purple.lab -u alice -p '<LAB_ALICE_PW>' -dc dc01.purple.lab -c All`  
+   `GetUserSPNs.py purple.lab/alice:<LAB_ALICE_PW> -dc-ip 10.30.0.10 -request`
 
 3. **AS-REP roasting**  
-   `GetNPUsers.py purple.lab/bob:Summer2024! -dc-ip 10.30.0.10 -no-pass`
+   `GetNPUsers.py purple.lab/bob -no-pass -dc-ip 10.30.0.10`
 
 4. **SMB share enumeration**  
-   `netexec smb 10.30.0.10 -u alice -p 'Password123!'`  
+   `netexec smb 10.30.0.10 -u alice -p '<LAB_ALICE_PW>'`  
    `smbclient -L //10.30.0.10 -U purple.lab\alice`
 
 5. **Credential abuse / lateral movement**  
@@ -58,10 +60,10 @@ Verify from the SIEM: `docker exec single-node_wazuh.manager_1 /var/ossec/bin/ag
 After verifying Phase 3, take a clean snapshot of every VM:
 
 ```bash
-vagrant snapshot save dc clean-phase3
-vagrant snapshot save win10 clean-phase3
-vagrant snapshot save router clean-phase3
-vagrant snapshot save siem clean-phase3
-vagrant snapshot save kali clean-phase3
-vagrant snapshot save target clean-phase3
+vagrant snapshot save router clean-phase4
+vagrant snapshot save siem clean-phase4
+vagrant snapshot save kali clean-phase4
+vagrant snapshot save target clean-phase4
+vagrant snapshot save dc clean-phase4
+vagrant snapshot save win10 clean-phase4
 ```
