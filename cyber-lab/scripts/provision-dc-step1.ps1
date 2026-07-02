@@ -1,14 +1,16 @@
 # Phase 3 - DC step 1: promote to domain controller
 $ErrorActionPreference = "Stop"
 
+Start-Transcript -Path C:\Windows\Temp\provision-dc-step1.log -Force
+
 $DomainName = "purple.lab"
 $NetbiosName = "PURPLE"
 $SafeModePassword = "P@ssw0rd1234!"
 
-# Disable Windows Firewall for lab use
+Write-Host "Step 1: disabling firewall for lab use..."
 Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled False
 
-# Identify the ADNet host-only adapter and ensure DNS points to self
+Write-Host "Step 2: identifying ADNet adapter..."
 $adapter = Get-NetAdapter | Where-Object {
     $_.Status -eq 'Up' -and
     (Get-NetIPAddress -InterfaceAlias $_.Name -AddressFamily IPv4 -ErrorAction SilentlyContinue |
@@ -20,7 +22,7 @@ if (-not $adapter) {
 $ifAlias = $adapter.Name
 Write-Host "ADNet adapter: $ifAlias"
 
-# Set static IP if not already configured
+Write-Host "Step 3: configuring static IP and DNS..."
 $existing = Get-NetIPAddress -InterfaceAlias $ifAlias -AddressFamily IPv4 -ErrorAction SilentlyContinue |
     Where-Object { $_.IPAddress -eq '10.30.0.10' }
 if (-not $existing) {
@@ -28,10 +30,11 @@ if (-not $existing) {
 }
 Set-DnsClientServerAddress -InterfaceAlias $ifAlias -ServerAddresses @('127.0.0.1','10.30.0.10') -Confirm:$false
 
-# Install AD DS + DNS
+Write-Host "Step 4: installing AD-Domain-Services + DNS + tools..."
 Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools -IncludeAllSubFeature
 Import-Module ADDSDeployment
 
+Write-Host "Step 5: promoting forest (this may take several minutes)..."
 $SecurePassword = ConvertTo-SecureString $SafeModePassword -AsPlainText -Force
 
 Install-ADDSForest `
@@ -46,6 +49,8 @@ Install-ADDSForest `
     -SysvolPath "C:\Windows\SYSVOL" `
     -SafeModeAdministratorPassword $SecurePassword `
     -NoRebootOnCompletion:$true `
-    -Force:$true
+    -Force:$true |
+    Out-File -FilePath C:\Windows\Temp\dcpromo.log -Append -Encoding utf8
 
-Write-Host "DC promotion complete. Reboot will be triggered by Vagrant."
+Write-Host "Step 6: DC promotion complete. Reboot will be triggered by Vagrant."
+Stop-Transcript
