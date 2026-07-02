@@ -94,4 +94,18 @@
     </mitre>
   </rule>
 
+  <!-- 100320: Golden Ticket indicator -->
+  <!-- Triggered by Security event 4769 with suspicious ticket options from the external subnet -->
+  <rule id="100320" level="10">
+    <if_group>windows_security</if_group>
+    <field name="win.system.eventID">^4769$</field>
+    <field name="win.eventdata.ticketOptions">^0x40810000$</field>
+    <field name="win.eventdata.ipAddress">10\.30\.0\.1</field>
+    <field name="win.eventdata.serviceName" negate="yes">^.+\$$</field>
+    <description>Golden Ticket indicator: TGS request with suspicious ticket options $(win.eventdata.ticketOptions) for $(win.eventdata.serviceName) by $(win.eventdata.targetUserName)</description>
+    <mitre>
+      <id>T1558.001</id>
+    </mitre>
+  </rule>
+
 </group>

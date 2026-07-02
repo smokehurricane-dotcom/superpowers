@@ -43,7 +43,9 @@ Custom Wazuh rules live in [`wazuh-rules/custom_ad_rules.xml`](wazuh-rules/custo
 | `100302` | T1110 | Valid NTLM network logon from the external subnet | ✅ Verified |
 | `100305` | T1110 | Failed NTLM network logon from the external subnet | ✅ Verified |
 | `100303` | T1110.001 | SMB brute-force: 5 failed NTLM logons in 60 s | ✅ Verified |
-| `100306` | — | DCSync attempt detection | 📝 Planned |
+| `100306` | T1003.006 | DCSync: directory replication access requested | ✅ Verified |
+| `100310` | T1110.003 | Password spraying against multiple users | ✅ Verified |
+| `100320` | T1558.001 | Golden Ticket indicator (suspicious TGS options) | 📝 Syntactic rule |
 
 See the detailed playbooks in [`docs/detections/`](docs/detections/).
 
