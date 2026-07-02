@@ -88,6 +88,7 @@
     <field name="win.eventdata.objectServer">^DS$</field>
     <field name="win.eventdata.accessMask">^0x100$</field>
     <field name="win.eventdata.properties">1131f6aa|1131f6ad</field>
+    <field name="win.eventdata.subjectUserName" negate="yes">^.+\$$</field>
     <description>DCSync: directory replication access requested by $(win.eventdata.subjectDomainName)\$(win.eventdata.subjectUserName)</description>
     <mitre>
       <id>T1003.006</id>

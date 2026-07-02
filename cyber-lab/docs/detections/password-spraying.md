@@ -10,7 +10,7 @@ From the Kali attack host (`10.10.0.10`):
 
 ```bash
 for user in alice bob carol; do
-  netexec smb 10.30.0.10 -u "$user" -p 'Winter2024!'
+  netexec smb 10.30.0.10 -u "$user" -p '<password>'
 done
 ```
 

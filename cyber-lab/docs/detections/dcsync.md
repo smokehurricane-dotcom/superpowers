@@ -52,6 +52,7 @@ Example decoded eventdata:
   <field name="win.eventdata.objectServer">^DS$</field>
   <field name="win.eventdata.accessMask">^0x100$</field>
   <field name="win.eventdata.properties">1131f6aa|1131f6ad</field>
+  <field name="win.eventdata.subjectUserName" negate="yes">^.+\$$</field>
   <description>DCSync: directory replication access requested by $(win.eventdata.subjectDomainName)\$(win.eventdata.subjectUserName)</description>
   <mitre>
     <id>T1003.006</id>
@@ -85,6 +86,10 @@ On the SIEM host, confirm rule `100306` fired:
 sudo docker exec single-node_wazuh.manager_1 \
   grep -E '"id":"100306"' /var/ossec/logs/alerts/alerts.json
 ```
+
+## Known limitation / next refinement
+
+Domain controllers legitimately replicate with each other and can produce 4662 events with the same replication GUIDs (`1131f6aa-...` / `1131f6ad-...`) and `AccessMask 0x100`. This lab rule suppresses computer accounts (`subjectUserName` ending in `$`), which removes the bulk of DC-to-DC noise. A production-ready refinement would additionally whitelist known domain-controller principals or correlate the event with the source host being a legitimate DC, e.g. by checking that the requesting principal is **not** a domain controller.
 
 ## Prevention
 
