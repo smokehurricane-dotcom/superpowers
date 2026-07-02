@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "target": "10.10.0.20",
+    "scanned_at": "2026-07-02T14:45:00Z",
+    "tool": "recon.py"
+  },
+  "findings": [
+    {
+      "id": "F-10.10.0.20-3000-tcp",
+      "title": "Open service: http on 10.10.0.20:3000",
+      "severity": "info",
+      "host": "10.10.0.20",
+      "port": "3000",
+      "service": "http",
+      "product": "OWASP Juice Shop",
+      "evidence": "http on 3000/tcp — title: OWASP Juice Shop",
+      "remediation": "Ensure the application is patched and not exposed to untrusted networks."
+    },
+    {
+      "id": "F-10.10.0.20-22-tcp",
+      "title": "Open service: ssh on 10.10.0.20:22",
+      "severity": "low",
+      "host": "10.10.0.20",
+      "port": "22",
+      "service": "ssh",
+      "product": "OpenSSH 8.9p1 Ubuntu",
+      "evidence": "ssh on 22/tcp",
+      "remediation": "Restrict SSH to management hosts and enforce key-based authentication."
+    }
+  ]
+}

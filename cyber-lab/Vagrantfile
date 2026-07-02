@@ -1,0 +1,48 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Phase 1: attack VM + first vulnerable target on a single private network.
+
+  config.vm.define "kali" do |kali|
+    kali.vm.box = "kalilinux/rolling"
+    kali.vm.hostname = "kali-lab"
+    kali.vm.network "private_network", ip: "10.10.0.10"
+    kali.vm.provider "virtualbox" do |vb|
+      vb.name = "lab-kali"
+      vb.memory = 4096
+      vb.cpus = 2
+      vb.gui = false
+    end
+    kali.vm.provision "shell", inline: <<-SHELL
+      set -e
+      echo "Updating Kali..."
+      apt-get update -y
+      apt-get upgrade -y
+      apt-get install -y bloodhound.py netexec ligolo-ng
+      echo "Kali ready at 10.10.0.10"
+    SHELL
+  end
+
+  config.vm.define "target" do |target|
+    target.vm.box = "ubuntu/jammy64"
+    target.vm.hostname = "juice-shop"
+    target.vm.network "private_network", ip: "10.10.0.20"
+    target.vm.provider "virtualbox" do |vb|
+      vb.name = "lab-juice-shop"
+      vb.memory = 2048
+      vb.cpus = 1
+      vb.gui = false
+    end
+    target.vm.provision "shell", inline: <<-SHELL
+      set -e
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y docker.io
+      systemctl enable --now docker
+      docker pull bkimminich/juice-shop:latest
+      docker run -d --name juice-shop -p 3000:3000 --restart=unless-stopped bkimminich/juice-shop:latest
+      echo "Juice Shop ready at http://10.10.0.20:3000"
+    SHELL
+  end
+end

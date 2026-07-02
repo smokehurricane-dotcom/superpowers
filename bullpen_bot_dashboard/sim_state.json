@@ -8,11 +8,8 @@
     },
     "hyperliquid": {
       "address": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-      "usdc": 14690.66666666674,
-      "spcx": 0,
-      "maintenance_margin": 150,
-      "margin_usage": 0,
-      "pair_setup_done": true
+      "usd"spcx": 0,
+c": 14693.333333333407,      "maintenance_margin": 150,"margin_usage": 0,"pair_setup_done": true
     },
     "polymarket": {
       "address": "0xPolymarketMockAddress777",
@@ -39,7 +36,7 @@
       "sizeUsd": 100,
       "shares": 220.4099625303064,
       "entryPrice": 0.4537,
-      "currentPrice": 0.2469,
+      "currentPrice": 0.2827,
       "timestamp": "2026-06-27T02:36:03.489Z"
     },
     {
@@ -65,8 +62,8 @@
       "entryTime": "2026-06-27T02:36:05.810Z",
       "entryPriceLong": 3360.5959058376498,
       "entryPriceShort": 62421.15013068783,
-      "currentPriceLong": 3334.7171833834263,
-      "currentPriceShort": 62983.80692563142
+      "currentPriceLong": 3335.6613622348964,
+      "currentPriceShort": 63031.04088790651
     },
     {
       "id": "poly_t2tpe2exk",
@@ -98,7 +95,7 @@
       "sizeUsd": 100,
       "shares": 266.95141484249865,
       "entryPrice": 0.3746,
-      "currentPrice": 0.1901,
+      "currentPrice": 0.2259,
       "timestamp": "2026-06-27T02:36:12.108Z"
     },
     {
@@ -132,7 +129,7 @@
       "sizeUsd": 100,
       "shares": 111.5822361080116,
       "entryPrice": 0.8962,
-      "currentPrice": 0.9189,
+      "currentPrice": 0.95,
       "timestamp": "2026-06-27T02:37:27.240Z"
     },
     {
@@ -146,18 +143,6 @@
       "tp": 1,
       "sl": 1.4,
       "timestamp": "2026-06-27T02:37:33.858Z"
-    },
-    {
-      "id": "perp_mertq3kab",
-      "type": "perp",
-      "market": "xyz:SPCX",
-      "direction": "long",
-      "size": 200,
-      "leverage": 75,
-      "entryPrice": 1.9694399031002991,
-      "tp": 1.5,
-      "sl": 1.1,
-      "timestamp": "2026-06-27T02:38:04.429Z"
     }
   ],
   "orders": [],
@@ -25144,22 +25129,6 @@
         "timestamp": "2026-06-27T02:37:33.858Z"
       },
       "timestamp": "2026-06-27T02:37:33.859Z"
-    },
-    {
-      "action": "perp_open",
-      "details": {
-        "id": "perp_mertq3kab",
-        "type": "perp",
-        "market": "xyz:SPCX",
-        "direction": "long",
-        "size": 200,
-        "leverage": 75,
-        "entryPrice": 1.9694399031002991,
-        "tp": 1.5,
-        "sl": 1.1,
-        "timestamp": "2026-06-27T02:38:04.429Z"
-      },
-      "timestamp": "2026-06-27T02:38:04.431Z"
     }
   ],
   "polymarket_markets": [
@@ -25170,8 +25139,8 @@
       "startAssetPrice": 62460.509627193824,
       "startTime": "2026-06-27T02:34:31.177Z",
       "endTime": "2026-06-27T02:39:31.177Z",
-      "currentYesPrice": 0.9189,
-      "currentNoPrice": 0.0811
+      "currentYesPrice": 0.95,
+      "currentNoPrice": 0.05
     },
     {
       "id": "will-eth-be-up-in-5-min",
@@ -25190,8 +25159,8 @@
       "startAssetPrice": 143.31342605904837,
       "startTime": "2026-06-27T02:34:31.177Z",
       "endTime": "2026-06-27T02:39:31.177Z",
-      "currentYesPrice": 0.2469,
-      "currentNoPrice": 0.7531
+      "currentYesPrice": 0.2827,
+      "currentNoPrice": 0.7173
     },
     {
       "id": "will-btc-be-up-in-15-min",
@@ -25220,15 +25189,15 @@
       "startAssetPrice": 143.47717899080584,
       "startTime": "2026-06-27T02:34:25.164Z",
       "endTime": "2026-06-27T02:49:25.165Z",
-      "currentYesPrice": 0.1901,
-      "currentNoPrice": 0.8099
+      "currentYesPrice": 0.2259,
+      "currentNoPrice": 0.7741
     }
   ],
   "prices": {
-    "BTC": 62983.80692563142,
-    "ETH": 3334.7171833834263,
-    "SPCX": 1.9682720841981842,
-    "SOL": 142.5879241670713,
-    "CHZ": 0.14463203493422727
+    "BTC": 63031.04088790651,
+    "ETH": 3335.6613622348964,
+    "SPCX": 1.9738813272078835,
+    "SOL": 142.69065876331518,
+    "CHZ": 0.14504735681570877
   }
 }
