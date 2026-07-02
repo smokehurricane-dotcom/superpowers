@@ -68,4 +68,18 @@
   </rule>
 
 
+  <!-- 100306: DCSync -->
+  <!-- Triggered by Security event 4662 with AccessMask 0x100 and DS replication GUIDs -->
+  <rule id="100306" level="14">
+    <if_group>windows_security</if_group>
+    <field name="win.system.eventID">^4662$</field>
+    <field name="win.eventdata.objectServer">^DS$</field>
+    <field name="win.eventdata.accessMask">^0x100$</field>
+    <field name="win.eventdata.properties">1131f6aa|1131f6ad</field>
+    <description>DCSync: directory replication access requested by $(win.eventdata.subjectDomainName)\$(win.eventdata.subjectUserName)</description>
+    <mitre>
+      <id>T1003.006</id>
+    </mitre>
+  </rule>
+
 </group>
