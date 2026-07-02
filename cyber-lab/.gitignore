@@ -1,0 +1,6 @@
+.vagrant/
+tools/venv/
+recon-output/
+*.html
+!templates/*.html
+*.log

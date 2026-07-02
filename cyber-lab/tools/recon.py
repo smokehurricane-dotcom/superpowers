@@ -10,9 +10,8 @@ import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
 
 
 def run_nmap(target: str, top_ports: int = 1000) -> str:
@@ -105,7 +104,7 @@ def write_outputs(out_dir: Path, hosts: list, findings: list, target: str):
     out_dir.mkdir(parents=True, exist_ok=True)
     metadata = {
         "target": target,
-        "scanned_at": datetime.utcnow().isoformat() + "Z",
+        "scanned_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "tool": "recon.py",
     }
     (out_dir / "hosts.json").write_text(json.dumps(hosts, indent=2))
