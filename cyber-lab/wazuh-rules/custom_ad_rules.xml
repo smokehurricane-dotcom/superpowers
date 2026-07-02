@@ -67,6 +67,18 @@
     </mitre>
   </rule>
 
+  <!-- 100310: Password spraying -->
+  <!-- Fires when three rule 100305 events come from the same IP but target different users within 120 seconds -->
+  <rule id="100310" level="12" frequency="3" timeframe="120">
+    <if_matched_sid>100305</if_matched_sid>
+    <same_field>win.eventdata.ipAddress</same_field>
+    <different_field>win.eventdata.targetUserName</different_field>
+    <description>Password spraying: 3 failed NTLM logons from the same IP against different users within 120 seconds</description>
+    <mitre>
+      <id>T1110.003</id>
+    </mitre>
+  </rule>
+
 
   <!-- 100306: DCSync -->
   <!-- Triggered by Security event 4662 with AccessMask 0x100 and DS replication GUIDs -->
