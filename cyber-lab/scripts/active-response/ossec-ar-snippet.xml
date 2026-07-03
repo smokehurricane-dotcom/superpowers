@@ -1,0 +1,13 @@
+<command>
+  <name>firewall-block</name>
+  <executable>firewall-block.cmd</executable>
+  <timeout_allowed>yes</timeout_allowed>
+</command>
+
+<active-response>
+  <disabled>no</disabled>
+  <command>firewall-block</command>
+  <location>local</location>
+  <level>10</level>
+  <timeout>600</timeout>
+</active-response>
