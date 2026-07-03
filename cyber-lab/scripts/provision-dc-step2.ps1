@@ -92,4 +92,19 @@ Start-Process -FilePath "msiexec.exe" -ArgumentList $arg -Wait
 Start-Service -Name "WazuhSvc" -ErrorAction SilentlyContinue
 Set-Service -Name "WazuhSvc" -StartupType Automatic -ErrorAction SilentlyContinue
 
+# Ensure the Security eventchannel has a valid XPath query.
+# MSI reinstall preserves the existing ossec.conf; an empty/broken query breaks
+# EvtSubscribe and silently stops Windows Security events from reaching the manager.
+$OssecConf = "C:\Program Files (x86)\ossec-agent\ossec.conf"
+[xml]$conf = Get-Content $OssecConf
+$sec = $conf.ossec_config.localfile | Where-Object { $_.location -eq "Security" }
+$query = "Event/System[EventID != 5145 and EventID != 5156 and EventID != 5447 and EventID != 4656 and EventID != 4658 and EventID != 4663 and EventID != 4660 and EventID != 4670 and EventID != 4690 and EventID != 4703 and EventID != 4907 and EventID != 5152 and EventID != 5157]"
+if ($sec.query -eq $null) {
+    $q = $conf.CreateElement("query")
+    $sec.AppendChild($q) | Out-Null
+}
+$sec.query = $query
+$conf.Save($OssecConf)
+Restart-Service -Name "WazuhSvc" -ErrorAction SilentlyContinue
+
 Write-Host "DC step 2 complete. Domain $Domain is configured."

@@ -1,11 +1,11 @@
 # Phase 5C — Alerting integration and Active Response
 
-This page documents the final Phase 5C work: a custom Wazuh webhook integration and a staged (but not yet wired) Windows firewall-block Active Response.
+This page documents the final Phase 5C work: a custom Wazuh webhook integration and a Windows firewall-block Active Response.
 
 ## Goal
 
 1. Send every high-severity Wazuh alert to an external webhook with MITRE technique enrichment.
-2. Provide a PowerShell Active Response script that can temporarily block an attacker IP on the DC.
+2. Temporarily block an attacker IP on the DC when an SMB brute-force attack is detected.
 
 ## Files added / changed
 
@@ -15,7 +15,10 @@ This page documents the final Phase 5C work: a custom Wazuh webhook integration 
 | `scripts/custom-wazuh-notify` | Shell wrapper required by Wazuh 4.x custom integrations; integration name in `ossec.conf` must be `custom-wazuh-notify`. |
 | `data/mitre-techniques.json` | Local cache of MITRE ATT&CK technique names built from the public STIX dump. |
 | `scripts/webhook-receiver.py` | Tiny test receiver used on Kali to capture delivery attempts. |
-| `scripts/active-response/firewall-block.ps1` | Staged PowerShell AR script for the DC. |
+| `scripts/active-response/firewall-block.ps1` | PowerShell AR script for the DC. |
+| `scripts/active-response/firewall-block.cmd` | CMD launcher that Wazuh `execd` calls on the DC. |
+| `scripts/active-response/ossec-ar-snippet.xml` | `<command>` + `<active-response>` block for the manager's `ossec.conf`. |
+| `scripts/patch-ossec-conf.py` | Idempotent host-side `ossec.conf` patcher (removes old `firewall-block` blocks, inserts a fresh one, validates XML). |
 | `.env.example` | Added `ALERT_WEBHOOK_URL` placeholder. |
 | `.gitignore` | Excludes the raw `enterprise-attack.json` STIX source. |
 
@@ -74,7 +77,7 @@ done
 Result on the SIEM:
 
 ```text
-/var/ossec/logs/alerts/alerts.json contains 1 alert for rule 100303
+/var/ossec/logs/alerts/alerts.json contains alerts for rule 100303
 ```
 
 Webhook payload captured on Kali (`/tmp/wazuh-webhook.log`):
@@ -96,48 +99,60 @@ Webhook payload captured on Kali (`/tmp/wazuh-webhook.log`):
 
 Status: **webhook integration is configured and end-to-end verified.**
 
-## Active Response — deferred wiring
+## Active Response — blocked
 
-### What is staged
+### What is wired
 
-- `scripts/active-response/firewall-block.ps1` was uploaded to the DC at `C:\wazuh-ar\firewall-block.ps1`.
-- The script reads Wazuh AR JSON from stdin, extracts the attacker IP, creates a temporary Windows Firewall block rule, waits 600 seconds, then removes it.
+- `scripts/active-response/firewall-block.ps1` and `scripts/active-response/firewall-block.cmd` are deployed to `C:\Program Files (x86)\ossec-agent\active-response\bin\` on the DC.
+- The manager's `/var/ossec/etc/ossec.conf` contains a valid `<command>` and `<active-response>` block for `firewall-block`, inserted via the file-bytes method (host file → base64 → `docker cp` → decode).
+- Windows Firewall is enabled on the DC with explicit allow rules for WinRM inbound and Wazuh agent outbound to the manager (`10.10.0.30:1514`).
+- The PowerShell script is hardened so it never blocks the manager (`10.10.0.30`) or the router (`10.30.0.2`).
 
-### Why it is not wired yet
+Manager-side AR config:
 
-Adding the required `<command>` and `<active-response>` blocks to `ossec.conf` repeatedly corrupted the file in earlier attempts because Windows paths with backslashes and quotes were mangled by the remote shell/Python escaping layers.  After the corruption the manager failed to start (`wazuh-db did not start correctly`).  Rather than risk breaking the working webhook integration on the final pass, the AR wiring is intentionally deferred.
+```xml
+<command>
+  <name>firewall-block</name>
+  <executable>firewall-block.cmd</executable>
+  <timeout_allowed>yes</timeout_allowed>
+</command>
 
-### Remaining work to enable AR
+<active-response>
+  <disabled>no</disabled>
+  <command>firewall-block</command>
+  <location>local</location>
+  <level>10</level>
+  <timeout>600</timeout>
+</active-response>
+```
 
-1. Copy `firewall-block.ps1` into the Wazuh agent's `active-response\bin\` directory on the DC (custom AR scripts must live there).
-2. Add a `<command>` block to the manager's `ossec.conf`, e.g.:
+### Local script verification
 
-   ```xml
-   <command>
-     <name>firewall-block</name>
-     <executable>firewall-block.ps1</executable>
-     <timeout_allowed>yes</timeout_allowed>
-   </command>
-   ```
+Feeding the script valid Wazuh AR JSON creates inbound and outbound block rules and logs the action:
 
-3. Add an `<active-response>` block that references the command and the relevant rule group/ID, e.g.:
+```text
+Name                          DisplayName                   Direction Action Enabled
+----                          -----------                   --------- ------ -------
+WAZUH-AR-BLOCK-10-30-0-99     WAZUH-AR-BLOCK-10-30-0-99       Inbound  Block    True
+WAZUH-AR-BLOCK-10-30-0-99-out WAZUH-AR-BLOCK-10-30-0-99-out  Outbound  Block    True
 
-   ```xml
-   <active-response>
-     <command>firewall-block</command>
-     <location>local</location>
-     <rules_id>100303,100306,100310</rules_id>
-     <timeout>600</timeout>
-   </active-response>
-   ```
+2026-07-03T12:27:25.7918156+00:00 Blocking 10.30.0.99
+2026-07-03T12:28:25.8161534+00:00 Unblocking 10.30.0.99
+```
 
-4. Restart the Wazuh manager and verify `active-responses.log` on the DC.
+### Why it is not verified end-to-end
 
-Status: **AR script is staged; manager-side command/AR block is NOT configured.**
+1. **Wazuh manager instability:** the manager process inside the SIEM container restarts every few minutes. Each restart truncates `alerts/alerts.json` and drops agent connections.
+2. **DC agent instability:** the Wazuh service on the DC stops/starts repeatedly. After a restart it sometimes logs `Could not EvtSubscribe() for (Security) which returned (15001)`, preventing Security events from reaching the manager.
+3. **No automatic AR invocation:** when rule `100303` fires, neither the manager's `active-responses.log` nor the DC's `active-response\active-responses.log` shows a `firewall-block` entry.
+4. **Manual invocation not executed:** `agent_control -b 10.30.0.1 -f firewall-block60 -u 001` is accepted by the manager, but the DC agent does not create the firewall rule or log anything.
+
+Status: **AR script and manager config are wired, but the end-to-end trigger → block → timeout loop is blocked by Wazuh manager/agent instability.**
 
 ## Known issues
 
-- `win10-1` agent occasionally shows as `Disconnected` in the Wazuh dashboard.  This is a pre-existing intermittent issue from Phase 4 and does not affect the webhook integration.
+- `win10-1` agent occasionally shows as `Disconnected` in the Wazuh dashboard. This is a pre-existing intermittent issue from Phase 4.
+- After a fresh `vagrant up siem`, the SIEM host is missing persistent routes to `10.20.0.0/24` and `10.30.0.0/24` via `10.10.0.2`. This breaks DC → manager connectivity until the routes are re-added.
 
 ## Snapshot recommendation
 
@@ -145,8 +160,9 @@ If you want to preserve this state, snapshot all VMs now:
 
 ```bash
 for vm in router siem kali target dc win10; do
-  vagrant snapshot save "$vm" clean-phase5c
+  vagrant snapshot save "$vm" clean-phase5c-ar-wired
+  # use --force to overwrite an existing snapshot
 done
 ```
 
-To roll back to the pre-5C baseline, use `clean-phase5b`.
+To roll back to the pre-AR baseline, use `clean-5c-pre-ar`.

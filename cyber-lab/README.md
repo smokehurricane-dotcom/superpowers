@@ -56,7 +56,7 @@ The lab includes a custom Wazuh integration that forwards high-severity alerts (
 | Component | Status |
 |-----------|--------|
 | Webhook alerting (`custom-wazuh-notify`) | ✅ Verified live — SMB brute-force rule 100303 (level 12) was delivered to the Kali webhook receiver with MITRE enrichment. |
-| Active Response firewall block | ⏸️ Deferred — `firewall-block.ps1` is staged on the DC, but the manager-side `<command>` / `<active-response>` block is not wired and the script must be moved into the agent's `active-response\bin\` directory. |
+| Active Response firewall block | 🔧 Wired but unstable — `firewall-block.ps1` / `firewall-block.cmd` are in the DC agent's `active-response\bin\`, the manager-side `<command>` / `<active-response>` block is configured via the file-bytes method, and the script works locally, but the Wazuh manager/agent instability prevents the automatic trigger → block → timeout loop from completing end-to-end. |
 
 See [`docs/response/README.md`](docs/response/README.md) for configuration, verification output, and the honest deferred-items list.
 

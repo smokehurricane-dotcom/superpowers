@@ -13,13 +13,13 @@ Alles darunter ist **BACKLOG** — nicht anfangen, solange die ★ nicht fertig 
 
 Schritte:
 
-- [ ] `firewall-block.ps1` ins Wazuh-Agent-`active-response\bin\`-Verzeichnis auf dem DC verschieben.
-- [ ] `<command>`- und `<active-response>`-Blöcke sauber in `/var/ossec/etc/ossec.conf` einfügen — **ausschließlich über die Datei-Bytes-Methode** (Host-Datei → base64 → `docker cp` → decode), kein sed/heredoc.
-- [ ] Sicherstellen, dass der Block die Verbindung zum Manager/Agent nicht killt: ggf. WinRM- und Wazuh-Agent-IPs in `RemoteAddress`-Ausnahmen oder dedizierte "Wazuh allow"-Regel vor dem Block.
+- [x] `firewall-block.ps1` und `firewall-block.cmd` ins Wazuh-Agent-`active-response\bin\`-Verzeichnis auf dem DC kopieren.
+- [x] `<command>`- und `<active-response>`-Blöcke sauber in `/var/ossec/etc/ossec.conf` einfügen — **ausschließlich über die Datei-Bytes-Methode** (Host-Datei → base64 → `docker cp` → decode), kein sed/heredoc.
+- [x] Sicherstellen, dass der Block die Verbindung zum Manager/Agent nicht killt: WinRM- und Wazuh-Agent-Allow-Regeln auf dem DC vor dem Block aktivieren.
 - [ ] Live-Test: SMB-Brute-Force → Alert Level ≥10 → Active Response → temporärer Firewall-Block → nach Timeout Regel wieder weg.
-- [ ] Doku in `docs/response/README.md` aktualisieren: deferred-Status entfernen, Verifikationsnachweis einfügen.
+- [x] Doku in `docs/response/README.md` aktualisieren: Status auf „wired but blocked" setzen mit Begründung.
 
-**Done =** Manager startet sauber + AR-Block wird ausgelöst + Traffic wird blockiert + Regel läuft aus.
+**Status =** Konfiguration und Skript stehen; automatischer End-to-End-Loop ist durch Wazuh-Manager/Agent-Instabilität blockiert. nächster Schritt: Manager/Agent stabilisieren, dann Live-Test wiederholen.
 
 ---
 

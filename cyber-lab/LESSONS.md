@@ -124,3 +124,26 @@ The integration enriches technique IDs from a local JSON cache built once from t
 ### A snapshot is only as clean as the moment it is taken
 The `clean-phase5c` snapshot was named before its state was verified clean. It captured a live `ossec.conf` that still contained a leftover firewall-block `<command>` / `<active-response>` pair from earlier 5C escaping/corruption attempts. Restoring it re-introduced the corruption.  
 **Fix:** verify config against the provisioned template before trusting/naming a snapshot; prefer regenerating config from version control over restoring live state.
+
+## Phase 5D / Active Response
+
+### Empty `<query></query>` in the Windows Security eventchannel silently breaks detection
+The DC provisioner installs the Wazuh Windows agent with `msiexec`. MSI reinstalls preserve the existing `ossec.conf`, so any prior broken query survives. An empty `<query></query>` element causes Wazuh's `EvtSubscribe()` to fail with `ERROR_EVT_INVALID_QUERY (15001)`, and no Windows Security events (including `4625` logon failures) reach the manager. The agent still reports `Active`, so the failure is silent until an expected alert never fires.
+
+**Fix:** after installing/starting the agent, explicitly set the standard Wazuh Security XPath query in the provisioner:
+
+```powershell
+$OssecConf = "C:\Program Files (x86)\ossec-agent\ossec.conf"
+[xml]$conf = Get-Content $OssecConf
+$sec = $conf.ossec_config.localfile | Where-Object { $_.location -eq "Security" }
+$query = "Event/System[EventID != 5145 and EventID != 5156 and EventID != 5447 and EventID != 4656 and EventID != 4658 and EventID != 4663 and EventID != 4660 and EventID != 4670 and EventID != 4690 and EventID != 4703 and EventID != 4907 and EventID != 5152 and EventID != 5157]"
+if ($sec.query -eq $null) {
+    $q = $conf.CreateElement("query")
+    $sec.AppendChild($q) | Out-Null
+}
+$sec.query = $query
+$conf.Save($OssecConf)
+Restart-Service -Name "WazuhSvc"
+```
+
+Then verify end-to-end: run the SMB brute-force loop and `grep -c 100303 /var/ossec/logs/alerts/alerts.json` must be `> 0`.
