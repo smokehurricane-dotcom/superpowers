@@ -98,3 +98,25 @@ Alternatively, verify rules by running the real attack and grepping `/var/ossec/
 
 ### Use `archives.json` to inspect decoded events that do not alert
 Enabling `<logall_json>yes</logall_json>` in `/var/ossec/etc/ossec.conf` writes every decoded event to `/var/ossec/logs/archives/archives.json`. This is invaluable for confirming that events reached the manager and for checking exact field names/values before writing rules.
+
+## Phase 5C
+
+### Wazuh 4.x custom integrations must be named `custom-<something>`
+`integratord` rejects arbitrary script names. The integration name in `ossec.conf`, the wrapper filename, and the Python helper must all share the `custom-` prefix.  
+**Fix:** name the integration `custom-wazuh-notify`, place the wrapper at `/var/ossec/integrations/custom-wazuh-notify`, and keep the Python script in the same directory.
+
+### Use the file-copy method for `ossec.conf` edits, not inline heredocs
+Patching `ossec.conf` remotely with inline heredocs / Python string replacement mangled backslashes, quotes, and XML escaping, especially when Windows paths were involved. The resulting corruption prevented the manager from starting (`wazuh-db did not start correctly`).  
+**Fix:** copy `ossec.conf` out of the container, edit it locally with a proper XML-aware editor, validate the XML, then copy it back. Do not inject multi-line blocks through shell-escaped one-liners.
+
+### Verify the webhook end-to-end with a real attack
+Unit-testing the Python script with a static alert file is not enough; `integratord` only runs when the alert level and integration conditions match a live alert.  
+**Fix:** run a real attack that triggers a rule at or above the configured `<level>` (e.g. SMB brute-force → rule `100303`, level 12), then check the receiver log. This confirms the wrapper, permissions, environment variable, and network path all work.
+
+### Active Response wiring was deferred for two concrete reasons
+1. **XML / escaping risk:** the `<command>` / `<active-response>` blocks for the PowerShell script kept corrupting `ossec.conf` because Windows paths with backslashes and quotes were reinterpreted by the remote shell layers.
+2. **Wrong agent-side location:** `firewall-block.ps1` was staged at `C:\wazuh-ar\firewall-block.ps1`, but custom Wazuh AR scripts must live in the agent's `active-response\bin\` directory to be executable by Wazuh execd.  
+**Fix:** place the script in `C:\Program Files (x86)\ossec-agent\active-response\bin\firewall-block.ps1` (or the equivalent agent path), add a clean `<command>` + `<active-response>` block via the file-copy method, and restart the manager.
+
+### Prefer local MITRE cache over live API lookups during alert processing
+The integration enriches technique IDs from a local JSON cache built once from the MITRE ATT&CK STIX bundle. This avoids network dependencies and keeps alert latency low.

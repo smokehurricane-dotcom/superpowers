@@ -49,6 +49,17 @@ Custom Wazuh rules live in [`wazuh-rules/custom_ad_rules.xml`](wazuh-rules/custo
 
 See the detailed playbooks in [`docs/detections/`](docs/detections/).
 
+## Alerting and response
+
+The lab includes a custom Wazuh integration that forwards high-severity alerts (level 10+) to a webhook, plus a staged PowerShell Active Response script for temporary firewall blocks on the DC.
+
+| Component | Status |
+|-----------|--------|
+| Webhook alerting (`custom-wazuh-notify`) | ✅ Verified live — SMB brute-force rule 100303 (level 12) was delivered to the Kali webhook receiver with MITRE enrichment. |
+| Active Response firewall block | ⏸️ Deferred — `firewall-block.ps1` is staged on the DC, but the manager-side `<command>` / `<active-response>` block is not wired and the script must be moved into the agent's `active-response\bin\` directory. |
+
+See [`docs/response/README.md`](docs/response/README.md) for configuration, verification output, and the honest deferred-items list.
+
 ## Quick start
 
 1. Install prerequisites:

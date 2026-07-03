@@ -1,0 +1,8 @@
+#!/bin/sh
+# Wazuh integration wrapper for scripts/wazuh-notify.py.
+# The integration name in ossec.conf must be 'custom-wazuh-notify'.
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PYTHON_SCRIPT="${SCRIPT_DIR}/wazuh-notify.py"
+
+exec python3 "${PYTHON_SCRIPT}" "$@"

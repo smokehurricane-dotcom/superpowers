@@ -6,3 +6,6 @@ output/
 *.html
 !templates/*.html
 *.log
+*.tmp
+*~
+data/enterprise-attack.json
