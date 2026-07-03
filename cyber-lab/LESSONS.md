@@ -120,3 +120,7 @@ Unit-testing the Python script with a static alert file is not enough; `integrat
 
 ### Prefer local MITRE cache over live API lookups during alert processing
 The integration enriches technique IDs from a local JSON cache built once from the MITRE ATT&CK STIX bundle. This avoids network dependencies and keeps alert latency low.
+
+### A snapshot is only as clean as the moment it is taken
+The `clean-phase5c` snapshot was named before its state was verified clean. It captured a live `ossec.conf` that still contained a leftover firewall-block `<command>` / `<active-response>` pair from earlier 5C escaping/corruption attempts. Restoring it re-introduced the corruption.  
+**Fix:** verify config against the provisioned template before trusting/naming a snapshot; prefer regenerating config from version control over restoring live state.

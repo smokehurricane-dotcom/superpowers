@@ -16,7 +16,7 @@ def validate_blocks(text):
 
 
 def remove_existing_firewall_block(conf):
-    """Remove any old <command> and <active-response> blocks named firewall-block."""
+    """Remove any <command> or <active-response> blocks named firewall-block."""
     # Remove <command> blocks whose <name> is firewall-block
     conf = re.sub(
         r'\s*<command>\s*<name>firewall-block</name>.*?</command>\s*',
@@ -24,10 +24,16 @@ def remove_existing_firewall_block(conf):
         conf,
         flags=re.DOTALL,
     )
-    # Remove <active-response> blocks whose child <command> is firewall-block
+    # Remove <active-response> blocks that reference the firewall-block command
+    def ar_replacer(m):
+        block = m.group(0)
+        if '<command>firewall-block</command>' in block:
+            return '\n'
+        return block
+
     conf = re.sub(
-        r'\s*<active-response>\s*<command>firewall-block</command>.*?</active-response>\s*',
-        '\n',
+        r'\s*<active-response>\s*.*?</active-response>\s*',
+        ar_replacer,
         conf,
         flags=re.DOTALL,
     )
@@ -42,8 +48,7 @@ def main(conf_path, snippet_path, out_path):
 
     conf = remove_existing_firewall_block(conf)
 
-    # Insert before the first </ossec_config> (Wazuh allows multiple root blocks,
-    # but all built-in command/active-response blocks live in the first one).
+    # Insert before the first </ossec_config>
     marker = '</ossec_config>'
     idx = conf.find(marker)
     if idx == -1:
