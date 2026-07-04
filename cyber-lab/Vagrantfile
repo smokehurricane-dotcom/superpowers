@@ -92,23 +92,17 @@ Vagrant.configure("2") do |config|
       ip route add 10.20.0.0/24 via 10.10.0.2 || true
       ip route add 10.30.0.0/24 via 10.10.0.2 || true
 
-      # Wazuh needs this for the indexer
-      sysctl -w vm.max_map_count=262144
-      echo 'vm.max_map_count=262144' > /etc/sysctl.d/99-wazuh.conf
-
-      # Wazuh single-node deployment
+      # Manager-only Wazuh deployment (no indexer/dashboard) to fit in 16 GB host RAM.
       WAZUH_BRANCH="v4.10.1"
       if [ ! -d /opt/wazuh-docker ]; then
         git clone --depth 1 --branch "$WAZUH_BRANCH" https://github.com/wazuh/wazuh-docker.git /opt/wazuh-docker
       fi
       cd /opt/wazuh-docker/single-node
-      # Generate certs if not present
-      if [ ! -f config/wazuh-indexer/wazuh.indexer.pem ]; then
-        docker-compose -f generate-indexer-certs.yml run --rm generator
-      fi
-      docker-compose up -d
+      # Use the manager-only compose file from the repo.
+      cp /vagrant/docker-compose.manager-only.yml ./docker-compose.manager-only.yml
+      docker-compose -f docker-compose.manager-only.yml up -d
 
-      # Disable vulnerability-detector before the CVE feed loader can exhaust RAM.
+      # Disable heavy/unnecessary modules before they can exhaust RAM.
       # Use docker cp (not docker exec) for file reads/writes under load.
       echo "Waiting for Wazuh manager container..."
       for i in $(seq 1 60); do
@@ -118,21 +112,30 @@ Vagrant.configure("2") do |config|
         sleep 5
       done
 
-      echo "Disabling vulnerability-detector in manager ossec.conf..."
+      echo "Disabling vulnerability-detection and indexer output in manager ossec.conf..."
       docker cp single-node_wazuh.manager_1:/var/ossec/etc/ossec.conf /tmp/ossec.conf.siem
       python3 - <<'PY'
 import re
 with open('/tmp/ossec.conf.siem', 'r') as f:
     conf = f.read()
-# Force vulnerability-detector enabled flag to 'no'
+# Disable vulnerability-detection
 conf = re.sub(
-    r'(<vulnerability-detector>.*?<enabled>)[^<]+(</enabled>.*?</vulnerability-detector>)',
+    r'(<vulnerability-detection>.*?<enabled>)[^<]+(</enabled>.*?</vulnerability-detection>)',
     r'\1no\2',
     conf,
     flags=re.DOTALL
 )
-if '<vulnerability-detector>' in conf and not re.search(r'<vulnerability-detector>.*?<enabled>', conf, flags=re.DOTALL):
-    conf = conf.replace('<vulnerability-detector>', '<vulnerability-detector>\n    <enabled>no</enabled>')
+if '<vulnerability-detection>' in conf and not re.search(r'<vulnerability-detection>.*?<enabled>', conf, flags=re.DOTALL):
+    conf = conf.replace('<vulnerability-detection>', '<vulnerability-detection>\n    <enabled>no</enabled>')
+# Disable indexer output (manager-only, no indexer)
+conf = re.sub(
+    r'(<indexer>.*?<enabled>)[^<]+(</enabled>.*?</indexer>)',
+    r'\1no\2',
+    conf,
+    flags=re.DOTALL
+)
+if '<indexer>' in conf and not re.search(r'<indexer>.*?<enabled>', conf, flags=re.DOTALL):
+    conf = conf.replace('<indexer>', '<indexer>\n    <enabled>no</enabled>')
 with open('/tmp/ossec.conf.siem', 'w') as f:
     f.write(conf)
 PY
@@ -149,7 +152,7 @@ PY
         docker exec single-node_wazuh.manager_1 /var/ossec/bin/wazuh-control restart
       fi
 
-      echo "Wazuh dashboard: https://10.10.0.30 (admin / #{LAB_ENV.fetch('LAB_WAZUH_DASHBOARD_PW')})"
+      echo "Manager-only Wazuh ready at 10.10.0.30"
     SHELL
   end
 
