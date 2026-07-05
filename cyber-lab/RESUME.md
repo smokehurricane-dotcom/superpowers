@@ -1,65 +1,89 @@
-# Slice 1 Resume Point — before host reboot
+# Resume Point — 2026-07-04 EOD
 
-Date: 2026-07-03
-Status: SIEM-side Active Response config applied and manager restarted cleanly; DC-side blocked by a Vagrant machine lock. Host reboot required before continuing.
+Status: root cause found for the last Active Response gap. Stopping here for the night.
 
-## Root cause: clean-phase5c snapshot is contaminated
+## DONE today
 
-The SIEM snapshot `clean-phase5c` is **not clean**:
+- Detection proven on the manager-only SIEM: SMB brute-force from Kali fires Wazuh rule `100303` ✅
+- Active Response pipeline proven live end-to-end with the built-in `firewall-drop` command (add → block → timeout) ✅
+- Custom command acceptance solved: the Linux manager now registers our own `firewall-block` command via a cross-platform Python script (no file extension) with `root:wazuh` ownership and mode `750` ✅
+- Bisected placement, `rules_id`, and `level`: relocated the `<active-response>` block and the built-in `firewall-drop` still fires, so placement is not the issue ✅
 
-- `/var/ossec/etc/ossec.conf` inside the Wazuh manager container was modified at `2026-07-02 23:58:08`.
-- That config contains a leftover `<command>` / `<active-response>` firewall-block pair from the earlier Phase 5C escaping/corruption attempts.
-- The snapshot was saved at `02:43` the next day, so it froze the corrupted config.
-- **Rule:** do not trust a snapshot name — verify the config against the provisioned template before declaring it clean.
+## ROOT CAUSE of the remaining gap (found and proven)
 
-## Current SIEM state
+Our `firewall-block` Python script does **not** answer Wazuh's `check_keys` handshake.
 
-- The running manager has a **manually patched** `ossec.conf`:
-  - Old firewall-block blocks removed.
-  - One clean block inserted:
-    ```xml
-    <command>
-      <name>firewall-block</name>
-      <executable>firewall-block.cmd</executable>
-      <timeout_allowed>yes</timeout_allowed>
-    </command>
-    <active-response>
-      <command>firewall-block</command>
-      <location>local</location>
-      <level>10</level>
-      <timeout>600</timeout>
-    </active-response>
-    ```
-- Manager restart completed successfully; all important daemons are running.
-- This config is live in the container only and will be lost on `vagrant destroy siem` until it is folded into provisioning.
+When a stateful AR command has `<timeout_allowed>yes</timeout_allowed>`, `wazuh-analysisd`/`wazuh-execd` probe it with a message like:
 
-## After reboot — regenerate, do not restore
+```json
+{"version":1,"origin":{"name":"node01","module":"wazuh-execd"},"command":"check_keys","parameters":{"keys":["192.168.1.99"]}}
+```
 
-1. **Do not restore `clean-phase5c` for the SIEM** — it will re-introduce the corrupted config.
-2. Regenerate a clean config from version control / provisioning:
-   - `vagrant destroy siem && vagrant up siem`, or
-   - re-run the SIEM provisioner from the `Vagrantfile`.
-3. Apply the AR patch once with `scripts/patch-ossec-conf.py` (idempotent — removes existing firewall-block blocks before inserting).
+The built-in `firewall-drop` script answers this handshake and registers as usable. Our script exits 0 with no output, so `analysisd` silently drops the custom command.
 
-## Slice 1 remaining steps after reboot
+**Proof:** swapping only the `<command>` in the exact same `<active-response>` block from `firewall-block` to `firewall-drop` made it fire. The failure is specific to our script, not the block placement or rule match.
 
-- [ ] Verify manager restarts cleanly with the AR patch on a regenerated config.
-- [ ] Copy `firewall-block.ps1` and `firewall-block.cmd` to the DC's `C:\Program Files (x86)\ossec-agent\active-response\bin\`.
-- [ ] Enable Windows Firewall on the DC with explicit allow rules for WinRM and the Wazuh manager.
-- [ ] Harden `firewall-block.ps1` to never block the SIEM/manager (`10.10.0.30`) and the router (`10.30.0.2`).
-- [ ] Live test: SMB brute-force from Kali → rule `100303` → AR block → timeout → rule removed.
-- [ ] Update `docs/response/README.md`, `README.md`, and `ROADMAP.md` from "deferred" to "verified".
+## NEXT STEP (tomorrow, ~10 min)
 
-## Open decision after reboot
+Teach `firewall-block` the `check_keys` handshake:
 
-- **Path A (approved plan):** Use the new `firewall-block.cmd` block + script in `active-response\bin\`.
-- **Path B:** Keep the existing `powershell.exe -File C:\wazuh-ar\firewall-block.ps1` block from the contaminated snapshot and only fix that script (fewer DC changes).
+1. Read the built-in `/var/ossec/active-response/bin/firewall-drop` inside the manager container for the exact continue/abort JSON.
+2. Replicate that logic at the top of our Python script.
+3. Keep the existing Linux server-side noop and Windows add/delete firewall logic unchanged.
+4. Redeploy to `/var/ossec/active-response/bin/firewall-block` with `root:wazuh` and mode `750`.
+5. Switch `<command>` in the `<active-response>` block back to `firewall-block` and restart the manager.
+6. Run `/tmp/inject.py` and verify a `firewall-block` entry appears in `/var/ossec/logs/active-responses.log`.
 
-Decide after reboot.
+Then:
+- Switch `<location>` back to `local`.
+- Deploy the script to the DC agent's `active-response\bin\`.
+- Restore `<timeout>600</timeout>`.
+- Document the DC live-fire test as RAM-gated: verify from Kali side (SMB connection dropped), not via DC WinRM under load.
 
-## Files already in the repo
+## Current config state
 
-- `scripts/active-response/firewall-block.ps1`
-- `scripts/active-response/firewall-block.cmd`
-- `scripts/active-response/ossec-ar-snippet.xml`
-- `scripts/patch-ossec-conf.py` — idempotent; validates each `<ossec_config>` block separately.
+The `<active-response>` block in `/var/ossec/etc/ossec.conf` is currently in **test/bisect state**:
+
+```xml
+<command>
+  <name>firewall-block</name>
+  <executable>firewall-block</executable>
+  <timeout_allowed>yes</timeout_allowed>
+</command>
+
+<active-response>
+  <disabled>no</disabled>
+  <command>firewall-drop</command>   <!-- temporary bisect value; switch back to firewall-block for the fix -->
+  <location>server</location>
+  <rules_id>5710</rules_id>
+  <level>3</level>
+  <timeout>60</timeout>
+</active-response>
+```
+
+Important: `firewall-block` and `firewall-drop` `<command>` definitions both exist. The `<active-response>` block is pointed at `firewall-drop` for the bisect.
+
+## Snapshots saved today (SIEM `lab-siem`)
+
+- `manager-only-stable`
+- `ar-applied`
+- `ar-debug`
+- `ar-bisect`
+- `ar-synthetic`
+- `ar-optionb`
+- `ar-placement`
+- `ar-debug-log`
+- `ar-bisect2`
+- `resume-2026-07-04-eod` *(current, marked with `*`)*
+
+## Resource / RAM lesson
+
+The host has 16 GB of soldered RAM and cannot keep `siem`, `dc01`, and `kali` all healthy at once. When all three run, the DC's network stack collapses (WinRM becomes unreliable or fails).
+
+**Rule:** do manager-only proofs with the DC/Kali halted. Verify DC-side actions from the Kali side of the connection (e.g., the SMB session is dropped), never rely on DC WinRM while the full lab is under load.
+
+---
+
+## Prior resume (2026-07-03) — kept for reference
+
+See git history for the old `RESUME.md` content.

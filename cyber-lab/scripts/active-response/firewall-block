@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+"""Cross-platform Wazuh active-response script for firewall block/unblock.
+
+Runs on the manager (Linux, server-side noop) and on Windows agents (actual
+Windows Firewall block/unblock). Reads the standard Wazuh AR JSON message from
+stdin.
+"""
+import json
+import logging
+import platform
+import sys
+
+GUARDED_IPS = {"10.10.0.30", "10.30.0.2"}
+LOG_PATH_LINUX = "/var/ossec/logs/active-responses.log"
+LOG_PATH_WINDOWS = r"C:\wazuh-ar\firewall-block.log"
+
+
+def get_src_ip(payload):
+    """Extract source IP from the Wazuh AR JSON payload."""
+    try:
+        return payload["parameters"]["alert"]["data"]["srcip"]
+    except KeyError:
+        pass
+    # Fallback: some alerts place it at alert.data.win.eventdata.ipAddress
+    try:
+        return payload["parameters"]["alert"]["data"]["win"]["eventdata"]["ipAddress"]
+    except KeyError:
+        pass
+    return None
+
+
+def setup_logging():
+    system = platform.system()
+    log_path = LOG_PATH_WINDOWS if system == "Windows" else LOG_PATH_LINUX
+    logging.basicConfig(
+        filename=log_path,
+        level=logging.INFO,
+        format="%(asctime)s %(message)s",
+    )
+
+
+def linux_noop(command, srcip):
+    """Server-side noop on Linux manager."""
+    logging.info("firewall-block: server-side noop for %s %s", command, srcip)
+    print(f"firewall-block: server-side noop for {command} {srcip}")
+
+
+def windows_block(srcip):
+    """Create Windows Firewall block rule for srcip."""
+    name = f"WAZUH-AR-BLOCK-{srcip.replace('.', '-')}"
+    logging.info("Blocking %s", srcip)
+    # Prefer PowerShell/New-NetFirewallRule; fall back to netsh if unavailable.
+    try:
+        import subprocess
+        subprocess.run(
+            [
+                "powershell.exe",
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-Command",
+                f"New-NetFirewallRule -Name '{name}' -DisplayName '{name}' "
+                f"-Direction Inbound -Action Block -RemoteAddress {srcip} "
+                f"-Profile Any -Enabled True | Out-Null",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "powershell.exe",
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-Command",
+                f"New-NetFirewallRule -Name '{name}-out' -DisplayName '{name}-out' "
+                f"-Direction Outbound -Action Block -RemoteAddress {srcip} "
+                f"-Profile Any -Enabled True | Out-Null",
+            ],
+            check=True,
+        )
+    except Exception as e:
+        logging.error("Failed to block %s: %s", srcip, e)
+
+
+def windows_unblock(srcip):
+    """Remove Windows Firewall block rule for srcip."""
+    name = f"WAZUH-AR-BLOCK-{srcip.replace('.', '-')}"
+    logging.info("Unblocking %s", srcip)
+    try:
+        import subprocess
+        subprocess.run(
+            [
+                "powershell.exe",
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-Command",
+                f"Remove-NetFirewallRule -Name '{name}' -ErrorAction SilentlyContinue; "
+                f"Remove-NetFirewallRule -Name '{name}-out' -ErrorAction SilentlyContinue",
+            ],
+            check=True,
+        )
+    except Exception as e:
+        logging.error("Failed to unblock %s: %s", srcip, e)
+
+
+def main():
+    setup_logging()
+
+    try:
+        payload = json.load(sys.stdin)
+    except json.JSONDecodeError as e:
+        logging.error("Invalid JSON input: %s", e)
+        return 0
+
+    command = payload.get("parameters", {}).get("extra_args", [None])[0]
+    if not command:
+        command = "add"
+
+    srcip = get_src_ip(payload)
+    if not srcip:
+        logging.error("No attacker IP found in AR payload")
+        return 0
+
+    if srcip in GUARDED_IPS:
+        logging.info("skipped guarded IP %s", srcip)
+        return 0
+
+    system = platform.system()
+    if system == "Windows":
+        if command == "add":
+            windows_block(srcip)
+        elif command == "delete":
+            windows_unblock(srcip)
+        else:
+            logging.warning("Unknown command: %s", command)
+    else:
+        linux_noop(command, srcip)
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

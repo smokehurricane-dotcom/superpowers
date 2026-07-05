@@ -147,3 +147,6 @@ Restart-Service -Name "WazuhSvc"
 ```
 
 Then verify end-to-end: run the SMB brute-force loop and `grep -c 100303 /var/ossec/logs/alerts/alerts.json` must be `> 0`.
+
+### Stateful AR commands must answer the `check_keys` handshake
+Wazuh stateful AR commands (`<timeout_allowed>yes</timeout_allowed>`) require the script to answer the `check_keys` handshake, or `wazuh-analysisd` silently drops the custom command.

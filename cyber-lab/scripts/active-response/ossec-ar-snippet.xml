@@ -1,13 +1,16 @@
 <command>
   <name>firewall-block</name>
-  <executable>firewall-block.cmd</executable>
+  <executable>firewall-block</executable>
   <timeout_allowed>yes</timeout_allowed>
 </command>
 
+<!-- TEST / BISECT STATE: active-response temporarily points at firewall-drop to prove placement.
+     Switch <command> back to firewall-block once the script answers the check_keys handshake. -->
 <active-response>
   <disabled>no</disabled>
-  <command>firewall-block</command>
-  <location>local</location>
-  <level>10</level>
-  <timeout>600</timeout>
+  <command>firewall-drop</command>
+  <location>server</location>
+  <rules_id>5710</rules_id>
+  <level>3</level>
+  <timeout>60</timeout>
 </active-response>
