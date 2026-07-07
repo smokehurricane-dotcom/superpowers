@@ -231,10 +231,10 @@ def parse_detail_page(soup: BeautifulSoup, overview_dog: dict) -> dict:
     if gallery and gallery.find("img"):
         foto_url = urljoin(BASE_URL, gallery.find("img")["src"])
 
-    # Vollständige Beschreibung: alle Text-Knoten außer Kontakt/Status/Position
+    # Vollständige Beschreibung: alle Text-Knoten außer Status/Position/Kontakt
     description = ""
     # Wir nehmen den Text des Wrappers, entfernen aber bekannte Metadaten-Blöcke
-    for meta in wrapper.find_all(class_=["paw_state", "paw_position", "paw_contact_btn"]):
+    for meta in wrapper.find_all(class_=["paw_state", "paw_position", "paw_contact", "paw_contact_btn"]):
         meta.decompose()
     description = wrapper.get_text(strip=True, separator="\n")
     # Mehrfache Leerzeilen reduzieren

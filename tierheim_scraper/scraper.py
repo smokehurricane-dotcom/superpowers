@@ -53,7 +53,6 @@ DB_NAME = common.DB_NAME
 # ---------------------------------------------------------------------------
 # Scraping-Logik
 # ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
 
 def fetch_overview_pages(session: requests.Session) -> list[str]:
     """Sammelt alle Links zu Hunde-Detailseiten von der Übersicht samt Pagination."""

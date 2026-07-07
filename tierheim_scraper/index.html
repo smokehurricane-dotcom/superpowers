@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zuhause gesucht · OWL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Mulish:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F6F2E9;
+      --ink: #223B30;
+      --ink-soft: #5C6B60;
+      --accent: #DE9A47;
+      --accent-deep: #C47F2E;
+      --sage: #E4E7DC;
+      --card: #FFFFFF;
+      --line: #E6E1D4;
+      --radius: 14px;
+      --shadow: 0 4px 18px rgba(34, 59, 48, 0.08);
+      --shadow-hover: 0 12px 32px rgba(34, 59, 48, 0.14);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Mulish', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--accent-deep);
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    /* Header */
+    .site-header {
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      padding: 1rem 4vw;
+    }
+
+    .site-header__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(180deg, #EDE8DC 0%, var(--bg) 100%);
+      padding: 3rem 4vw 2.5rem;
+      text-align: center;
+    }
+
+    .hero__inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(1.8rem, 5vw, 2.75rem);
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.15;
+      margin: 0 0 1rem;
+    }
+
+    .hero p {
+      margin: 0 auto 0.75rem;
+      color: var(--ink-soft);
+      font-size: clamp(1rem, 2vw, 1.125rem);
+      max-width: 640px;
+    }
+
+    .hero__meta {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: var(--sage);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    /* Filter bar */
+    .filters {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: linear-gradient(180deg, #EDE8DC 0%, var(--bg) 100%);
+      border-bottom: 1px solid var(--line);
+      padding: 1rem 4vw;
+    }
+
+    .filters__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 1rem;
+    }
+
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1 1 180px;
+      min-width: 160px;
+    }
+
+    .filter-field label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .filter-field input,
+    .filter-field select {
+      padding: 0.6rem 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    .filter-field input:focus-visible,
+    .filter-field select:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .filter-reset {
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--accent-deep);
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .filter-reset:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .filter-count {
+      width: 100%;
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+    }
+
+    .empty-state {
+      display: none;
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--ink-soft);
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .empty-state.is-visible {
+      display: block;
+    }
+
+    /* Grid */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 4vw 4rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card {
+        transition: none;
+      }
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .photo-link {
+      display: block;
+      text-decoration: none;
+    }
+
+    .photo-wrap {
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background: var(--sage);
+    }
+
+    .photo-wrap img,
+    .photo-placeholder {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-placeholder {
+      background: repeating-linear-gradient(
+        45deg,
+        var(--sage),
+        var(--sage) 10px,
+        var(--line) 10px,
+        var(--line) 20px
+      );
+    }
+
+    .card-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+    }
+
+    .dog-name {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 0.75rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .dog-name::after {
+      content: '';
+      display: block;
+      width: 2.5rem;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin-top: 0.35rem;
+    }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      background: var(--sage);
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+
+    .pill--unknown {
+      background: transparent;
+      border: 1px dashed var(--line);
+      color: var(--ink-soft);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .description {
+      margin: 0 0 0.75rem;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .compatibility {
+      margin: 0 0 1.25rem;
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .compatibility span {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .compatibility--empty {
+      font-style: italic;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.7rem 1.1rem;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 10px;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--accent-deep);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Footer */
+    .site-footer {
+      background: var(--card);
+      border-top: 1px solid var(--line);
+      padding: 2.5rem 4vw;
+      text-align: center;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+    }
+
+    .site-footer__inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .site-footer strong {
+      display: block;
+      color: var(--ink);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="logo" href="./">Zuhause gesucht · OWL</a>
+    </div>
+  </header>
+
+  <section class="hero" aria-labelledby="hero-headline">
+    <div class="hero__inner">
+      <h1 id="hero-headline">Jeder von ihnen wartet auf ein Zuhause.</h1>
+      <p>Vermittelbare Hunde aus Tierheimen in Ostwestfalen-Lippe – gebündelt an einem Ort. Adoptiert wird immer direkt beim Tierheim.</p>
+      <p class="hero__meta" aria-live="polite">Aktuell 41 Hunde aus 2 Tierheimen</p>
+    </div>
+  </section>
+
+  <section class="filters" aria-label="Hunde filtern">
+    <div class="filters__inner">
+      <div class="filter-field">
+        <label for="filter-search">Suche</label>
+        <input type="search" id="filter-search" placeholder="Name, Rasse, Beschreibung…" autocomplete="off">
+      </div>
+      <div class="filter-field">
+        <label for="filter-heim">Tierheim</label>
+        <select id="filter-heim">
+          <option value="">Alle</option>
+          <option value="Tierheim Gütersloh">Tierheim Gütersloh</option>
+          <option value="Tierheim Paderborn">Tierheim Paderborn</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="filter-geschlecht">Geschlecht</label>
+        <select id="filter-geschlecht">
+          <option value="">Alle</option>
+          <option value="maennlich">Männlich</option>
+          <option value="weiblich">Weiblich</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="filter-groesse">Größe</label>
+        <select id="filter-groesse">
+          <option value="">Alle</option>
+          <option value="klein">Klein</option>
+          <option value="mittel">Mittel</option>
+          <option value="gross">Groß</option>
+        </select>
+      </div>
+      <button type="button" class="filter-reset" id="filter-reset">Filter zurücksetzen</button>
+      <p class="filter-count" id="filter-count" aria-live="polite">41 von 41 Hunden</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="grid" role="list">
+      <div class="empty-state" id="empty-state">
+        <p>Keine Hunde gefunden. Versuch's mit anderen Filtern oder setz sie zurück.</p>
+      </div>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="weiblich" data-groesse-kat="gross" data-search="coco mischling coco kam zusammen mit vielen anderen hunden aus einer sicherstellung zu uns. die bedingungen unter denen sie leben musste waren furchtbar.
+umso schöner ist es, dass sich coco ein offenes und freundliches wesen bewahrt hat. die hündin zeigte sich anfangs unterwürfig und zurückhaltend im umgang mit menschen, hat sich jedoch mittlerweile zu einer selbstbewussten dame entwickelt, die aufmerksamkeit auch einfordert und grenzen austestet.
+man kann sagen, sie holt nach, was sie bisher verpasst hat und geniest, was sie bekommen kann. dabei stellt sie insgesamt gar nicht so viele ansprüche an bewegung und beschäftigung. coco geht gerne spazieren, ist aber kein großer sportler und es darf auch mal gemütlich sein. coco beobachtet gerne ihre umgebung, freut sich über ansprache, kauartikel oder kleine beschäftigungsaufgaben zwischendurch, kann aber auch einfach entspannt dabei sein, ohne viel aufmerksamkeit einzufordern.
+das spazieren gehen in ländlicher umgebung hat sie mittlerweile gut gelernt, wobei sie hier sicherheit und unterstützung ihrer menschen benötigt, da sie mit vielen reizen überfordert ist und schnell unsicher wird.
+coco zeigt sich mit artgenossen überwiegend verträglich und sucht nun menschen mit hundeerfahrung, die lust haben, ihr die welt zu zeigen und ihr beizubringen, was sie können muss.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/coco/" target="_blank" rel="noopener" aria-label="Coco beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2026/05/IMG_3471-Kopie.jpg" alt="Foto von Coco" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Coco</h2>
+    <div class="pills"><span class="pill">Mischling</span>
+<span class="pill">groß</span>
+<span class="pill">weiblich intakt</span></div>
+    <p class="description">Coco kam zusammen mit vielen anderen Hunden aus einer Sicherstellung zu uns. Die Bedingungen unter denen sie leben musste waren furchtbar.
+Umso schöner ist es, dass sich Coco ein offenes und freundliches Wesen bewahrt hat. Die Hündin zeigte sich anfangs unterwürfig und zurückhaltend im Umgang mit Menschen, hat sich jedoch mittlerweile zu einer selbstbewussten Dame entwickelt, die Aufmerksamkeit auch einfordert und Grenzen austestet.
+Man kann sagen, sie holt nach, was sie bisher verpasst hat und geniest, was sie bekommen kann. Dabei stellt sie insgesamt gar nicht so viele Ansprüche an Bewegung und Beschäftigung. Coco geht gerne spazieren, ist aber kein großer Sportler und es darf auch mal gemütlich sein. Coco beobachtet gerne ihre Umgebung, freut sich über Ansprache, Kauartikel oder kleine Beschäftigungsaufgaben zwischendurch, kann aber auch einfach entspannt dabei sein, ohne viel Aufmerksamkeit einzufordern.
+Das Spazieren gehen in ländlicher Umgebung hat sie mittlerweile gut gelernt, wobei sie hier Sicherheit und Unterstützung ihrer Menschen benötigt, da sie mit vielen Reizen überfordert ist und schnell unsicher wird.
+Coco zeigt sich mit Artgenossen überwiegend verträglich und sucht nun Menschen mit Hundeerfahrung, die Lust haben, ihr die Welt zu zeigen und ihr beizubringen, was sie können muss.</p>
+    <p class="compatibility"><span>Verträglich:</span> Coco zeigt sich mit Artgenossen überwiegend verträglich und sucht nun Menschen mit Hundeerfahrung, die Lust haben, ihr die Welt zu zeigen und ihr beizubringen, was sie können muss.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/coco/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="maennlich" data-groesse-kat="gross" data-search="eddie mioritic-mix eddie ist ein imposanter rumänischer mischling, in dem ein guter anteil herdenschützer der rasse mioritic steckt. auf der einen seite ist er selbstbewusst, stellt sich gerne imponierend zur schau und bewacht zuverlässig haus und hof. auf der anderen seite hat er auch eine sensible und kindlich-verspielte seite, die er seiner bezugsperson gegenüber zeigt. hier gibt er sich loyal, verschmust und umgänglich. die regeln im zusammenleben müssen mit eddie allerdings konsequent erarbeitet und durchgesetzt werden.
+eddie ist ein kluger hund, der sehr charmant sein kann und auch gerne mit seinen menschen zusammenarbeitet, wenn diese sich sein vertrauen und seinen respekt erarbeitet haben. kadavergehorsam darf man von ihm jedoch nicht erwarten und er hinterfragt auch durchaus die führungsfähigkeiten seiner menschen. er steht voll im leben, testet zwischendurch grenzen aus und neigt dazu, entscheidungen selbständig zu treffen.
+der unkastrierte rüde ist robust, agiert körperlich und kann dabei auch schon mal ruppiger werden und herausfordern. mit seinen bezugspersonen im ruhigen umfeld zeigt er sich sanft, zärtlich und vorsichtig und geniest streicheleinheiten.  eddie hat ein ausgeglichenes wesen, ist jedoch immer wachsam und kann blitzschnell reagieren.
+der stattliche rüde muss in seiner persönlichkeit und seinem genetischen erbe ernst genommen werden, da er territoriales verhalten zeigt und fremde menschen auch entsprechend verletzen und attackieren würde. deshalb suchen wir zuverlässige und erfahrene hundehalter, die eddie auch körperlich gewachsen sind und sich nicht scheuen, ihn in der öffentlichkeit mit maulkorb zu sichern. an das tragen eines maulkorbes ist eddie gewöhnt.
+ein haus mit sicher eingezäuntem grundstück, ländlich gelegen wäre wünschenswert.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/siggi/" target="_blank" rel="noopener" aria-label="Eddie beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2025/12/3c3ff0d0-a1a3-4253-b28c-7e70b5523f7b.jpeg" alt="Foto von Eddie" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Eddie</h2>
+    <div class="pills"><span class="pill">Mioritic-Mix</span>
+<span class="pill">groß,gut 35 kg,</span>
+<span class="pill">männlich intakt</span></div>
+    <p class="description">Eddie ist ein imposanter rumänischer Mischling, in dem ein guter Anteil Herdenschützer der Rasse Mioritic steckt. Auf der einen Seite ist er selbstbewusst, stellt sich gerne imponierend zur Schau und bewacht zuverlässig Haus und Hof. Auf der anderen Seite hat er auch eine sensible und kindlich-verspielte Seite, die er seiner Bezugsperson gegenüber zeigt. Hier gibt er sich loyal, verschmust und umgänglich. Die Regeln im Zusammenleben müssen mit Eddie allerdings konsequent erarbeitet und durchgesetzt werden.
+Eddie ist ein kluger Hund, der sehr charmant sein kann und auch gerne mit seinen Menschen zusammenarbeitet, wenn diese sich sein Vertrauen und seinen Respekt erarbeitet haben. Kadavergehorsam darf man von ihm jedoch nicht erwarten und er hinterfragt auch durchaus die Führungsfähigkeiten seiner Menschen. Er steht voll im Leben, testet zwischendurch Grenzen aus und neigt dazu, Entscheidungen selbständig zu treffen.
+Der unkastrierte Rüde ist robust, agiert körperlich und kann dabei auch schon mal ruppiger werden und herausfordern. Mit seinen Bezugspersonen im ruhigen Umfeld zeigt er sich sanft, zärtlich und vorsichtig und geniest Streicheleinheiten.  Eddie hat ein ausgeglichenes Wesen, ist jedoch immer wachsam und kann blitzschnell reagieren.
+Der stattliche Rüde muss in seiner Persönlichkeit und seinem genetischen Erbe ernst genommen werden, da er territoriales Verhalten zeigt und fremde Menschen auch entsprechend verletzen und attackieren würde. Deshalb suchen wir zuverlässige und erfahrene Hundehalter, die Eddie auch körperlich gewachsen sind und sich nicht scheuen, ihn in der Öffentlichkeit mit Maulkorb zu sichern. An das Tragen eines Maulkorbes ist Eddie gewöhnt.
+Ein Haus mit sicher eingezäuntem Grundstück, ländlich gelegen wäre wünschenswert.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/siggi/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="weiblich" data-groesse-kat="mittel" data-search="elsa mischling elsa wurde mit vielen weiteren hunden vom veterinäramt sichergestellt, da sie unter schlimmen bedingungen leben musste.
+mittlerweile ist sie aufgeblüht und hat sich von den strapazen der vergangenheit erholt. sie zeigt sich aufmerksam, interessiert und neugierig und ist im umgang mit vertrauten bezugspersonen auch verschmust und körperbezogen. mittlerweile zeigt sie in ansätzen auch spielverhalten. mit fremden menschen ist elsa anfangs vorsichtig und zurückhaltend und ihr vertrauen muss man sich erst erarbeiten.
+elsa ist bemüht, die welt um sie herum zu verstehen, hat aber noch viele fragen im kopf. die hündin lernt eher langsam, aber gerne und braucht dazu ein ruhiges umfeld. mit trubel, hektik und zu vielen reizen kommt elsa nicht gut zurecht und ist dann schnell gestresst und überfordert.
+die sensible hündin braucht viel sicherheit durch ihre menschen und bindet sich stark an eine bezugsperson. mit dieser geht sie dann allerdings durch dick und dünn.
+elsa sehen wir in einem ruhigen ein- bis zwei-personen-haushalt mit geregeltem alltag. kinder und andere tiere sollten in ihrem neuen zuhause nicht leben und ihre neuen menschen sollten bereits hundeerfahrung mitbringen.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/elsa/" target="_blank" rel="noopener" aria-label="Elsa beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2026/03/IMG_2533.jpg" alt="Foto von Elsa" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Elsa</h2>
+    <div class="pills"><span class="pill">Mischling</span>
+<span class="pill">gut 55 cm, ca 30 kg</span>
+<span class="pill">weiblich intakt</span></div>
+    <p class="description">Elsa wurde mit vielen weiteren Hunden vom Veterinäramt sichergestellt, da sie unter schlimmen Bedingungen leben musste.
+Mittlerweile ist sie aufgeblüht und hat sich von den Strapazen der Vergangenheit erholt. Sie zeigt sich aufmerksam, interessiert und neugierig und ist im Umgang mit vertrauten Bezugspersonen auch verschmust und körperbezogen. Mittlerweile zeigt sie in Ansätzen auch Spielverhalten. Mit fremden Menschen ist Elsa anfangs vorsichtig und zurückhaltend und ihr Vertrauen muss man sich erst erarbeiten.
+Elsa ist bemüht, die Welt um sie herum zu verstehen, hat aber noch viele Fragen im Kopf. Die Hündin lernt eher langsam, aber gerne und braucht dazu ein ruhiges Umfeld. Mit Trubel, Hektik und zu vielen Reizen kommt Elsa nicht gut zurecht und ist dann schnell gestresst und überfordert.
+Die sensible Hündin braucht viel Sicherheit durch ihre Menschen und bindet sich stark an eine Bezugsperson. Mit dieser geht sie dann allerdings durch Dick und Dünn.
+Elsa sehen wir in einem ruhigen Ein- bis Zwei-Personen-Haushalt mit geregeltem Alltag. Kinder und andere Tiere sollten in ihrem neuen Zuhause nicht leben und ihre neuen Menschen sollten bereits Hundeerfahrung mitbringen.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/elsa/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="maennlich" data-groesse-kat="mittel" data-search="gino terrier-mix der am 13.03.2012 geborene terrier-mix gino, kam zu uns, da seine ehemaligen besitzer mit ihm überfordert waren. das lag sicherlich daran, dass der sehr intelligente rüde chronisch unterfordert war und ihm keine sicherheit gegeben werden konnte. mit fremden menschen hatte er große probleme und zeigte es auch, wenn er überfordert war.
+nach vielen schwierigkeiten hat sich gino an den strukturierten tierheimalltag gewöhnt. mit viel geduld und einfühlungsvermögen hat sich gino zu einem lebensfrohen, sehr intelligenten rüden entwickelt, der mit feuereifer bei jeder aufgabe dabei ist und schon weit mehr als einfache grundkommandos beherrscht.
+update:
+die lange zeit, die gino mittlerweile im tierheim ist, hat spuren hinterlassen. er ist älter und ruhiger geworden und braucht mittlerweile sehr viel schlaf. sein hör- und sehvermögen haben stark nachgelassen. auf spaziergängen und ausflügen ist er aber immer noch begeistert dabei und zeigt gerne, was er alles gelernt hat.
+aufgrund seiner unsicherheiten braucht gino seine tägliche routine. veränderungen im alltag verunsichern ihn mittlerweile so sehr, dass er sich dann manchmal komplett verweigert oder auch  attackiert.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/gino/" target="_blank" rel="noopener" aria-label="Gino beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2021/11/Gino-Kopf.png" alt="Foto von Gino" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Gino</h2>
+    <div class="pills"><span class="pill">Terrier-Mix</span>
+<span class="pill">14 Jahre, 3 Monate</span>
+<span class="pill">mittel</span>
+<span class="pill">männlich kastriert</span></div>
+    <p class="description">Der am 13.03.2012 geborene Terrier-Mix Gino, kam zu uns, da seine ehemaligen Besitzer mit ihm überfordert waren. Das lag sicherlich daran, dass der sehr intelligente Rüde chronisch unterfordert war und ihm keine Sicherheit gegeben werden konnte. Mit fremden Menschen hatte er große Probleme und zeigte es auch, wenn er überfordert war.
+Nach vielen Schwierigkeiten hat sich Gino an den strukturierten Tierheimalltag gewöhnt. Mit viel Geduld und Einfühlungsvermögen hat sich Gino zu einem lebensfrohen, sehr intelligenten Rüden entwickelt, der mit Feuereifer bei jeder Aufgabe dabei ist und schon weit mehr als einfache Grundkommandos beherrscht.
+Update:
+Die lange Zeit, die Gino mittlerweile im Tierheim ist, hat Spuren hinterlassen. Er ist älter und ruhiger geworden und braucht mittlerweile sehr viel Schlaf. Sein Hör- und Sehvermögen haben stark nachgelassen. Auf Spaziergängen und Ausflügen ist er aber immer noch begeistert dabei und zeigt gerne, was er alles gelernt hat.
+Aufgrund seiner Unsicherheiten braucht Gino seine tägliche Routine. Veränderungen im Alltag verunsichern ihn mittlerweile so sehr, dass er sich dann manchmal komplett verweigert oder auch  attackiert.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/gino/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="maennlich" data-groesse-kat="" data-search="giovanni schäferhund, langhaar giovanni wurde ende februar 2026 in einem sehr schlechten körperlichen zustand bei uns im tierheim abgegeben. er war bis auf die knochen abgemagert. mittlerweile hat er gut an gewicht zugenommen, entwickelt muskulatur und blüht auf.
+giovanni hatte bisher eng mit seiner besitzerin zusammengelebt, ist stubenrein und kennt die grundkommandos. der stattliche rüde liebt seine spaziergänge und geht auch gerne ins wasser. bisher hat er ländlich gelebt und wir sehen ihn auch zukünftig wieder in einem eher ruhigen bereich.
+giovanni ist grundsätzlich aufgeschlossen und freundlich, sehr anhänglich und braucht viel nähe mit seiner bezugsperson. er lernt gerne, ist aufmerksam und sehr für futter zu begeistern. der tierheimalltag gefällt ihm daher gar nicht und er zeigt sich im zwinger nervös und unterfordert.
+außerhalb des tierheimes wird er sofort ruhiger, entspannt und geniest die aufmerksamkeit und beschäftigung mit seinen gassigängern.
+relevant für seine zukunft ist ein ebenerdiger haushalt sowie aufbau und erhalt einer gesunden muskulatur, da er eine ausgeprägte hd sowie lumbosakrale übergangswirbel hat. aktuell bekommt er zur unterstützung auch ein schmerzmittel.
+giovannis gesundheit sollte weiterhin tierärztlich und physiotherapeutisch begleitet werden.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/giovanni/" target="_blank" rel="noopener" aria-label="Giovanni beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2026/03/e91fefaa-3d36-4cfb-b168-a83c31d202df-1.jpg" alt="Foto von Giovanni" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Giovanni</h2>
+    <div class="pills"><span class="pill">Schäferhund, langhaar</span>
+<span class="pill">männlich intakt</span>
+<span class="pill pill--unknown">Größe unbekannt</span></div>
+    <p class="description">Giovanni wurde Ende Februar 2026 in einem sehr schlechten körperlichen Zustand bei uns im Tierheim abgegeben. Er war bis auf die Knochen abgemagert. Mittlerweile hat er gut an Gewicht zugenommen, entwickelt Muskulatur und blüht auf.
+Giovanni hatte bisher eng mit seiner Besitzerin zusammengelebt, ist stubenrein und kennt die Grundkommandos. Der stattliche Rüde liebt seine Spaziergänge und geht auch gerne ins Wasser. Bisher hat er ländlich gelebt und wir sehen ihn auch zukünftig wieder in einem eher ruhigen Bereich.
+Giovanni ist grundsätzlich aufgeschlossen und freundlich, sehr anhänglich und braucht viel Nähe mit seiner Bezugsperson. Er lernt gerne, ist aufmerksam und sehr für Futter zu begeistern. Der Tierheimalltag gefällt ihm daher gar nicht und er zeigt sich im Zwinger nervös und unterfordert.
+Außerhalb des Tierheimes wird er sofort ruhiger, entspannt und geniest die Aufmerksamkeit und Beschäftigung mit seinen Gassigängern.
+Relevant für seine Zukunft ist ein ebenerdiger Haushalt sowie Aufbau und Erhalt einer gesunden Muskulatur, da er eine ausgeprägte HD sowie lumbosakrale Übergangswirbel hat. Aktuell bekommt er zur Unterstützung auch ein Schmerzmittel.
+Giovannis Gesundheit sollte weiterhin tierärztlich und physiotherapeutisch begleitet werden.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/giovanni/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="maennlich" data-groesse-kat="gross" data-search="keks münsterländer-mix keks ist ein grundsätzlich freundlicher, extrovertierter und selbständiger rüde. als ehemaliger hofhund durfte er teilweise auf dem gelände frei laufen und hat ansonsten überwiegend im zwinger gelebt. nach aufgabe des hofes ist die familie in eine wohnung umgezogen und konnte keks nicht dorthin mitnehmen.
+der aufgeweckte und bewegungsfreudige rüde hat noch nie das enge zusammenleben mit menschen in einer wohnung kennengelernt, ist nicht stubenrein und hat auch keine erziehung bekommen. keks ist selbständig und lässt sich nicht gerne einschränken. er liebt die eigenständigkeit, obwohl er durchaus auch die nähe mit seinen menschen zu schätzen weiß und stundenlang durchs zwingergitter gekrault werden möchte. in direktem kontakt mit menschen ist er aber oft misstrauisch und unsicher und reagiert situativ mit ernsthaftem abwehrschnappen und aggressionsverhalten.
+lange ausgiebige spaziergänge durch feld und wald sind für keks eine willkommene abwechslung vom tierheimalltag. als jagdhund setzt er hier gerne seine nase ein. aufgrund seines verhaltens und seines bisherigen lebens möchten wir keks in außenhaltung mit eingezäuntem grundstück und entsprechender schutzhütte vermitteln. tägliche spaziergänge, ansprache und kontakt zu seinen bezugspersonen müssen natürlich gegeben sein.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/keks/" target="_blank" rel="noopener" aria-label="Keks beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2022/02/Keks-3-HP.jpg" alt="Foto von Keks" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Keks</h2>
+    <div class="pills"><span class="pill">Münsterländer-Mix</span>
+<span class="pill">groß</span>
+<span class="pill">männlich intakt</span></div>
+    <p class="description">Keks ist ein grundsätzlich freundlicher, extrovertierter und selbständiger Rüde. Als ehemaliger Hofhund durfte er teilweise auf dem Gelände frei laufen und hat ansonsten überwiegend im Zwinger gelebt. Nach Aufgabe des Hofes ist die Familie in eine Wohnung umgezogen und konnte Keks nicht dorthin mitnehmen.
+Der aufgeweckte und bewegungsfreudige Rüde hat noch nie das enge Zusammenleben mit Menschen in einer Wohnung kennengelernt, ist nicht stubenrein und hat auch keine Erziehung bekommen. Keks ist selbständig und lässt sich nicht gerne einschränken. Er liebt die Eigenständigkeit, obwohl er durchaus auch die Nähe mit seinen Menschen zu schätzen weiß und stundenlang durchs Zwingergitter gekrault werden möchte. In direktem Kontakt mit Menschen ist er aber oft misstrauisch und unsicher und reagiert situativ mit ernsthaftem Abwehrschnappen und Aggressionsverhalten.
+Lange ausgiebige Spaziergänge durch Feld und Wald sind für Keks eine willkommene Abwechslung vom Tierheimalltag. Als Jagdhund setzt er hier gerne seine Nase ein. Aufgrund seines Verhaltens und seines bisherigen Lebens möchten wir Keks in Außenhaltung mit eingezäuntem Grundstück und entsprechender Schutzhütte vermitteln. Tägliche Spaziergänge, Ansprache und Kontakt zu seinen Bezugspersonen müssen natürlich gegeben sein.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/keks/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="maennlich" data-groesse-kat="" data-search="max rauhaardackel max kam zu uns ins tierheim, weil sein besitzer verstorben ist und das zusammenleben mit ihm im haushalt der verwandtschaft nicht funktioniert hat.
+der dackelrüde hatte bisher ein regelloses leben und durfte seinen tag gestalten, wie er wollte. nicht einmal das anlegen eines halsbandes kannte der rüde bisher.
+so ist es auch nicht verwunderlich, dass max seine eigenen grenzen erstmal sehr klar und unmissverständlich festgelegt und kommuniziert hat, nachdem sein leben urplötzlich derart auf den kopf gestellt wurde.
+max ist grundsätzlich ein fröhlicher und relativ anspruchsloser hund. er ist stubenrein, geht gut und gerne spazieren, zeigt sich ansprechbar und kann auch mal alleine zuhause bleiben.
+mit artgenossen zeigt er sich nach sympathie verträglich, körperkontakt mit bezugspersonen findet er klasse.
+etwas eigenwillig ist er als echter dackel natürlich auch und eine eigene meinung hat er ebenfalls zu vielen dingen.
+konflikten geht max eher aus dem weg und vermeidet diskussionen mit seinen menschen. diese strategie findet allerdings nur dann anwendung, wenn alles so läuft, wie der herr das wünscht. läuft es nicht nach seinen wünschen, dann kennt er keine kompromisse. bereits das anlegen eines halsbandes oder einer leine kann so zum thema werden, welches max mit allen 42 argumenten vehement ablehnt.
+max lebt momentan in einer pflegestelle, wo normale alltagssituationen mit ihm geübt werden können. damit dies verletzungsfrei geschehen kann, hat er gelernt, einen maulkorb zu tragen. interessenten sollten bereits entsprechend hundeerfahrung haben und bereit sein, weiter mit ihm zu trainieren und den maulkorb zu nutzen.
+max befindet sich nicht im tierheim, sodass interessenten sich zunächst telefonisch im tierheim melden sollten, um einen termin zum kennenlernen zu vereinbaren.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/max/" target="_blank" rel="noopener" aria-label="Max beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2026/05/IMG_3352.jpg" alt="Foto von Max" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Max</h2>
+    <div class="pills"><span class="pill">Rauhaardackel</span>
+<span class="pill">männlich intakt</span>
+<span class="pill pill--unknown">Größe unbekannt</span></div>
+    <p class="description">Max kam zu uns ins Tierheim, weil sein Besitzer verstorben ist und das Zusammenleben mit ihm im Haushalt der Verwandtschaft nicht funktioniert hat.
+Der Dackelrüde hatte bisher ein regelloses Leben und durfte seinen Tag gestalten, wie er wollte. Nicht einmal das Anlegen eines Halsbandes kannte der Rüde bisher.
+So ist es auch nicht verwunderlich, dass Max seine eigenen Grenzen erstmal sehr klar und unmissverständlich festgelegt und kommuniziert hat, nachdem sein Leben urplötzlich derart auf den Kopf gestellt wurde.
+Max ist grundsätzlich ein fröhlicher und relativ anspruchsloser Hund. Er ist stubenrein, geht gut und gerne spazieren, zeigt sich ansprechbar und kann auch mal alleine Zuhause bleiben.
+Mit Artgenossen zeigt er sich nach Sympathie verträglich, Körperkontakt mit Bezugspersonen findet er klasse.
+Etwas eigenwillig ist er als echter Dackel natürlich auch und eine eigene Meinung hat er ebenfalls zu vielen Dingen.
+Konflikten geht Max eher aus dem Weg und vermeidet Diskussionen mit seinen Menschen. Diese Strategie findet allerdings nur dann Anwendung, wenn alles so läuft, wie der Herr das wünscht. Läuft es nicht nach seinen Wünschen, dann kennt er keine Kompromisse. Bereits das Anlegen eines Halsbandes oder einer Leine kann so zum Thema werden, welches Max mit allen 42 Argumenten vehement ablehnt.
+Max lebt momentan in einer Pflegestelle, wo normale Alltagssituationen mit ihm geübt werden können. Damit dies verletzungsfrei geschehen kann, hat er gelernt, einen Maulkorb zu tragen. Interessenten sollten bereits entsprechend Hundeerfahrung haben und bereit sein, weiter mit ihm zu trainieren und den Maulkorb zu nutzen.
+Max befindet sich nicht im Tierheim, sodass Interessenten sich zunächst telefonisch im Tierheim melden sollten, um einen Termin zum Kennenlernen zu vereinbaren.</p>
+    <p class="compatibility"><span>Verträglich:</span> Mit Artgenossen zeigt er sich nach Sympathie verträglich, Körperkontakt mit Bezugspersonen findet er klasse.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/max/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="maennlich" data-groesse-kat="mittel" data-search="nero mischling nero hat sein zuhause verloren, weil seine besitzerin schwerkrank geworden ist und sich nicht mehr ausreichend um ihn kümmern konnte.
+er kennt das leben im haus, ist stubenrein und kann auch mal alleine zuhause bleiben. auch auto fahren ist mit nero problemlos möglich. seine 14 lebensjahre merkt man ihm mittlerweile durchaus an. er geht zwar gerne ausgiebig spazieren, jedoch merklich ruhiger als früher und die runden fallen nicht mehr ganz so groß aus. nero ist gut leinenführig, sodass spaziergänge mit ihm sehr entspannt sind. auch hundebegegnungen sind in der regel völlig unproblematisch. wen er nicht mag, den ignoriert er meistens und nette hündinnen werden von ihm eigentlich immer freundlich umworben.
+nero liegt gerne im garten und beobachtet die welt um ihn herum.
+der rüde ist höflich, kommuniziert sehr fein und ehrlich und erwartet im gegenzug auch von den menschen einen respektvollen umgang mit ihm. wird er übergangen oder zu sehr bedrängt, kann er durchaus seine zähne zeigen.
+mit seinen bezugspersonen ist er fröhlich, anhänglich, charmant und witzig. körperkontakt und streicheleinheiten geniest er mit vertrauten personen, braucht jedoch auch seinen freiraum und kommuniziert deutlich, wenn ihm die nähe zu viel wird.
+nero sucht einen ruhigen ein- oder zwei-personenhaushalt ohne kinder und ohne andere tiere bei hundeerfahrenen menschen, die nero akzeptieren, wie er ist und dem rüstigen rentner noch eine schöne zeit als einzelprinz ermöglichen.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/nero/" target="_blank" rel="noopener" aria-label="Nero beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2022/06/Nero1-Kopie.jpg" alt="Foto von Nero" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Nero</h2>
+    <div class="pills"><span class="pill">Mischling</span>
+<span class="pill">ca 20 kg</span>
+<span class="pill">männlich kastriert</span></div>
+    <p class="description">Nero hat sein Zuhause verloren, weil seine Besitzerin schwerkrank geworden ist und sich nicht mehr ausreichend um ihn kümmern konnte.
+Er kennt das Leben im Haus, ist stubenrein und kann auch mal alleine Zuhause bleiben. Auch Auto fahren ist mit Nero problemlos möglich. Seine 14 Lebensjahre merkt man ihm mittlerweile durchaus an. Er geht zwar gerne ausgiebig spazieren, jedoch merklich ruhiger als früher und die Runden fallen nicht mehr ganz so groß aus. Nero ist gut leinenführig, sodass Spaziergänge mit ihm sehr entspannt sind. Auch Hundebegegnungen sind in der Regel völlig unproblematisch. Wen er nicht mag, den ignoriert er meistens und nette Hündinnen werden von ihm eigentlich immer freundlich umworben.
+Nero liegt gerne im Garten und beobachtet die Welt um ihn herum.
+Der Rüde ist höflich, kommuniziert sehr fein und ehrlich und erwartet im Gegenzug auch von den Menschen einen respektvollen Umgang mit ihm. Wird er übergangen oder zu sehr bedrängt, kann er durchaus seine Zähne zeigen.
+Mit seinen Bezugspersonen ist er fröhlich, anhänglich, charmant und witzig. Körperkontakt und Streicheleinheiten geniest er mit vertrauten Personen, braucht jedoch auch seinen Freiraum und kommuniziert deutlich, wenn ihm die Nähe zu viel wird.
+Nero sucht einen ruhigen Ein- oder Zwei-Personenhaushalt ohne Kinder und ohne andere Tiere bei hundeerfahrenen Menschen, die Nero akzeptieren, wie er ist und dem rüstigen Rentner noch eine schöne Zeit als Einzelprinz ermöglichen.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/nero/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="weiblich" data-groesse-kat="klein" data-search="paula jack russel-mischling paulas vorgeschichte können wir nicht ganz nachvollziehen, da ihre vorbesitzer sie als überraschungsgeschenk bekommen haben. ihr verhalten lässt jedoch darauf schließen, dass sie in ihren ersten lebensmonaten unter sehr reizarmen bedingungen gelebt und nichts kennengelernt hat. als sie ende 2025 zu uns kam, hatte sie vor allem angst: menschen, alltagsgeräusche, bewegungen, autos, fallendes laub, türen, spazieren gehen… und paula hatte nicht einfach nur angst, sondern war entweder in einem panischen fluchtmodus indem sie nicht mehr ansprechbar war oder verlor sich in hektik und nervosität.
+doch wenn paula sich erstmal sicher fühlt und vertrauen gefasst hat, dann ist sie clever, lebendig, aufmerksam, verspielt und zeigt einen starken und zielstrebigen charakter. sie ist sensibel, zärtlich und anhänglich im umgang mit ihren vertrauenspersonen. kuscheln und körperkontakt liebt sie über alles.
+im umgang mit artgenossen blüht paula auf und ist sehr verträglich, zeigt sich aber auch distanzlos und fordernd.
+paula hat mittlerweile riesige fortschritte gemacht und ist kaum wieder zu erkennen. mittlerweile liebt sie ihre spaziergänge und hat verschiedene strategien erlernt, mit ihren ängsten umzugehen. paula hat selbstbewusstsein entwickeln können und vertraut ihren bezugspersonen, fremde menschen müssen sich ihr vertrauen erst erarbeiten.
+mit viel freude am leben, energie, neugier und entdeckerdrang lebt sie nun ihren alltag, kann sich aber auch an ihre menschen gekuschelt fallenlassen, ruhen, entspannen und den körperkontakt genießen. mit fremden menschen kommt sie nun auch schneller und besser in kontakt und neugier sowie positive erfahrungen lassen sie wachsen und aufblühen und geben ihr mut, sich neuen erfahrungen und herausforderungen zu stellen.
+natürlich sind paulas ängste nicht einfach verschwunden, aber es zeigt, welches potenzial in paula schlummert, das nun in den richtigen händen weiter gefördert werden muss.
+von einem „normalen“ alltag als haushund ist paula noch ein stück entfernt und wird vermutlich bei einem umzug in ein neues zuhause zunächst wieder rückschritte machen. wir würden paula gerne zu einem souveränen kastrierten rüden vermitteln an dem sie sich orientieren kann. paula ist kein hund für hundeanfänger und wird nicht in einen haushalt mit kleinen kindern vermittelt. ein absolut sicher eingezäunter garten sollte vorhanden sein, da paula in den ersten wochen im neuen zuhause noch nicht spazieren gehen sollte, sondern zunächst der fokus auf beziehungsarbeit, orientierung am menschen und vertrauen zu ihren neuen menschen liegen muss.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/paula-2/" target="_blank" rel="noopener" aria-label="Paula beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2026/06/Paula1-scaled.jpeg" alt="Foto von Paula" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Paula</h2>
+    <div class="pills"><span class="pill">Jack Russel-Mischling</span>
+<span class="pill">klein</span>
+<span class="pill">weiblich intakt</span></div>
+    <p class="description">Paulas Vorgeschichte können wir nicht ganz nachvollziehen, da ihre Vorbesitzer sie als Überraschungsgeschenk bekommen haben. Ihr Verhalten lässt jedoch darauf schließen, dass sie in ihren ersten Lebensmonaten unter sehr reizarmen Bedingungen gelebt und nichts kennengelernt hat. Als sie Ende 2025 zu uns kam, hatte sie vor allem Angst: Menschen, Alltagsgeräusche, Bewegungen, Autos, fallendes Laub, Türen, Spazieren gehen… Und Paula hatte nicht einfach nur Angst, sondern war entweder in einem panischen Fluchtmodus indem sie nicht mehr ansprechbar war oder verlor sich in Hektik und Nervosität.
+Doch wenn Paula sich erstmal sicher fühlt und Vertrauen gefasst hat, dann ist sie clever, lebendig, aufmerksam, verspielt und zeigt einen starken und zielstrebigen Charakter. Sie ist sensibel, zärtlich und anhänglich im Umgang mit ihren Vertrauenspersonen. Kuscheln und Körperkontakt liebt sie über alles.
+Im Umgang mit Artgenossen blüht Paula auf und ist sehr verträglich, zeigt sich aber auch distanzlos und fordernd.
+Paula hat mittlerweile riesige Fortschritte gemacht und ist kaum wieder zu erkennen. Mittlerweile liebt sie ihre Spaziergänge und hat verschiedene Strategien erlernt, mit ihren Ängsten umzugehen. Paula hat Selbstbewusstsein entwickeln können und vertraut ihren Bezugspersonen, Fremde Menschen müssen sich ihr Vertrauen erst erarbeiten.
+Mit viel Freude am Leben, Energie, Neugier und Entdeckerdrang lebt sie nun ihren Alltag, kann sich aber auch an ihre Menschen gekuschelt fallenlassen, ruhen, entspannen und den Körperkontakt genießen. Mit fremden Menschen kommt sie nun auch schneller und besser in Kontakt und Neugier sowie positive Erfahrungen lassen sie wachsen und aufblühen und geben ihr Mut, sich neuen Erfahrungen und Herausforderungen zu stellen.
+Natürlich sind Paulas Ängste nicht einfach verschwunden, aber es zeigt, welches Potenzial in Paula schlummert, das nun in den richtigen Händen weiter gefördert werden muss.
+Von einem „normalen“ Alltag als Haushund ist Paula noch ein Stück entfernt und wird vermutlich bei einem Umzug in ein neues Zuhause zunächst wieder Rückschritte machen. Wir würden Paula gerne zu einem souveränen kastrierten Rüden vermitteln an dem sie sich orientieren kann. Paula ist kein Hund für Hundeanfänger und wird nicht in einen Haushalt mit kleinen Kindern vermittelt. Ein absolut sicher eingezäunter Garten sollte vorhanden sein, da Paula in den ersten Wochen im neuen Zuhause noch nicht spazieren gehen sollte, sondern zunächst der Fokus auf Beziehungsarbeit, Orientierung am Menschen und Vertrauen zu ihren neuen Menschen liegen muss.</p>
+    <p class="compatibility"><span>Verträglich:</span> Im Umgang mit Artgenossen blüht Paula auf und ist sehr verträglich, zeigt sich aber auch distanzlos und fordernd.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/paula-2/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="weiblich" data-groesse-kat="mittel" data-search="ronja australian shepherd ronja kam aus einer sicherstellung durch das veterinäramt zu uns. die junge hündin hat in ihrem bisherigen leben leider nichts kennengelernt und kennt auch das zusammenleben mit menschen im haushalt noch nicht.
+sie zeigt sich bei uns freundlich und neugierig gegenüber menschen, ist aber auch sehr schüchtern, schreckhaft und schnell überfordert mit reizen aus dem alltag. das laufen an der leine fällt ihr noch sehr schwer, da ihre ängste hier sehr groß sind.
+update: ronja hat inzwischen eine tolle entwicklung durchgemacht. sie ist selbstbewusster geworden und zeigt sich offener gegenüber menschen und neuen reizen. am spazieren gehen hat sie große freude entwickelt und erkundet – zwar vorsichtig, – aber mit begeisterung ihre umwelt.
+mit ihren bezugspersonen ist sie gerne zusammen, orientiert sich stark an diesen und fordert körperkontakt ein.
+mit artgenossen zeigt sie sich nach sympathie verträglich. die vermittlung zu einem souveränen ersthund können wir uns sehr gut vorstellen.
+ronja ist sensibel, aufmerksam und clever. sie lernt gerne und kann sich in entspannter und ruhiger atmosphäre auch gut auf aufgaben und training konzentrieren.
+ihre ängste und unsicherheiten sind natürlich nicht einfach verschwunden, doch ronja hat inzwischen eine gute grundlage entwickelt, auf der ihre neuen menschen aufbauen können.
+hundeerfahrung muss vorhanden sein, da ronja eine sichere und klare führung ihrer menschen braucht, um sich im alltag an ihnen orientieren zu können. ronja eignet sich nicht für ein leben in der stadt.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/ronja/" target="_blank" rel="noopener" aria-label="Ronja beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2026/06/HP.jpg" alt="Foto von Ronja" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Ronja</h2>
+    <div class="pills"><span class="pill">Australian Shepherd</span>
+<span class="pill">4 Jahre, 1 Monate</span>
+<span class="pill">ca 20 kg</span>
+<span class="pill">weiblich</span></div>
+    <p class="description">Ronja kam aus einer Sicherstellung durch das Veterinäramt zu uns. Die junge Hündin hat in ihrem bisherigen Leben leider nichts kennengelernt und kennt auch das Zusammenleben mit Menschen im Haushalt noch nicht.
+Sie zeigt sich bei uns freundlich und neugierig gegenüber Menschen, ist aber auch sehr schüchtern, schreckhaft und schnell überfordert mit Reizen aus dem Alltag. Das Laufen an der Leine fällt ihr noch sehr schwer, da ihre Ängste hier sehr groß sind.
+UPDATE: Ronja hat inzwischen eine tolle Entwicklung durchgemacht. Sie ist selbstbewusster geworden und zeigt sich offener gegenüber Menschen und neuen Reizen. Am Spazieren gehen hat sie große Freude entwickelt und erkundet – zwar vorsichtig, – aber mit Begeisterung ihre Umwelt.
+Mit ihren Bezugspersonen ist sie gerne zusammen, orientiert sich stark an diesen und fordert Körperkontakt ein.
+Mit Artgenossen zeigt sie sich nach Sympathie verträglich. Die Vermittlung zu einem souveränen Ersthund können wir uns sehr gut vorstellen.
+Ronja ist sensibel, aufmerksam und clever. Sie lernt gerne und kann sich in entspannter und ruhiger Atmosphäre auch gut auf Aufgaben und Training konzentrieren.
+Ihre Ängste und Unsicherheiten sind natürlich nicht einfach verschwunden, doch Ronja hat inzwischen eine gute Grundlage entwickelt, auf der ihre neuen Menschen aufbauen können.
+Hundeerfahrung muss vorhanden sein, da Ronja eine sichere und klare Führung ihrer Menschen braucht, um sich im Alltag an ihnen orientieren zu können. Ronja eignet sich nicht für ein Leben in der Stadt.</p>
+    <p class="compatibility"><span>Verträglich:</span> Mit Artgenossen zeigt sie sich nach Sympathie verträglich. Die Vermittlung zu einem souveränen Ersthund können wir uns sehr gut vorstellen.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/ronja/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="maennlich" data-groesse-kat="mittel" data-search="sammy jagdterrier-mix sammy ist ein agiler und selbstbewusster hund. lange spaziergänge und viel bewegung gehören zu seinen lieblingsbeschäftigungen. da der jagdtrieb bei ihm durchaus vorhanden ist, sollten seine spaziergänge entsprechend aktiv gestaltet werden. wer lust auf sinnvolle beschäftigung und auslastung mit dem hund hat, der bekommt mit sammy einen aufmerksamen begleiter. der junge rüde braucht allerdings menschen, die im alltag konsequent mit ihm arbeiten und umgehen und eignet sich nicht für hundeanfänger. bisher hat er als familienhund gelebt, ist stubenrein und kennt die regeln im haushalt.
+der junge rüde bringt als jagdterrier-mix einen starken willen, eine gute portion selbstbewusstsein und energie mit. nach getaner arbeit kann er aber auch entspannen und seine streicheleinheiten genießen.
+sammy fährt gut im auto mit, ist im allgemeinen gut zu händeln und braucht noch konsequente erziehung. wichtig: sammy kann aktuell nicht alleine bleiben und muss dies erst noch lernen! mit artgenossen zeigt sich sammy nach sympathie verträglich, im begegnungsverkehr an der leine neigt er allerdings zum pöbeln und ist schnell frustriert, weshalb er gelernt hat, einen maulkorb zu tragen. kleine kinder und katzen sollten nicht in seinem neuen zuhause leben.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/sammy/" target="_blank" rel="noopener" aria-label="Sammy beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2025/08/SammyHP.png" alt="Foto von Sammy" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Sammy</h2>
+    <div class="pills"><span class="pill">Jagdterrier-Mix</span>
+<span class="pill">ca 10 kg,mittel,</span>
+<span class="pill">männlich intakt</span></div>
+    <p class="description">Sammy ist ein agiler und selbstbewusster Hund. Lange Spaziergänge und viel Bewegung gehören zu seinen Lieblingsbeschäftigungen. Da der Jagdtrieb bei ihm durchaus vorhanden ist, sollten seine Spaziergänge entsprechend aktiv gestaltet werden. Wer Lust auf sinnvolle Beschäftigung und Auslastung mit dem Hund hat, der bekommt mit Sammy einen aufmerksamen Begleiter. Der junge Rüde braucht allerdings Menschen, die im Alltag konsequent mit ihm arbeiten und umgehen und eignet sich nicht für Hundeanfänger. Bisher hat er als Familienhund gelebt, ist stubenrein und kennt die Regeln im Haushalt.
+Der junge Rüde bringt als Jagdterrier-Mix einen starken Willen, eine gute Portion Selbstbewusstsein und Energie mit. Nach getaner Arbeit kann er aber auch entspannen und seine Streicheleinheiten genießen.
+Sammy fährt gut im Auto mit, ist im Allgemeinen gut zu händeln und braucht noch konsequente Erziehung. Wichtig: Sammy kann aktuell nicht alleine Bleiben und muss dies erst noch lernen! Mit Artgenossen zeigt sich Sammy nach Sympathie verträglich, im Begegnungsverkehr an der Leine neigt er allerdings zum Pöbeln und ist schnell frustriert, weshalb er gelernt hat, einen Maulkorb zu tragen. Kleine Kinder und Katzen sollten nicht in seinem neuen Zuhause leben.</p>
+    <p class="compatibility"><span>Verträglich:</span> Mit Artgenossen zeigt sich Sammy nach Sympathie verträglich, im Begegnungsverkehr an der Leine neigt er allerdings zum Pöbeln und ist schnell frustriert, weshalb er gelernt hat, einen Maulkorb zu tragen.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/sammy/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="maennlich" data-groesse-kat="mittel" data-search="siggi mischling siggi kommt aus einer sicherstellung durch das veterinäramt. die bedingungen unter denen er leben musste, waren katastrophal.
+siggi hat vom richtigen leben bisher noch nicht viel kennengelernt. hausregeln und grundkommandos stehen daher zukünftig noch auf seinem stundenplan. bei uns hat er bereits das laufen an der leine gelernt und die grundlagen der kommunikation mit menschen.
+siggi ist ein extrovertierter und neugieriger hund, der menschen gegenüber sehr offen und zugänglich ist. er liebt streicheleinheiten und bekommt gerne aufmerksamkeit von den tierpflegern. auch auf artgenossen geht er in der regel freundlich zu und zeigt sich grundsätzlich nach sympathie verträglich.
+obwohl vieles für ihn noch ganz neu ist, meistert er die situationen gut und schaut sich sein umfeld aktiv an. siggi probiert gerne neue dinge aus, ist aktiv und lernwillig.
+aufgrund seiner mangelnden erfahrungen in der vergangenheit, ist er oft noch unsicher unterwegs und muss erst lernen mit all den eindrücken, wie z.b. straßenverkehr umzugehen.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/siggi-2/" target="_blank" rel="noopener" aria-label="Siggi beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2026/06/IMG_3784.png" alt="Foto von Siggi" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Siggi</h2>
+    <div class="pills"><span class="pill">Mischling</span>
+<span class="pill">gut 55 cm, ca 30 kg</span>
+<span class="pill">männlich intakt</span></div>
+    <p class="description">Siggi kommt aus einer Sicherstellung durch das Veterinäramt. Die Bedingungen unter denen er leben musste, waren katastrophal.
+Siggi hat vom richtigen Leben bisher noch nicht viel kennengelernt. Hausregeln und Grundkommandos stehen daher zukünftig noch auf seinem Stundenplan. Bei uns hat er bereits das Laufen an der Leine gelernt und die Grundlagen der Kommunikation mit Menschen.
+Siggi ist ein extrovertierter und neugieriger Hund, der Menschen gegenüber sehr offen und zugänglich ist. Er liebt Streicheleinheiten und bekommt gerne Aufmerksamkeit von den Tierpflegern. Auch auf Artgenossen geht er in der Regel freundlich zu und zeigt sich grundsätzlich nach Sympathie verträglich.
+Obwohl Vieles für ihn noch ganz neu ist, meistert er die Situationen gut und schaut sich sein Umfeld aktiv an. Siggi probiert gerne neue Dinge aus, ist aktiv und lernwillig.
+Aufgrund seiner mangelnden Erfahrungen in der Vergangenheit, ist er oft noch unsicher unterwegs und muss erst lernen mit all den Eindrücken, wie z.B. Straßenverkehr umzugehen.</p>
+    <p class="compatibility"><span>Verträglich:</span> Auch auf Artgenossen geht er in der Regel freundlich zu und zeigt sich grundsätzlich nach Sympathie verträglich.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/siggi-2/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Gütersloh" data-geschlecht="maennlich" data-groesse-kat="klein" data-search="stitch französische bulldogge stitch ist ein freundlicher, liebevoller und sehr anhänglicher rüde. er begegnet menschen im allgemeinen vertrauensvoll und aufgeschlossen und steht gerne im mittelpunkt der aufmerksamkeit. auch mit den meisten artgenossen ist er gut verträglich. stitch kann problemlos im auto mitgenommen werden und weiß sich in den meisten alltagssituationen zu benehmen. manchmal zeigt er auch seinen kleinen sturkopf und versucht, diesen durchzusetzen. seine rund 10 kg körpergewicht soll er aus gesundheitlichen gründen halten. stitch könnte durchaus als zweithund vermittelt werden, wenn die körperlichen voraussetzungen ähnlich sind und ihn nicht überfordern. der intakte rüde liebt und sucht den engen körperkontakt mit seinen menschen.
+charakterlich ist stitch ein traumhund, den man einfach liebhaben muss, aber leider ist er auch ein paradebeispiel für das leid vieler französischer bulldoggen und hat eine menge körperlicher/gesundheitlicher auffälligkeiten. mittlerweile hat stitch einen behandlungsmarathon, operationen und viel intensive pflege hinter sich. seine akuten probleme sind erstmal beseitigt, sodass er nun schmerzfrei und gesundheitlich stabil ist. er blüht wieder auf, geniesst das leben und ist im alltag überall dabei. stitch hat gute hundefreunde gefunden, spielt, kuschelt und kommuniziert ganz toll mit ihnen. er ist in einer pflegefamilie untergebracht, wo er einen normalen alltag hat und auch aktiv an diesem teilnehmen möchte.
+gesund wird stitch niemals sein und auch in zukunft wird er dauergast beim tierarzt sein und möglicherweise hohe kosten verursachen. deshalb suchen wir für ihn die nadel im heuhaufen: menschen, die ausreichend finanzielle mittel haben, um notwendige behandlungen stemmen zu können, aber auch beachten, dass er ein gutes und erfülltes leben verdient hat. seine menschen müssen verantwortungsvoll ein auge auf seinen gesamtzustand haben und ihn bremsen, wenn er seine kräfte überschätzt. stitch zeigt uns deutlich, dass er nicht einfach nur leben möchte, sondern dieses leben auch, so gut er kann, aktiv gestalten und auskosten möchte. schließlich hat er nur dieses eine leben!
+detaillierte informationen bekommen sie gerne telefonisch, per e-mail oder auch persönlich im tierheim. ein kennenlernen ist nur nach terminvereinbarung möglich, da stitch nicht im tierheim, sondern in einer pflegefamilie untergebracht ist.">
+  <a class="photo-link" href="https://tierheim-guetersloh.de/pets/stitch/" target="_blank" rel="noopener" aria-label="Stitch beim Tierheim Gütersloh ansehen">
+    <div class="photo-wrap"><img src="https://tierheim-guetersloh.de/wp-content/uploads/2025/04/Stitch-HP-Kopie-e1765796001739.jpg" alt="Foto von Stitch" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Gütersloh</p>
+    <h2 class="dog-name">Stitch</h2>
+    <div class="pills"><span class="pill">Französische Bulldogge</span>
+<span class="pill">ca 10 kg,klein,</span>
+<span class="pill">männlich intakt</span></div>
+    <p class="description">Stitch ist ein freundlicher, liebevoller und sehr anhänglicher Rüde. Er begegnet Menschen im Allgemeinen vertrauensvoll und aufgeschlossen und steht gerne im Mittelpunkt der Aufmerksamkeit. Auch mit den meisten Artgenossen ist er gut verträglich. Stitch kann problemlos im Auto mitgenommen werden und weiß sich in den meisten Alltagssituationen zu benehmen. Manchmal zeigt er auch seinen kleinen Sturkopf und versucht, diesen durchzusetzen. Seine rund 10 kg Körpergewicht soll er aus gesundheitlichen Gründen halten. Stitch könnte durchaus als Zweithund vermittelt werden, wenn die körperlichen Voraussetzungen ähnlich sind und ihn nicht überfordern. Der intakte Rüde liebt und sucht den engen Körperkontakt mit seinen Menschen.
+Charakterlich ist Stitch ein Traumhund, den man einfach liebhaben muss, aber leider ist er auch ein Paradebeispiel für das Leid vieler französischer Bulldoggen und hat eine Menge körperlicher/gesundheitlicher Auffälligkeiten. Mittlerweile hat Stitch einen Behandlungsmarathon, Operationen und viel intensive Pflege hinter sich. Seine akuten Probleme sind erstmal beseitigt, sodass er nun schmerzfrei und gesundheitlich stabil ist. Er blüht wieder auf, geniesst das Leben und ist im Alltag überall dabei. Stitch hat gute Hundefreunde gefunden, spielt, kuschelt und kommuniziert ganz toll mit ihnen. Er ist in einer Pflegefamilie untergebracht, wo er einen normalen Alltag hat und auch aktiv an diesem teilnehmen möchte.
+Gesund wird Stitch niemals sein und auch in Zukunft wird er Dauergast beim Tierarzt sein und möglicherweise hohe Kosten verursachen. Deshalb suchen wir für ihn die Nadel im Heuhaufen: Menschen, die ausreichend finanzielle Mittel haben, um notwendige Behandlungen stemmen zu können, aber auch beachten, dass er ein gutes und erfülltes Leben verdient hat. Seine Menschen müssen verantwortungsvoll ein Auge auf seinen Gesamtzustand haben und ihn bremsen, wenn er seine Kräfte überschätzt. Stitch zeigt uns deutlich, dass er nicht einfach nur leben möchte, sondern dieses Leben auch, so gut er kann, aktiv gestalten und auskosten möchte. Schließlich hat er nur dieses eine Leben!
+Detaillierte Informationen bekommen Sie gerne telefonisch, per E-Mail oder auch persönlich im Tierheim. Ein Kennenlernen ist nur nach Terminvereinbarung möglich, da Stitch nicht im Tierheim, sondern in einer Pflegefamilie untergebracht ist.</p>
+    <p class="compatibility"><span>Verträglich:</span> Auch mit den meisten Artgenossen ist er gut verträglich. Stitch hat gute Hundefreunde gefunden, spielt, kuschelt und kommuniziert ganz toll mit ihnen.</p>
+    <a class="btn" href="https://tierheim-guetersloh.de/pets/stitch/" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="mittel" data-search="aros staffordshire-terrier aros
+staffordshire terrier aros kam am 12.09.2022 als fundhund zu uns.
+nach überprüfung seines chips hat sich herausgestellt, dass der finder der eigentliche besitzer war und sich dem hund nach ablehnung in mehreren tierheimen auf einfache weise entledigen wollte.
+er ist ca. 2019 geboren und hat eine schulterhöhe von ca. 50cm.
+anfangs war er uns als fremden gegenüber sehr skeptisch. die pflegerin, die ihn angenommen hat, war aber schnell seine erste bezugsperson, mit der er am liebsten die ganze zeit kuscheln wollte.
+danach war es für jede neue person nicht mehr so einfach, an ihn heranzukommen. er verbellte und attackierte sie, trug deshalb draußen auf dem hof vorerst immer einen maulkorb.
+schnell schloss er aber auch die anderen pfleger in sein herz und zeigte sein volles schmusebacken-potential.
+im tierheim ist er leider sehr gestresst und sehnt sich nach ruhe.
+aros wurde scheinbar von seinen ehemaligen besitzer/n gut erzogen. grundkommandos wie &quot;sitz&quot;, &quot;platz&quot;, &quot;auf deinen platz&quot;, &quot;bleib&quot; sind für ihn ein klacks.
+die verträglichkeit mit anderen hunden wird durch symphatie entschieden.
+auf spaziergängen ist aros recht gut leinenführig, trifft man aber auf andere hunde, wird er schnell nervös und ungehalten und äußert dies auch schon mal lautstark, indem er rassetypisch schreit. daran arbeiten wir gerade mit gezieltem training.
+für aros brauchen wir rasseerfahrene liebhaber, die ihm die nötige sicherheit, konsequenz und ruhe geben können.
+kinder sollten nicht im haushalt vorhanden sein oder bereits erwachsen und standhaft.
+aufgrund seiner rasse müssen adoptanten die auflagen für die haltung bestimmter rassen erfüllen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/aros.html" target="_blank" rel="noopener" aria-label="Aros beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Aros271122/Aros_261122h-1.jpg" alt="Foto von Aros" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Aros</h2>
+    <div class="pills"><span class="pill">Staffordshire-Terrier</span>
+<span class="pill">7 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 50 cm</span></div>
+    <p class="description">Aros
+Staffordshire Terrier Aros kam am 12.09.2022 als Fundhund zu uns.
+Nach Überprüfung seines Chips hat sich herausgestellt, dass der Finder der eigentliche Besitzer war und sich dem Hund nach Ablehnung in mehreren Tierheimen auf einfache Weise entledigen wollte.
+Er ist ca. 2019 geboren und hat eine Schulterhöhe von ca. 50cm.
+Anfangs war er uns als Fremden gegenüber sehr skeptisch. Die Pflegerin, die ihn angenommen hat, war aber schnell seine erste Bezugsperson, mit der er am liebsten die ganze Zeit kuscheln wollte.
+Danach war es für jede neue Person nicht mehr so einfach, an ihn heranzukommen. Er verbellte und attackierte sie, trug deshalb draußen auf dem Hof vorerst immer einen Maulkorb.
+Schnell schloss er aber auch die anderen Pfleger in sein Herz und zeigte sein volles Schmusebacken-potential.
+Im Tierheim ist er leider sehr gestresst und sehnt sich nach Ruhe.
+Aros wurde scheinbar von seinen ehemaligen Besitzer/n gut erzogen. Grundkommandos wie &quot;Sitz&quot;, &quot;Platz&quot;, &quot;auf deinen Platz&quot;, &quot;Bleib&quot; sind für ihn ein Klacks.
+Die Verträglichkeit mit anderen Hunden wird durch Symphatie entschieden.
+Auf Spaziergängen ist Aros recht gut leinenführig, trifft man aber auf andere Hunde, wird er schnell nervös und ungehalten und äußert dies auch schon mal lautstark, indem er rassetypisch schreit. Daran arbeiten wir gerade mit gezieltem Training.
+Für Aros brauchen wir rasseerfahrene Liebhaber, die ihm die nötige Sicherheit, Konsequenz und Ruhe geben können.
+Kinder sollten nicht im Haushalt vorhanden sein oder bereits erwachsen und standhaft.
+Aufgrund seiner Rasse müssen Adoptanten die Auflagen für die Haltung bestimmter Rassen erfüllen.</p>
+    <p class="compatibility"><span>Verträglich:</span> Die Verträglichkeit mit anderen Hunden wird durch Symphatie entschieden. Auf Spaziergängen ist Aros recht gut leinenführig, trifft man aber auf andere Hunde, wird er schnell nervös und ungehalten und äußert dies auch schon mal lautstark, indem er rassetypisch schreit.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/aros.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="mittel" data-search="barney boxer barney
+boxer barney ist 2020 geboren und wurde am 05.02.2022 im tierheim abgegeben.
+was barney in seinen ersten beiden lebensjahren durchgemacht haben muss, können wir nur anhand seines verhaltens vermuten. er wurde wegen mehrerer beißvorfälle abgegeben.
+durch viel training und geduld hat barney gelernt, situationen auch mal auszuhalten. nähe und distanz kann man mittlerweile auch gut einfordern.
+als barney zu uns kam hatte er eine sehr kurze zündschnur und war schnell besorgt. sobald etwas nicht zu seinen bedingungen lief wurde gezündet.
+er hat sich so toll entwickelt, dass er absolut bereit ist den nächsten schritt richtung eigenes zuhause zu gehen. seine bezugspersonen können wirklich viel mit ihm machen. passt ihm etwas nicht, dann kommuniziert er sehr fair und entspannt sich auch wieder.
+gesucht werden menschen, die einen hund gut lesen können und bereit sind, in der kennenlernphase und später situationsbedingt den maulkorb zu nutzen. ohne maulkorb hätte barney nicht die chance gehabt sich so toll zu entwickeln. leider hat der maulkorb in der gesellschaft oft noch einen negativen ruf.
+mit seinen menschen ist barney ein absoluter gute-laune-hund, der verstanden werden möchte. kuscheln ist seine große leidenschaft und natürlich spielen – mit mensch und hund. bei uns läuft barney mit rüden und hündinnen und auch welpen.
+barney sucht menschen, die bereit sind ihm vom ersten tag an klare strukturen und regeln zu vermitteln. dann kann er sein ganzes potential entfalten und endlich ankommen. er hat es mehr als verdient!
+es werden mehrere termine zum kennenlernen nötig sein. dabei haben interessenten die möglichkeit den hund besser kennen zu lernen und in das laufende training eingebunden zu werden.
+vorsorglich sollten im neuen zuhause keine kinder leben. schön wäre ein zuhause mit eingezäuntem garten wo er ordentlich flitzen kann.
+auch paten, die seine trainingsstunden helfen zu finanzieren sind sehr willkommen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/barney-2022-07-09-09-31-00.html" target="_blank" rel="noopener" aria-label="Barney beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Barney120222/Barney_030622d_1_von_1.jpg" alt="Foto von Barney" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Barney</h2>
+    <div class="pills"><span class="pill">Boxer</span>
+<span class="pill">6 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 53 cm</span></div>
+    <p class="description">Barney
+Boxer Barney ist 2020 geboren und wurde am 05.02.2022 im Tierheim abgegeben.
+Was Barney in seinen ersten beiden Lebensjahren durchgemacht haben muss, können wir nur anhand seines Verhaltens vermuten. Er wurde wegen mehrerer Beißvorfälle abgegeben.
+Durch viel Training und Geduld hat Barney gelernt, Situationen auch mal auszuhalten. Nähe und Distanz kann man mittlerweile auch gut einfordern.
+Als Barney zu uns kam hatte er eine sehr kurze Zündschnur und war schnell besorgt. Sobald etwas nicht zu seinen Bedingungen lief wurde gezündet.
+Er hat sich so toll entwickelt, dass er absolut bereit ist den nächsten Schritt Richtung eigenes Zuhause zu gehen. Seine Bezugspersonen können wirklich viel mit ihm machen. Passt ihm etwas nicht, dann kommuniziert er sehr fair und entspannt sich auch wieder.
+Gesucht werden Menschen, die einen Hund gut lesen können und bereit sind, in der Kennenlernphase und später situationsbedingt den Maulkorb zu nutzen. Ohne Maulkorb hätte Barney nicht die Chance gehabt sich so toll zu entwickeln. Leider hat der Maulkorb in der Gesellschaft oft noch einen negativen Ruf.
+Mit seinen Menschen ist Barney ein absoluter Gute-Laune-Hund, der verstanden werden möchte. Kuscheln ist seine große Leidenschaft und natürlich spielen – mit Mensch und Hund. Bei uns läuft Barney mit Rüden und Hündinnen und auch Welpen.
+Barney sucht Menschen, die bereit sind ihm vom ersten Tag an klare Strukturen und Regeln zu vermitteln. Dann kann er sein ganzes Potential entfalten und endlich ankommen. Er hat es mehr als verdient!
+Es werden mehrere Termine zum Kennenlernen nötig sein. Dabei haben Interessenten die Möglichkeit den Hund besser kennen zu lernen und in das laufende Training eingebunden zu werden.
+Vorsorglich sollten im neuen Zuhause keine Kinder leben. Schön wäre ein Zuhause mit eingezäuntem Garten wo er ordentlich flitzen kann.
+Auch Paten, die seine Trainingsstunden helfen zu finanzieren sind sehr willkommen.</p>
+    <p class="compatibility"><span>Verträglich:</span> Gesucht werden Menschen, die einen Hund gut lesen können und bereit sind, in der Kennenlernphase und später situationsbedingt den Maulkorb zu nutzen. Mit seinen Menschen ist Barney ein absoluter Gute-Laune-Hund, der verstanden werden möchte.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/barney-2022-07-09-09-31-00.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="maennlich" data-groesse-kat="mittel" data-search="ben australian kelpie ben
+ben ist ein australian kelpie und am 07.12.2018 geboren mit einer schulterhöhe von ca. 52 cm. er wurde am 18.09.23 wegen trennung abgegeben.
+der mittelgroße rüde kennt grundgehorsam. aber er reagiert sehr unsicher, weil er nie grenzen kennen gelernt  und die richtige führung bekommen hat. die braucht er, dann zeigt er sich auch gleich anders. ben ist sehr sensibel und spürt schnell, wenn ein mensch in seiner umgebung unsicher ist.
+fremden gegenüber ist ben zunächst skeptisch. daher braucht es auch zeit um vertrauen zu einer neuen person aufzubauen. hat er aber erst mal vertrauen, dann sucht er auch körperlich die nähe und mag es zu kuscheln, zeigt aber auch an, wenn es ihm genug ist. ben ist wachsam und beschützt sein revier. er braucht daher auch einen rückzugsort, wo er seine ruhe hat.
+bei artgenossen kommt es bei ihm auf die sympathie an.
+ben ist ein toller hund, wenn er auch führung bekommt. hier sind hundeerfahrene menschen mit guter körpersprache gefragt, ohne kinder und andere tiere. wer diese punkte erfüllen kann, bekommt einen loyalen begleiter an seiner seite.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/ben-2023-10-19-20-30-29.html" target="_blank" rel="noopener" aria-label="Ben beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Ben171023/Ben.jpg" alt="Foto von Ben" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Ben</h2>
+    <div class="pills"><span class="pill">Australian Kelpie</span>
+<span class="pill">8 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 52 cm</span>
+<span class="pill">Rüde</span></div>
+    <p class="description">Ben
+Ben ist ein Australian Kelpie und am 07.12.2018 geboren mit einer Schulterhöhe von ca. 52 cm. Er wurde am 18.09.23 wegen Trennung abgegeben.
+Der mittelgroße Rüde kennt Grundgehorsam. Aber er reagiert sehr unsicher, weil er nie Grenzen kennen gelernt  und die richtige Führung bekommen hat. Die braucht er, dann zeigt er sich auch gleich anders. Ben ist sehr sensibel und spürt schnell, wenn ein Mensch in seiner Umgebung unsicher ist.
+Fremden gegenüber ist Ben zunächst skeptisch. Daher braucht es auch Zeit um Vertrauen zu einer neuen Person aufzubauen. Hat er aber erst mal Vertrauen, dann sucht er auch körperlich die Nähe und mag es zu kuscheln, zeigt aber auch an, wenn es ihm genug ist. Ben ist wachsam und beschützt sein Revier. Er braucht daher auch einen Rückzugsort, wo er seine Ruhe hat.
+Bei Artgenossen kommt es bei ihm auf die Sympathie an.
+Ben ist ein toller Hund, wenn er auch Führung bekommt. Hier sind Hundeerfahrene Menschen mit guter Körpersprache gefragt, ohne Kinder und andere Tiere. Wer diese Punkte erfüllen kann, bekommt einen loyalen Begleiter an seiner Seite.</p>
+    <p class="compatibility"><span>Verträglich:</span> Hier sind Hundeerfahrene Menschen mit guter Körpersprache gefragt, ohne Kinder und andere Tiere.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/ben-2023-10-19-20-30-29.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="gross" data-search="bobo retrievermischling bobo
+der retrievermischling bobo ist ca. 2020 geboren und kam am 22.01.26 aus einer beschlagnahme aus dem kreis gütersloh. hier wurden in einem haus 30 hunde sichergestellt, die unter schlimmen bedingungen ihr leben dort fristeten. die sieben retrievermixe, die wir davon übernommen haben, waren in einem zimmer untergebracht und standen fast bis zum bauch in scheiße. entsprechend verfilzt sah ihr fell auch aus. da waren bislang nicht nur etliche bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die haut überhaupt atmen konnte. sie waren zu dünn, hatten zum größten teil entzündete ohrgänge und viel zahnstein. da kommt auch jetzt noch einiges auf uns zu.
+bobo ist ein lieber und aufgeschlossener vierbeiner, der sich aber noch etwas verloren fühlt in seinem &quot;neuen&quot; leben. er braucht menschen, auf die er sich verlassen kann und wäre auch besser als einzelhund geeignet. er versteht sich zwar mit vielen anderen hunden, aber auch hier entscheidet mehr die sympathie.
+alle hunde aus der beschlagnahme brauchen eine zahnsanierung oder sogar mehr, daher würden wir uns über paten, die uns bei den zu erwartenden hohen tierarztkosten unterstützen, sehr freuen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/bobo-0.html" target="_blank" rel="noopener" aria-label="Bobo beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Bobo210326/Bobo_210326g.jpg" alt="Foto von Bobo" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Bobo</h2>
+    <div class="pills"><span class="pill">Retrievermischling</span>
+<span class="pill">6 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 63 cm</span></div>
+    <p class="description">Bobo
+Der Retrievermischling Bobo ist ca. 2020 geboren und kam am 22.01.26 aus einer Beschlagnahme aus dem Kreis Gütersloh. Hier wurden in einem Haus 30 Hunde sichergestellt, die unter schlimmen Bedingungen ihr Leben dort fristeten. Die sieben Retrievermixe, die wir davon übernommen haben, waren in einem Zimmer untergebracht und standen fast bis zum Bauch in Scheiße. Entsprechend verfilzt sah ihr Fell auch aus. Da waren bislang nicht nur etliche Bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die Haut überhaupt atmen konnte. Sie waren zu dünn, hatten zum größten Teil entzündete Ohrgänge und viel Zahnstein. Da kommt auch jetzt noch einiges auf uns zu.
+Bobo ist ein lieber und aufgeschlossener Vierbeiner, der sich aber noch etwas verloren fühlt in seinem &quot;neuen&quot; Leben. Er braucht Menschen, auf die er sich verlassen kann und wäre auch besser als Einzelhund geeignet. Er versteht sich zwar mit vielen anderen Hunden, aber auch hier entscheidet mehr die Sympathie.
+Alle Hunde aus der Beschlagnahme brauchen eine Zahnsanierung oder sogar mehr, daher würden wir uns über Paten, die uns bei den zu erwartenden hohen Tierarztkosten unterstützen, sehr freuen.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/bobo-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="maennlich" data-groesse-kat="mittel" data-search="boo terriermischling boo
+terriermischling boo ist ca. januar 2025 geboren und kam als fundhund am 01.06.26 aus schloß neuhaus zu uns.
+boo war anfangs sehr misstrauisch, wollte sich nicht anfassen lassen, aber mehr aus unsicherheit heraus.
+nachdem er mitarbeiter und ehrenamtliche besser kennen gelernt hat, fasst er eigentlich schnell vertrauen.
+aus dem erst unsicheren vierbeiner wurde dann schnell ein temperamentvoller kleiner kerl, der aufmerksamkeit sucht. er sucht die nähe des menschen und legt sich dann auch ruhig zu einem.
+boo zeigt sich auf gassigängen sehr neugierig und allem aufgeschlossen. an der leinenführigkeit muss man allerdings noch arbeiten.
+mit artgenossen kommt er recht schnell klar, sofern er sie erst mal kennen gelernt.
+ein junger hund, in dem noch viel potential steckt. hier ist sicherlich auch noch erziehung gefragt.
+boo sucht nun hundefreunde, die viel zeit für den kleinen kerl haben, denn er braucht noch viel beschäftigung.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/boo.html" target="_blank" rel="noopener" aria-label="Boo beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Boo040626/Boo_040626a%201%20von%201.jpg" alt="Foto von Boo" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Boo</h2>
+    <div class="pills"><span class="pill">Terriermischling</span>
+<span class="pill">1 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 40 cm</span>
+<span class="pill">Rüde</span></div>
+    <p class="description">Boo
+Terriermischling Boo ist ca. Januar 2025 geboren und kam als Fundhund am 01.06.26 aus Schloß Neuhaus zu uns.
+Boo war anfangs sehr misstrauisch, wollte sich nicht anfassen lassen, aber mehr aus Unsicherheit heraus.
+Nachdem er Mitarbeiter und Ehrenamtliche besser kennen gelernt hat, fasst er eigentlich schnell Vertrauen.
+Aus dem erst unsicheren Vierbeiner wurde dann schnell ein temperamentvoller kleiner Kerl, der Aufmerksamkeit sucht. Er sucht die Nähe des Menschen und legt sich dann auch ruhig zu einem.
+Boo zeigt sich auf Gassigängen sehr neugierig und allem aufgeschlossen. An der Leinenführigkeit muss man allerdings noch arbeiten.
+Mit Artgenossen kommt er recht schnell klar, sofern er sie erst mal kennen gelernt.
+Ein junger Hund, in dem noch viel Potential steckt. Hier ist sicherlich auch noch Erziehung gefragt.
+Boo sucht nun Hundefreunde, die viel Zeit für den kleinen Kerl haben, denn er braucht noch viel Beschäftigung.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/boo.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="mittel" data-search="bruno old english bulldog bruno
+bruno ist ein old english bulldog und am 12.07.2019 geboren mit einer schulterhöhe von ca. 45 cm. bruno kam als sicherstellung am 07.05.21 zu uns.
+da der american bulldog lt. ordnungsamt mit besonderer ausprägung vorhanden ist, fällt bruno unter die anlagenhunde des landeshundegesetzes. somit müssen
+zu haltung beondere auflagen erfüllt werden.
+der junge bruno verhält sich in vielen situationen noch wie ein großes baby. er hat vermutlich in seinem kurzen leben nicht allzu viel erlebt.
+ruhephasen und regeln sollten für seine neuen besitzer selbstverständlich sein.
+er hat anscheinend bisher noch keine menschen an seiner seite gehabt, die ihm die ruhe und führung gegeben haben die er braucht.
+bewegungsreize und bestimmte töne bringen ihn manchmal noch schnell aus der fassung.
+menschen sollten ihn nicht bedrängen, sondern kommen lassen. das gilt allerdings für die meisten hunde.
+gibt man ihm die zeit und ruhe zum lernen ist er eifrig dabei.
+bruno spielt gerne etwas körperbetont. er und sein labradorfreund im tierheim würden am liebsten den ganzen tag toben und rangeln. da kommen beide voll auf ihre kosten und sie vergessen die welt um sich herum.
+für bruno suchen wir menschen, die bereit sind mit diesem jungen hund noch viel zu trainieren, ihn durch neue situationen souverän zu führen und die gerne und ausgiebig mit ihm kuscheln. außerdem sollte der charmante kleine dickkopf mit konsequenz und ein bisschen humor gelenkt werden.
+bruno wird nicht in eine familie mit kleinen kindern vermittelt.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/bruno-2021-08-22-21-26-33.html" target="_blank" rel="noopener" aria-label="Bruno beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Bruno220821/Bruno_210821j_1_von_1.jpg" alt="Foto von Bruno" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Bruno</h2>
+    <div class="pills"><span class="pill">Old English Bulldog</span>
+<span class="pill">6 Jahre, 11 Monate</span>
+<span class="pill">Schulterhöhe ca. 45 cm</span></div>
+    <p class="description">Bruno
+Bruno ist ein Old English Bulldog und am 12.07.2019 geboren mit einer Schulterhöhe von ca. 45 cm. Bruno kam als Sicherstellung am 07.05.21 zu uns.
+Da der American Bulldog lt. Ordnungsamt mit besonderer Ausprägung vorhanden ist, fällt Bruno unter die Anlagenhunde des Landeshundegesetzes. Somit müssen
+zu Haltung beondere Auflagen erfüllt werden.
+Der junge Bruno verhält sich in vielen Situationen noch wie ein großes Baby. Er hat vermutlich in seinem kurzen Leben nicht allzu viel erlebt.
+Ruhephasen und Regeln sollten für seine neuen Besitzer selbstverständlich sein.
+Er hat anscheinend bisher noch keine Menschen an seiner Seite gehabt, die ihm die Ruhe und Führung gegeben haben die er braucht.
+Bewegungsreize und bestimmte Töne bringen ihn manchmal noch schnell aus der Fassung.
+Menschen sollten ihn nicht bedrängen, sondern kommen lassen. Das gilt allerdings für die meisten Hunde.
+Gibt man ihm die Zeit und Ruhe zum lernen ist er eifrig dabei.
+Bruno spielt gerne etwas körperbetont. Er und sein Labradorfreund im Tierheim würden am liebsten den ganzen Tag toben und rangeln. Da kommen beide voll auf ihre Kosten und sie vergessen die Welt um sich herum.
+Für Bruno suchen wir Menschen, die bereit sind mit diesem jungen Hund noch viel zu trainieren, ihn durch neue Situationen souverän zu führen und die gerne und ausgiebig mit ihm kuscheln. Außerdem sollte der charmante kleine Dickkopf mit Konsequenz und ein bisschen Humor gelenkt werden.
+Bruno wird nicht in eine Familie mit kleinen Kindern vermittelt.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/bruno-2021-08-22-21-26-33.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="gross" data-search="buma buma
+buma ist am 10.02.2020 geboren und hat eine schulterhöhe von ca. 70 cm. er wurde am 09.09.2020 bei uns abgegeben, weil seine menschen mit ihm überfordert waren. zuvor war der arme kerl schon durch mehrere hände gewandert. es steckt sehr viel herdenschutzhund in ihm, was charakterlich nicht weg zu diskutieren ist.
+vor allem im verteidigen von ressourcen sollte es in seinem zuhause große probleme gegeben haben. wo buma sehr heftig reagierte, war wirklich alles in bezug auf fressen. bei anderen sachen wie spielzeug etc. hält es sich in grenzen. aber er reagierte schon offensiv, wenn ihm was nicht behagt oder gefällt. aber daran wurde jetzt auch seit geraumer zeit mit unserer hundetrainerin gearbeitet.
+er lernt auf seine bezugsperson zu hören und sich führen zu lassen. seine ihm vertrauten menschen können sehr viel mit ihm machen. in seinem tempo ist buma sehr gern bereit zu lernen und nimmt regeln an. seinen genetisch bedingten dickkopf bringt er immer mal wieder ins spiel. und jeder mensch wird „getestet“. beim spaziergang wird dann zum beispiel die führungsqualität des menschen geprüft, indem er einfach mal bockt. auch bei begegnungen mit fremden menschen oder hunden muss er klar geführt werden. dann ist er aber wirklich angenehm und leinenführig.
+buma liebt es zu kuscheln. seine zuneigung zu seinen lieblingsmenschen zeigt er durch viel nähe und anschmiegen. auch da sind klare regeln nötig, damit nicht er bestimmt, wann und in welchen situationen er wie viel aufmerksamkeit bekommt.
+umso klarer die führung bei buma ist, umso weniger diskussionen gibt es mit ihm.
+im freilauf mit artgenossen hat buma viel spaß und liebt es zu rennen. bei den langen beinen macht er richtig meter. er hat mittlerweile auch gelernt, sich mal angemessen zu wehren. lange zeit war buma immer das mobbing-opfer.
+buma sucht hundefreunde, die ihn klar und konsequent führen und ihm die nötige sicherheit geben. buma ist kein hund für anfänger und wird wegen seines verhaltens auch nicht in eine familie mit kindern vermittelt.
+mehrmalige treffen und teilnahme am training sind voraussetzung für eine spätere übernahme.
+leider hat sich auch herausgestellt, dass buma sich in geschlossenen räumen (= wohnung) nicht dauerhaft wohlfühlt, was noch erschwerend hinzu kommt. eine vermittlung mit nicht direktem wohnungsanschluß wäre daher eher denkbar und auch einfacher zu händeln. draußen zeigt er sich ja sehr gut im umgang mit menschen. vielleicht hat er dann noch eine chance, das tierheim noch mal zu verlassen.
+aber buma ist noch jung und kann noch sehr viel lernen.
+wer sich für buma interessiert, und die aufgabe nicht scheut aus buma einen tollen begleithund zu machen, kann gerne kennenlerntermine vereinbaren und auch am training teilnehmen. auch wenn buma sich bei erstkontakten meist positiv zeigt, benötigt er seine kennenlernphase und kann nicht nach ein oder zwei treffen vermittelt werden. interessenten sollten sich daher auf mehrmalige treffen und teilnahme am training einstellen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/buma.html" target="_blank" rel="noopener" aria-label="Buma beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Buma311020/Buma_240421d-0020.jpg" alt="Foto von Buma" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Buma</h2>
+    <div class="pills"><span class="pill">6 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 70 cm</span></div>
+    <p class="description">Buma
+Buma ist am 10.02.2020 geboren und hat eine Schulterhöhe von ca. 70 cm. Er wurde am 09.09.2020 bei uns abgegeben, weil seine Menschen mit ihm überfordert waren. Zuvor war der arme Kerl schon durch mehrere Hände gewandert. Es steckt sehr viel Herdenschutzhund in ihm, was charakterlich nicht weg zu diskutieren ist.
+Vor allem im Verteidigen von Ressourcen sollte es in seinem Zuhause große Probleme gegeben haben. Wo Buma sehr heftig reagierte, war wirklich alles in Bezug auf Fressen. Bei anderen Sachen wie Spielzeug etc. hält es sich in Grenzen. Aber er reagierte schon offensiv, wenn ihm was nicht behagt oder gefällt. Aber daran wurde jetzt auch seit geraumer Zeit mit unserer Hundetrainerin gearbeitet.
+Er lernt auf seine Bezugsperson zu hören und sich führen zu lassen. Seine ihm vertrauten Menschen können sehr viel mit ihm machen. In seinem Tempo ist Buma sehr gern bereit zu lernen und nimmt Regeln an. Seinen genetisch bedingten Dickkopf bringt er immer mal wieder ins Spiel. Und jeder Mensch wird „getestet“. Beim Spaziergang wird dann zum Beispiel die Führungsqualität des Menschen geprüft, indem er einfach mal bockt. Auch bei Begegnungen mit fremden Menschen oder Hunden muss er klar geführt werden. Dann ist er aber wirklich angenehm und leinenführig.
+Buma liebt es zu kuscheln. Seine Zuneigung zu seinen Lieblingsmenschen zeigt er durch viel Nähe und Anschmiegen. Auch da sind klare Regeln nötig, damit nicht er bestimmt, wann und in welchen Situationen er wie viel Aufmerksamkeit bekommt.
+Umso klarer die Führung bei Buma ist, umso weniger Diskussionen gibt es mit ihm.
+Im Freilauf mit Artgenossen hat Buma viel Spaß und liebt es zu rennen. Bei den langen Beinen macht er richtig Meter. Er hat mittlerweile auch gelernt, sich mal angemessen zu wehren. Lange Zeit war Buma immer das Mobbing-Opfer.
+Buma sucht Hundefreunde, die ihn klar und konsequent führen und ihm die nötige Sicherheit geben. Buma ist kein Hund für Anfänger und wird wegen seines Verhaltens auch nicht in eine Familie mit Kindern vermittelt.
+Mehrmalige Treffen und Teilnahme am Training sind Voraussetzung für eine spätere Übernahme.
+Leider hat sich auch herausgestellt, dass Buma sich in geschlossenen Räumen (= Wohnung) nicht dauerhaft wohlfühlt, was noch erschwerend hinzu kommt. Eine Vermittlung mit nicht direktem Wohnungsanschluß wäre daher eher denkbar und auch einfacher zu händeln. Draußen zeigt er sich ja sehr gut im Umgang mit Menschen. Vielleicht hat er dann noch eine Chance, das Tierheim noch mal zu verlassen.
+Aber Buma ist noch jung und kann noch sehr viel lernen.
+Wer sich für Buma interessiert, und die Aufgabe nicht scheut aus Buma einen tollen Begleithund zu machen, kann gerne Kennenlerntermine vereinbaren und auch am Training teilnehmen. Auch wenn Buma sich bei Erstkontakten meist positiv zeigt, benötigt er seine Kennenlernphase und kann nicht nach ein oder zwei Treffen vermittelt werden. Interessenten sollten sich daher auf mehrmalige Treffen und Teilnahme am Training einstellen.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/buma.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="mittel" data-search="burek mischlingsrüde burek
+der mischlingsrüde burek ist ca. 2018 geboren und hat eine schulterhöhe von ca. 50 cm. er kam am 01.10.24 über einen befreundeten tierschutzverein zu uns. er war von seinem besitzer abgegeben worden, weil dieser sich nicht mehr um ihn kümmern konnte.
+burek war dort schon anfangs sehr ängstlich und schreckhaft. neue situationen und fremde menschen überforderten ihn. erst als er in der gesellschaft eines anderen hundes kam, der menschen vertraute, taute auch er langsam auf.
+bei uns zeigte sich burek zunächst auch leicht zurückhaltend, fasste dann aber relativ schnell vertrauen zu uns. er ist halt erst vorsichtig und nicht gleich sehr überschwenglich. aber nähe macht ihm immer noch viel aus. er versucht diese zu meiden wo er nur kann und unterstreicht dies deutlich.
+burek zeigt schnell, wenn ihm was nicht passt. aber man kann ihn gut &quot;lesen&quot; und aus der situation, die ihm nicht behagt, dann auch herausholen.
+für burek suchen wir ein zuhause wo es vielleicht etwas ruhiger zugeht und er nicht täglich mit neuen herausforderungen konfrontiert wird. hundeerfahrung ist ein muss! er ist kein hund, der gerne angefasst werden will.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/burek.html" target="_blank" rel="noopener" aria-label="Burek beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Burek011024/Burek_031024_1_von_1.jpg" alt="Foto von Burek" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Burek</h2>
+    <div class="pills"><span class="pill">Mischlingsrüde</span>
+<span class="pill">8 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 50 cm</span></div>
+    <p class="description">Burek
+Der Mischlingsrüde Burek ist ca. 2018 geboren und hat eine Schulterhöhe von ca. 50 cm. Er kam am 01.10.24 über einen befreundeten Tierschutzverein zu uns. Er war von seinem Besitzer abgegeben worden, weil dieser sich nicht mehr um ihn kümmern konnte.
+Burek war dort schon anfangs sehr ängstlich und schreckhaft. Neue Situationen und fremde Menschen überforderten ihn. Erst als er in der Gesellschaft eines anderen Hundes kam, der Menschen vertraute, taute auch er langsam auf.
+Bei uns zeigte sich Burek zunächst auch leicht zurückhaltend, fasste dann aber relativ schnell Vertrauen zu uns. Er ist halt erst vorsichtig und nicht gleich sehr überschwenglich. Aber Nähe macht ihm immer noch viel aus. Er versucht diese zu meiden wo er nur kann und unterstreicht dies deutlich.
+Burek zeigt schnell, wenn ihm was nicht passt. Aber man kann ihn gut &quot;lesen&quot; und aus der Situation, die ihm nicht behagt, dann auch herausholen.
+Für Burek suchen wir ein Zuhause wo es vielleicht etwas ruhiger zugeht und er nicht täglich mit neuen Herausforderungen konfrontiert wird. Hundeerfahrung ist ein muss! Er ist kein Hund, der gerne angefasst werden will.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/burek.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="gross" data-search="charly retrievermischling charly
+der retrievermischling charly ist ca. 2015 geboren und kam am 22.01.26 aus einer beschlagnahme aus dem kreis gütersloh. hier wurden in einem haus 30 hunde sichergestellt, die unter schlimmen bedingungen ihr leben dort fristeten. die sieben retrievermixe, die wir davon übernommen haben, waren in einem zimmer untergebracht und standen fast bis zum bauch in scheiße. entsprechend verfilzt sah ihr fell auch aus. da waren bislang nicht nur etliche bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die haut überhaupt atmen konnte. sie waren zu dünn, hatten zum größten teil entzündete ohrgänge und viel zahnstein. da kommt auch jetzt noch einiges auf uns zu.
+charly, der älteste von den sieben, ist einfach nur lieb und natürlich aufgrund seines alters viel ruhiger und ausgeglichener wie seine kumpels.
+er hat eine kopfschiefhaltung, die wahrscheinlich von einer ursprünglichen ohrenentzündung, die mittlerweile verheilt ist, herrührt.
+charly geht noch sehr gerne und auch lange spazieren. er liebt es einfach bei seinen menschen zu sein.
+mit anderen hunden zeigt er sich verträglich.
+alle hunde aus der beschlagnahme brauchen eine zahnsanierung oder sogar mehr, daher würden wir uns über paten, die uns bei den zu erwartenden hohen tierarztkosten unterstützen, sehr freuen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/charly-0.html" target="_blank" rel="noopener" aria-label="Charly beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Charly210326/Charly_210326a.jpg" alt="Foto von Charly" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Charly</h2>
+    <div class="pills"><span class="pill">Retrievermischling</span>
+<span class="pill">11 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 62 cm</span></div>
+    <p class="description">Charly
+Der Retrievermischling Charly ist ca. 2015 geboren und kam am 22.01.26 aus einer Beschlagnahme aus dem Kreis Gütersloh. Hier wurden in einem Haus 30 Hunde sichergestellt, die unter schlimmen Bedingungen ihr Leben dort fristeten. Die sieben Retrievermixe, die wir davon übernommen haben, waren in einem Zimmer untergebracht und standen fast bis zum Bauch in Scheiße. Entsprechend verfilzt sah ihr Fell auch aus. Da waren bislang nicht nur etliche Bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die Haut überhaupt atmen konnte. Sie waren zu dünn, hatten zum größten Teil entzündete Ohrgänge und viel Zahnstein. Da kommt auch jetzt noch einiges auf uns zu.
+Charly, der älteste von den sieben, ist einfach nur lieb und natürlich aufgrund seines Alters viel ruhiger und ausgeglichener wie seine Kumpels.
+Er hat eine Kopfschiefhaltung, die wahrscheinlich von einer ursprünglichen Ohrenentzündung, die mittlerweile verheilt ist, herrührt.
+Charly geht noch sehr gerne und auch lange spazieren. Er liebt es einfach bei seinen Menschen zu sein.
+Mit anderen Hunden zeigt er sich verträglich.
+Alle Hunde aus der Beschlagnahme brauchen eine Zahnsanierung oder sogar mehr, daher würden wir uns über Paten, die uns bei den zu erwartenden hohen Tierarztkosten unterstützen, sehr freuen.</p>
+    <p class="compatibility"><span>Verträglich:</span> Mit anderen Hunden zeigt er sich verträglich.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/charly-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="weiblich" data-groesse-kat="" data-search="daisy chihuahua-mischling daisy
+daisy ist eine chihuahua-mischlingshündin und soll ca. 13 jahre alt sein, obwohl sie auf uns einen viel jüngeren eindruck macht.
+nachdembereits ihr 2. besitzer verstarb, nahmen bekannte sie erst mal auf, hatten aber leider nicht genügend zeit für sie. dazu kam, dass daisy wegen eines tumors an der gesäugeleiste dringend operiert werden musst.
+so kam sie zu uns und durfte sofort in eine pflegestelle, wo bereits eine kleine chihuahuahündin lebt.
+daisy ist sehr menschenbezogen und hängt sich schnell an eine bezugsperson. sie ist auch gut erzogen und sehr verschmust.
+eine intelligente und kinderfreundliche kleine hündin.
+bei anderen hunden entscheidet sie nach sympathie. entweder mag sie den hund oder eben nicht.
+katzen mag sie leider nicht.
+alleine bleiben muss man mit ihr üben, dass wird anfangs nicht gleich klappen. aber in der pflegestelle klappt es auch schon immer besser.
+daisy wurde inzwischen auch operiert. sie ist schon wieder sehr gut drauf.
+gesucht wird nun ein zuhause, wo sie gesellschaft hat und nach möglichkeit auch nicht alleine bleiben muss.
+klar, sie ist sicherlich nicht mehr die jüngste, aber zurzeit noch ganz fit und läuft auch gerne. es wäre schön, wenn sie noch irgendwo ein liebevolles plätzchen für die letzten jahre bekommt.
+daisy lebt in einer pflegestelle. bei interesse stellen wir gerne den kontakt her!">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/daisy-0.html" target="_blank" rel="noopener" aria-label="Daisy beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/DaisyPflegestelle/sandy.jpg" alt="Foto von Daisy" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Daisy</h2>
+    <div class="pills"><span class="pill">Chihuahua-Mischling</span>
+<span class="pill">13 Jahre, 6 Monate</span>
+<span class="pill">Hündin</span>
+<span class="pill pill--unknown">Größe unbekannt</span></div>
+    <p class="description">Daisy
+Daisy ist eine Chihuahua-Mischlingshündin und soll ca. 13 Jahre alt sein, obwohl sie auf uns einen viel jüngeren Eindruck macht.
+Nachdembereits ihr 2. Besitzer verstarb, nahmen Bekannte sie erst mal auf, hatten aber leider nicht genügend Zeit für sie. Dazu kam, dass Daisy wegen eines Tumors an der Gesäugeleiste dringend operiert werden musst.
+So kam sie zu uns und durfte sofort in eine Pflegestelle, wo bereits eine kleine Chihuahuahündin lebt.
+Daisy ist sehr menschenbezogen und hängt sich schnell an eine Bezugsperson. Sie ist auch gut erzogen und sehr verschmust.
+Eine intelligente und kinderfreundliche kleine Hündin.
+Bei anderen Hunden entscheidet sie nach Sympathie. Entweder mag sie den Hund oder eben nicht.
+Katzen mag sie leider nicht.
+Alleine bleiben muss man mit ihr üben, dass wird anfangs nicht gleich klappen. Aber in der Pflegestelle klappt es auch schon immer besser.
+Daisy wurde inzwischen auch operiert. Sie ist schon wieder sehr gut drauf.
+Gesucht wird nun ein Zuhause, wo sie Gesellschaft hat und nach Möglichkeit auch nicht alleine bleiben muss.
+Klar, sie ist sicherlich nicht mehr die Jüngste, aber zurzeit noch ganz fit und läuft auch gerne. Es wäre schön, wenn sie noch irgendwo ein liebevolles Plätzchen für die letzten Jahre bekommt.
+Daisy lebt in einer Pflegestelle. Bei Interesse stellen wir gerne den Kontakt her!</p>
+    <p class="compatibility"><span>Verträglich:</span> Eine intelligente und kinderfreundliche kleine Hündin.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/daisy-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="" data-search="eddi staffordshire-terrier-mix eddi
+eddi kam als fundhund in das tierheim paderborn. er wurde nicht vermisst und war nicht gechipt. also vermutlich ausgesetzt.
+niemand weiß wie lange er auf der straße umher irrte. aber diese erfahrung hat seine spuren hinterlassen. anfangs waren hupende autos und laute menschen sehr gruselig für eddi und er reagierte panisch. leider stellte sich im tierheim sehr schnell heraus, dass er insgesamt ein sehr schwaches nervenkostüm hat und zu überreaktionen neigt.
+da er im tierheim überhaupt nicht zur ruhe kam und anfing, sich selbst offene stellen zu lecken, entschloss das tierheim sich dazu, eine passende pflegestelle zu suchen, damit er zur ruhe kommen und sein wahres ich zeigen kann. einfacher gesagt als getan.
+seine chance dazu bekam eddi bei unserer hundetrainerin, die seit vielen jahren das tierheim betreut. somit ist er in erfahrenen händen und hat nun die möglichkeit, seine guten seiten zu zeigen.
+es zeigt sich auf seiner pflegestelle, dass eddi keine starken nerven hat. er hat schon sehr viel gelernt und kann auch durch souveräne führung zur ruhe finden. ein ruhiges zuhause mit gewohnten abläufen und klaren regeln sind für ihn unerlässlich. als zweithund sehen wir ihn eher nicht. bei hunden entscheidet die sympathie und ressourcen sind im wichtig.
+eddi ist ein umheimlich schlauer hund, der sehr gerne neue sachen lernt. anfangs war er ein absoluter balljunkie und wasserfetischist. er hat inzwischen gelernt, dass man frust durchaus aushalten kann und auf kommando auch mal schwimmen kann. der mensch, den wir uns für eddi wünschen sollte ruhig, souverän, vorrausschauend und mit einer portion humor ausgestattet sein.
+eddi kann, wenn er sich wohl fühlt, ein richtiger clown sein. ansagen werden terriertypisch mehrfach überdacht. bei zuviel druck macht er dicht.
+wir suchen für eddi erfahrene hundekenner, die frühzeitig seine sorgen erkennen und immer als fels in der brandung an seiner seite stehen, damit er alte sorgen vergessen kann und der fröhliche hundejunge, der er auch ist, zum vorschein kommt.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/eddi-2024-11-28-22-13-58.html" target="_blank" rel="noopener" aria-label="Eddi beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Eddi301124/Eddi.jpg" alt="Foto von Eddi" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Eddi</h2>
+    <div class="pills"><span class="pill">Staffordshire-Terrier-Mix</span>
+<span class="pill">5 Jahre, 11 Monate</span>
+<span class="pill pill--unknown">Größe unbekannt</span></div>
+    <p class="description">Eddi
+Eddi kam als Fundhund in das Tierheim Paderborn. Er wurde nicht vermisst und war nicht gechipt. Also vermutlich ausgesetzt.
+Niemand weiß wie lange er auf der Straße umher irrte. Aber diese Erfahrung hat seine Spuren hinterlassen. Anfangs waren hupende Autos und laute Menschen sehr gruselig für Eddi und er reagierte panisch. Leider stellte sich im Tierheim sehr schnell heraus, dass er insgesamt ein sehr schwaches Nervenkostüm hat und zu Überreaktionen neigt.
+Da er im Tierheim überhaupt nicht zur Ruhe kam und anfing, sich selbst offene Stellen zu lecken, entschloss das Tierheim sich dazu, eine passende Pflegestelle zu suchen, damit er zur Ruhe kommen und sein wahres Ich zeigen kann. Einfacher gesagt als getan.
+Seine Chance dazu bekam Eddi bei unserer Hundetrainerin, die seit vielen Jahren das Tierheim betreut. Somit ist er in erfahrenen Händen und hat nun die Möglichkeit, seine guten Seiten zu zeigen.
+Es zeigt sich auf seiner Pflegestelle, dass Eddi keine starken Nerven hat. Er hat schon sehr viel gelernt und kann auch durch souveräne Führung zur Ruhe finden. Ein ruhiges Zuhause mit gewohnten Abläufen und klaren Regeln sind für ihn unerlässlich. Als Zweithund sehen wir ihn eher nicht. Bei Hunden entscheidet die Sympathie und Ressourcen sind im wichtig.
+Eddi ist ein umheimlich schlauer Hund, der sehr gerne neue Sachen lernt. Anfangs war er ein absoluter Balljunkie und Wasserfetischist. Er hat inzwischen gelernt, dass man Frust durchaus aushalten kann und auf Kommando auch mal schwimmen kann. Der Mensch, den wir uns für Eddi wünschen sollte ruhig, souverän, vorrausschauend und mit einer Portion Humor ausgestattet sein.
+Eddi kann, wenn er sich wohl fühlt, ein richtiger Clown sein. Ansagen werden terriertypisch mehrfach überdacht. Bei zuviel Druck macht er dicht.
+Wir suchen für Eddi erfahrene Hundekenner, die frühzeitig seine Sorgen erkennen und immer als Fels in der Brandung an seiner Seite stehen, damit er alte Sorgen vergessen kann und der fröhliche Hundejunge, der er auch ist, zum Vorschein kommt.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/eddi-2024-11-28-22-13-58.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="maennlich" data-groesse-kat="mittel" data-search="finn dobermannrüde finn
+der dobermannrüde finn ist ca. 2021 geboren und wurde am 07.05.24 bei uns abgegeben, weil sein herrchen nicht mehr mit ihm klar kam.
+finn zeigt sich uns gegenüber sehr freundlich, aber auch distanzlos. so rempelte er einen gerne in voller fahrt an, sofern man es zuläßt. man merkt schon, dass der junge rüde keine grenzen gesetzt bekommen hat. gundkommandos beherrscht er aber gut.
+wie sich herausstellte, hatte man ihn auch nicht entsprechend ausgelastet und die meiste zeit einfach in der wohnung weg gesperrt. das diese nicht selten der fall war, merken wir hier nun auch.
+so mag es finn gar nicht, wenn er zurück gelassen wird und er nicht mit kann. er versucht bei uns auch immer schnell mit durch die tür zu kommen.
+dazu kommt, dass finn aus einer zuchtlinie stammt, die hauptsächlich für den hundesport genommen wird. er ist also hoffnungslos unterfordert und sucht nun menschen, die mehr mit ihm machen möchten und ihn entsprechend auslasten können. ebenso braucht er eine klare führung, aber dann hat man auch einen treuen begleiter.
+finn sucht sehr die nähe des menschen und kuschelt auch gerne.
+erfahrene und sportliche hundefreunde können sich gerne zwecks kennenlerntermin bei uns melden.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/finn-2024-05-27-18-23-42.html" target="_blank" rel="noopener" aria-label="Finn beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Finn250524/Finn_250524_1_von_1.jpg" alt="Foto von Finn" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Finn</h2>
+    <div class="pills"><span class="pill">Dobermannrüde</span>
+<span class="pill">5 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 55 cm</span>
+<span class="pill">Rüde</span></div>
+    <p class="description">Finn
+Der Dobermannrüde Finn ist ca. 2021 geboren und wurde am 07.05.24 bei uns abgegeben, weil sein Herrchen nicht mehr mit ihm klar kam.
+Finn zeigt sich uns gegenüber sehr freundlich, aber auch distanzlos. So rempelte er einen gerne in voller Fahrt an, sofern man es zuläßt. Man merkt schon, dass der junge Rüde keine Grenzen gesetzt bekommen hat. Gundkommandos beherrscht er aber gut.
+Wie sich herausstellte, hatte man ihn auch nicht entsprechend ausgelastet und die meiste Zeit einfach in der Wohnung weg gesperrt. Das diese nicht selten der Fall war, merken wir hier nun auch.
+So mag es Finn gar nicht, wenn er zurück gelassen wird und er nicht mit kann. Er versucht bei uns auch immer schnell mit durch die Tür zu kommen.
+Dazu kommt, dass Finn aus einer Zuchtlinie stammt, die hauptsächlich für den Hundesport genommen wird. Er ist also hoffnungslos unterfordert und sucht nun Menschen, die mehr mit ihm machen möchten und ihn entsprechend auslasten können. Ebenso braucht er eine klare Führung, aber dann hat man auch einen treuen Begleiter.
+Finn sucht sehr die Nähe des Menschen und kuschelt auch gerne.
+Erfahrene und sportliche Hundefreunde können sich gerne zwecks Kennenlerntermin bei uns melden.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/finn-2024-05-27-18-23-42.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="maennlich" data-groesse-kat="mittel" data-search="hugo american staffordshire-terrier hugo
+american staffordshire terrier hugo ist ca. 06/2016 geboren und hat eine schulterhöhe von ca. 50 cm. der kräftige rüde kam über eine sicherstellung bereits am 12.02.2021 zu uns.
+hugo ist anfangs fremden menschen gegenüber etwas skeptisch. einige gewinnen dann aber sehr schnell sein vertrauen, manche schaffen es allerdings nicht.
+hugo kann ein wahres kraftpaket sein. geht man mit ihm alleine gassi, läuft er relativ gut an der leine. mit mehreren zusammen, fängt er an zu ziehen. er ist halt gerne immer erster und weit vorn.
+bei anderen hunden entscheidet er nach sympathie. je besser er sie kennen lernt, desto schneller finden sie seine akzeptanz.
+fahrende autos lösen bei ihm noch einen bewegungsreiz aus.
+aber schlimmer noch ist: wasser! da ist er nicht zu bremsen. wenn man nicht frühzeitig aufpasst, kann es passieren, dass man mit baden geht.
+wir kennen wirklich viele „wasserratten“, aber einen solchen hund, der so verrückt wie hugo darauf reagiert, hatten wir noch nie.
+wenn er nicht gerade im see oder im fluß planschen darf, fährt er liebend gerne mit zur physio, wo er im schwimmbad voll auf seine kosten kommt.
+da hugo ein so genannter „anlagehund“ ist, müssen auch die jeweiligen auflagen eines bundeslandes erfüllt werden.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/hugo-2021-06-21-16-33-40.html" target="_blank" rel="noopener" aria-label="Hugo beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Hugo210621/Hugo_060321f-0034.jpg" alt="Foto von Hugo" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Hugo</h2>
+    <div class="pills"><span class="pill">American Staffordshire-Terrier</span>
+<span class="pill">10 Jahre, 1 Monate</span>
+<span class="pill">Schulterhöhe ca. 50 cm</span>
+<span class="pill">Rüde</span></div>
+    <p class="description">Hugo
+American Staffordshire Terrier Hugo ist ca. 06/2016 geboren und hat eine Schulterhöhe von ca. 50 cm. Der kräftige Rüde kam über eine Sicherstellung bereits am 12.02.2021 zu uns.
+Hugo ist anfangs fremden Menschen gegenüber etwas skeptisch. Einige gewinnen dann aber sehr schnell sein Vertrauen, manche schaffen es allerdings nicht.
+Hugo kann ein wahres Kraftpaket sein. Geht man mit ihm alleine Gassi, läuft er relativ gut an der Leine. Mit mehreren zusammen, fängt er an zu ziehen. Er ist halt gerne immer Erster und weit vorn.
+Bei anderen Hunden entscheidet er nach Sympathie. Je besser er sie kennen lernt, desto schneller finden sie seine Akzeptanz.
+Fahrende Autos lösen bei ihm noch einen Bewegungsreiz aus.
+Aber schlimmer noch ist: Wasser! Da ist er nicht zu bremsen. Wenn man nicht frühzeitig aufpasst, kann es passieren, dass man mit baden geht.
+Wir kennen wirklich viele „Wasserratten“, aber einen solchen Hund, der so verrückt wie Hugo darauf reagiert, hatten wir noch nie.
+Wenn er nicht gerade im See oder im Fluß planschen darf, fährt er liebend gerne mit zur Physio, wo er im Schwimmbad voll auf seine Kosten kommt.
+Da Hugo ein so genannter „Anlagehund“ ist, müssen auch die jeweiligen Auflagen eines Bundeslandes erfüllt werden.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/hugo-2021-06-21-16-33-40.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="" data-search="jacko chihuahua-franz.bulldoggenmix jacko
+jacko wurde das erste mal am 25.08. 2015 abgegeben, damals aus zeit-und geldmangel.
+im oktober 2015 fand er dann ein zuhause, wo er 11 jahre lang lebte. am 25.06 kam er leider wieder zurück, weil es mit dem kind nicht mehr funktioniert hat.
+jacko ist manchmal etwas unsicher, fast aber sehr schnell vertrauen und ist auch sehr anhänglich.
+zur zeit hat er ein paar pfunde zu viel auf dem rippen und sollte etwas abnehmen.
+jacko soll die letzte zeit seines lebens nicht im tierheim verbringen.
+ein ruhiger haushalt mit ein bis zwei bezugspersonen wären ideal für ihn.
+wer gibt dem senior noch eine schöne zeit?">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/jacko-0.html" target="_blank" rel="noopener" aria-label="Jacko beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Jacko300626/Jacko_300626c%201%20von%201.jpg" alt="Foto von Jacko" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Jacko</h2>
+    <div class="pills"><span class="pill">Chihuahua-Franz.Bulldoggenmix</span>
+<span class="pill">15 Jahre, 6 Monate</span>
+<span class="pill pill--unknown">Größe unbekannt</span></div>
+    <p class="description">Jacko
+Jacko wurde das erste Mal am 25.08. 2015 abgegeben, damals aus Zeit-und Geldmangel.
+Im Oktober 2015 fand er dann ein Zuhause, wo er 11 Jahre lang lebte. Am 25.06 kam er leider wieder zurück, weil es mit dem Kind nicht mehr funktioniert hat.
+Jacko ist manchmal etwas unsicher, fast aber sehr schnell Vertrauen und ist auch sehr anhänglich.
+Zur Zeit hat er ein paar Pfunde zu viel auf dem Rippen und sollte etwas abnehmen.
+Jacko soll die letzte Zeit seines Lebens nicht im Tierheim verbringen.
+Ein ruhiger Haushalt mit ein bis zwei Bezugspersonen wären ideal für ihn.
+Wer gibt dem Senior noch eine schöne Zeit?</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/jacko-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="weiblich" data-groesse-kat="mittel" data-search="leyla staffordshire terrier leyla
+die staffordshire terrier hündin leyla ist ca. juni 2024 geboren und eher von kleiner kompakter statur.
+man fand sie am 23.05.26 nähe moosheide/ecke emsquellen. sie soll mit ausgefahrener flexileine aus dem wald gerannt gekommen sein. ein autofahrer wurde auf sie aufmerksam.
+leyla zeigte sich anfangs sehr distanziert und eher misstrauisch uns gegenüber, suchte aber gleichzeitig sofort die nähe unserer mitarbeiter.
+wie sich gezeigt hat, braucht leyla einfach etwas zeit zum kennen lernen. dann ist sie aber relativ schnell recht anhänglich und verschmust.
+auch mit artgenossen versteht sie sich ganz gut und begegnet ihnen eher neugierig und freundlich.
+die &quot;kompakte&quot; gechillte hündin wird sicherlich bei menschen aufgewachsen sein. vielleicht traut man sich nur einfach nicht, sich zu melden, weil man sie weder gechipt noch ordnungsgemäß angemeldet hat. traurig!
+die freundliche und teilweise etwas unsichere leyla sucht nun hundefreunde, die ihr eine neue heimat geben, die auflagen zur haltung erfüllen können und ihr sicherheit und führung bieten.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/leyla-0.html" target="_blank" rel="noopener" aria-label="Leyla beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Leyla040626/Leyla_040626f%201%20von%201.jpg" alt="Foto von Leyla" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Leyla</h2>
+    <div class="pills"><span class="pill">Staffordshire Terrier</span>
+<span class="pill">2 Jahre, 1 Monate</span>
+<span class="pill">Schulterhöhe ca. 50 cm</span>
+<span class="pill">Hündin</span></div>
+    <p class="description">Leyla
+Die Staffordshire Terrier Hündin Leyla ist ca. Juni 2024 geboren und eher von kleiner kompakter Statur.
+Man fand sie am 23.05.26 Nähe Moosheide/Ecke Emsquellen. Sie soll mit ausgefahrener Flexileine aus dem Wald gerannt gekommen sein. Ein Autofahrer wurde auf sie aufmerksam.
+Leyla zeigte sich anfangs sehr distanziert und eher misstrauisch uns gegenüber, suchte aber gleichzeitig sofort die Nähe unserer Mitarbeiter.
+Wie sich gezeigt hat, braucht Leyla einfach etwas Zeit zum Kennen lernen. Dann ist sie aber relativ schnell recht anhänglich und verschmust.
+Auch mit Artgenossen versteht sie sich ganz gut und begegnet ihnen eher neugierig und freundlich.
+Die &quot;kompakte&quot; gechillte Hündin wird sicherlich bei Menschen aufgewachsen sein. Vielleicht traut man sich nur einfach nicht, sich zu melden, weil man sie weder gechipt noch ordnungsgemäß angemeldet hat. Traurig!
+Die freundliche und teilweise etwas unsichere Leyla sucht nun Hundefreunde, die ihr eine neue Heimat geben, die Auflagen zur Haltung erfüllen können und ihr Sicherheit und Führung bieten.</p>
+    <p class="compatibility"><span>Verträglich:</span> Auch mit Artgenossen versteht sie sich ganz gut und begegnet ihnen eher neugierig und freundlich. Die freundliche und teilweise etwas unsichere Leyla sucht nun Hundefreunde, die ihr eine neue Heimat geben, die Auflagen zur Haltung erfüllen können und ihr Sicherheit und Führung bieten.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/leyla-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="mittel" data-search="luke labrador luke
+labrador luke ist ca. april 2022 geboren und wurde am 07.12.25 abgegeben, weil seine besitzer nicht mehr mit ihm klar kamen. es waren hundeanfänger, die sich für einen labrador entschieden haben, weil dieser oft als einfacher familienhund dargestellt wird. aber da gibt es eben auch unterschiede. luke ist eben nicht der typische gemütliche labrador, sondern eher der aktive arbeitshund.
+luke ist ein noch recht unsicherer hund, der geistige beschäftigung und eine klare führung braucht.
+seine leinenführigkeit lässt noch zu wünschen übrig. was vermutlich an der bisherigen mangel in den auslastung liegt. daran muss noch gearbeitet werden.
+er kennt zwar grundkommandos, hat aber keine grenzen gesetzt bekommen.
+luke zeigt sich noch sehr aktiv und hibbelig und reagiert stark auf bewegungsreize. er muss erstmal lernen, auch ruhe auszuhalten, was ihm gerade noch recht schwer fällt.
+anderen hunden gegenüber ist er noch recht zurückhaltend und unsicher. aber die sozialen kontakte
+müssen einfach noch mehr gefördert werden.
+kinder kennt luke nicht und sollte daher eher zu erfahrenen hundefreunden ohne kinder, die ihm nicht nur die nötige führung geben, sondern auch spaß daran haben ihn auch anderweitig - eben geistig - auszulasten.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/luke-0.html" target="_blank" rel="noopener" aria-label="Luke beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Luke221125/Luke_121125a.jpg" alt="Foto von Luke" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Luke</h2>
+    <div class="pills"><span class="pill">Labrador</span>
+<span class="pill">4 Jahre, 3 Monate</span>
+<span class="pill">Schulterhöhe ca. 55 cm</span></div>
+    <p class="description">Luke
+Labrador Luke ist ca. April 2022 geboren und wurde am 07.12.25 abgegeben, weil seine Besitzer nicht mehr mit ihm klar kamen. Es waren Hundeanfänger, die sich für einen Labrador entschieden haben, weil dieser oft als einfacher Familienhund dargestellt wird. Aber da gibt es eben auch Unterschiede. Luke ist eben nicht der typische gemütliche Labrador, sondern eher der aktive Arbeitshund.
+Luke ist ein noch recht unsicherer Hund, der geistige Beschäftigung und eine klare Führung braucht.
+Seine Leinenführigkeit lässt noch zu wünschen übrig. Was vermutlich an der bisherigen Mangel in den Auslastung liegt. Daran muss noch gearbeitet werden.
+Er kennt zwar Grundkommandos, hat aber keine Grenzen gesetzt bekommen.
+Luke zeigt sich noch sehr aktiv und hibbelig und reagiert stark auf Bewegungsreize. Er muss erstmal lernen, auch Ruhe auszuhalten, was ihm gerade noch recht schwer fällt.
+Anderen Hunden gegenüber ist er noch recht zurückhaltend und unsicher. Aber die sozialen Kontakte
+müssen einfach noch mehr gefördert werden.
+Kinder kennt Luke nicht und sollte daher eher zu erfahrenen Hundefreunden ohne Kinder, die ihm nicht nur die nötige Führung geben, sondern auch Spaß daran haben ihn auch anderweitig - eben geistig - auszulasten.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/luke-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="weiblich" data-groesse-kat="mittel" data-search="luna altdeutsche hütehündin luna
+die altdeutsche hütehündin luna ist am 14.10.2019 geboren. sie hat eine schulterhöhe von ca. 50 cm und wurde am 31.03.24 wegen überforderung abgegeben.
+luna lebte seit welpenalter an einer familie. sie zeigte sich sehr anhänglich und schmusebedürftig, wollte aber auch schnell schon immer im mittelpunkt stehen.
+sie neigt dazu „ihren“ menschen sehr einzunehmen und auch für ihre bedürfnisse zu auszunutzen.
+in ihrer anfangszeit bei uns im tierheim zeigte luna dann recht schnell, dass sie nicht gern allein gelassen wird.
+ebenso hatten wir schnell die erkenntnis, dass luna sehr stressanfällig ist. sie reagiert auf jede veränderung in ihrem direkten umfeld und braucht dann eine weile sich daran zu gewöhnen.
+diese anfälligkeit für stress führt bei ihr zu übersprungshandlungen, die je nach gegenüber mal mehr mal weniger heftig ausfallen.
+das sind themen, die wir mit unserer hundetrainerin angegangen sind, an denen im neuen heim aber weiterhin gearbeitet werden müssen.
+durch gezieltes training konnten wir so zb. schon an lunas impulskontrolle arbeiten. aber auch hier steht noch weitere arbeit an.
+da der charakter eines hütehundes bei ihr schon sehr stark ausgeprägt ist, führte das letztendlich in der familie zu den problemen, die wir im tierheim auch schnell feststellten. wir sehen sie daher nicht mehr in einer familie mit kindern. ebenso sollten in lunas neuem heim keine katzen oder kleintiere leben.
+bei anderen hunden entscheidet die sympathie, generell ist luna aber schon verträglich. ist ein hund aber zu aufdringlich zeigt sie ihm sehr klar die grenzen.
+ein eventuelles zusammenleben mit einem weiteren hund entscheidet also die sympathie.
+luna sucht menschen, die ihr eine konsequente und souveräne führung geben können und wollen. dabei zeigt sie recht deutlich, dass männer es bei ihr leichter haben als frauen.
+sie ist eine hündin, die nicht einfach nebenher läuft. luna möchte geistig schon sehr gefordert und gefördert werden.
+aufgrund ihrer stressanfälligkeit wäre ein eher ländlich gelegenes zuhause mit sicherheit besser als eine stadtwohnung.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/luna-2023-12-29-12-11-39.html" target="_blank" rel="noopener" aria-label="Luna beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Luna2025/Luna10.jpg" alt="Foto von Luna" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Luna</h2>
+    <div class="pills"><span class="pill">Altdeutsche Hütehündin</span>
+<span class="pill">7 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 50 cm</span>
+<span class="pill">Hündin</span></div>
+    <p class="description">Luna
+Die Altdeutsche Hütehündin Luna ist am 14.10.2019 geboren. Sie hat eine Schulterhöhe von ca. 50 cm und wurde am 31.03.24 wegen Überforderung abgegeben.
+Luna lebte seit Welpenalter an einer Familie. Sie zeigte sich sehr anhänglich und schmusebedürftig, wollte aber auch schnell schon immer im Mittelpunkt stehen.
+Sie neigt dazu „Ihren“ Menschen sehr einzunehmen und auch für ihre Bedürfnisse zu auszunutzen.
+In ihrer Anfangszeit bei uns im Tierheim zeigte Luna dann recht schnell, dass sie nicht gern allein gelassen wird.
+Ebenso hatten wir schnell die Erkenntnis, dass Luna sehr stressanfällig ist. Sie reagiert auf jede Veränderung in ihrem direkten Umfeld und braucht dann eine Weile sich daran zu gewöhnen.
+Diese Anfälligkeit für Stress führt bei ihr zu Übersprungshandlungen, die je nach Gegenüber mal mehr mal weniger heftig ausfallen.
+Das sind Themen, die wir mit unserer Hundetrainerin angegangen sind, an denen im neuen Heim aber weiterhin gearbeitet werden müssen.
+Durch gezieltes Training konnten wir so zB. schon an Lunas Impulskontrolle arbeiten. Aber auch hier steht noch weitere Arbeit an.
+Da der Charakter eines Hütehundes bei ihr schon sehr stark ausgeprägt ist, führte das letztendlich in der Familie zu den Problemen, die wir im Tierheim auch schnell feststellten. Wir sehen sie daher nicht mehr in einer Familie mit Kindern. Ebenso sollten in Lunas neuem Heim keine Katzen oder Kleintiere leben.
+Bei anderen Hunden entscheidet die Sympathie, generell ist Luna aber schon verträglich. Ist ein Hund aber zu aufdringlich zeigt sie ihm sehr klar die Grenzen.
+Ein eventuelles Zusammenleben mit einem weiteren Hund entscheidet also die Sympathie.
+Luna sucht Menschen, die ihr eine konsequente und souveräne Führung geben können und wollen. Dabei zeigt sie recht deutlich, dass Männer es bei ihr leichter haben als Frauen.
+Sie ist eine Hündin, die nicht einfach nebenher läuft. Luna möchte geistig schon sehr gefordert und gefördert werden.
+Aufgrund ihrer Stressanfälligkeit wäre ein eher ländlich gelegenes Zuhause mit Sicherheit besser als eine Stadtwohnung.</p>
+    <p class="compatibility"><span>Verträglich:</span> Bei anderen Hunden entscheidet die Sympathie, generell ist Luna aber schon verträglich.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/luna-2023-12-29-12-11-39.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="gross" data-search="meiki retrievermischling meiki
+der retrievermischling meiki ist ca. 2021 geboren und kam am 22.01.26 aus einer beschlagnahme aus dem kreis gütersloh. hier wurden in einem haus 30 hunde sichergestellt, die unter schlimmen bedingungen ihr leben dort fristeten. die sieben retrievermixe, die wir davon übernommen haben, waren in einem zimmer untergebracht und standen fast bis zum bauch in scheiße. entsprechend verfilzt sah ihr fell auch aus. da waren bislang nicht nur etliche bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die haut überhaupt atmen konnte. sie waren zu dünn, hatten zum größten teil entzündete ohrgänge und viel zahnstein. da kommt auch jetzt noch einiges auf uns zu.
+aber alle hunde waren von anfang sehr freundlich, nur auf dem stand eines junghundes, der noch nichts kennen gelernt hat. an der leine führten sie sich anfangs wie &quot;wildpferde&quot; auf. aber sie haben schnell dazu gelernt. nur kann man in dieser - noch relativ kurzen zeit - nicht alles aufholen, was jahrelang versäumt wurde ihnen beizubringen.
+meiki hat ein cherry eye, was auch noch operiert werden muss. er ist als einziger von den 7 hunden kastriert.
+er ist sehr aufgeschlossen, aber oft auch noch unsicher. hier ist eine klare, ruhige führung gefragt.
+mit anderen hunden zeigt er sich verträglich, nur anfangs, wenn er sie noch nicht gut kennt, eher zurückhaltend.
+alle hunde aus der beschlagnahme brauchen eine zahnsanierung oder sogar mehr, daher würden wir uns über paten, die uns bei den zu erwartenden hohen tierarztkosten unterstützen, sehr freuen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/meiki-0.html" target="_blank" rel="noopener" aria-label="Meiki beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Meiki210326/Meiki_210326a.jpg" alt="Foto von Meiki" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Meiki</h2>
+    <div class="pills"><span class="pill">Retrievermischling</span>
+<span class="pill">5 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 63 cm</span></div>
+    <p class="description">Meiki
+Der Retrievermischling Meiki ist ca. 2021 geboren und kam am 22.01.26 aus einer Beschlagnahme aus dem Kreis Gütersloh. Hier wurden in einem Haus 30 Hunde sichergestellt, die unter schlimmen Bedingungen ihr Leben dort fristeten. Die sieben Retrievermixe, die wir davon übernommen haben, waren in einem Zimmer untergebracht und standen fast bis zum Bauch in Scheiße. Entsprechend verfilzt sah ihr Fell auch aus. Da waren bislang nicht nur etliche Bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die Haut überhaupt atmen konnte. Sie waren zu dünn, hatten zum größten Teil entzündete Ohrgänge und viel Zahnstein. Da kommt auch jetzt noch einiges auf uns zu.
+Aber alle Hunde waren von Anfang sehr freundlich, nur auf dem Stand eines Junghundes, der noch nichts kennen gelernt hat. An der Leine führten sie sich anfangs wie &quot;Wildpferde&quot; auf. Aber sie haben schnell dazu gelernt. Nur kann man in dieser - noch relativ kurzen Zeit - nicht alles aufholen, was jahrelang versäumt wurde ihnen beizubringen.
+Meiki hat ein Cherry Eye, was auch noch operiert werden muss. Er ist als einziger von den 7 Hunden kastriert.
+Er ist sehr aufgeschlossen, aber oft auch noch unsicher. Hier ist eine klare, ruhige Führung gefragt.
+Mit anderen Hunden zeigt er sich verträglich, nur anfangs, wenn er sie noch nicht gut kennt, eher zurückhaltend.
+Alle Hunde aus der Beschlagnahme brauchen eine Zahnsanierung oder sogar mehr, daher würden wir uns über Paten, die uns bei den zu erwartenden hohen Tierarztkosten unterstützen, sehr freuen.</p>
+    <p class="compatibility"><span>Verträglich:</span> Aber alle Hunde waren von Anfang sehr freundlich, nur auf dem Stand eines Junghundes, der noch nichts kennen gelernt hat. Mit anderen Hunden zeigt er sich verträglich, nur anfangs, wenn er sie noch nicht gut kennt, eher zurückhaltend.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/meiki-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="mittel" data-search="nemo american bulldog - mix nemo
+nemo ist ein american bulldog - mix und ca. 2020 geboren. er hat eine schulterhöhe von ca. 53 cm und kam als sicherstellung im märz 2023 zu uns. er sollte eingeschläfert werden, nachdem er zu hause auffällig geworden war.
+uns gegenüber war nemo anfangs sehr skeptisch, weshalb wir uns über futter erstmal sein vertrauen erarbeiten mussten.
+ziemlich schnell war das ziel erreicht und wir konnten mit ihm ins maulkorb-training gehen.
+auch dies hat nemo schnell gelernt, sodass wir ihn ausführen und mit unserer hundetrainerin eine wesenseinschätzung machen konnten. der anwesende amtsveterinär hat daraufhin entschieden, dass nemo nicht euthanasiert wird.
+auf spaziergängen ist nemo sehr unauffällig, fast schon lauffaul. er benötigt draußen (und drinnen) klare führung und darf nicht mit seinem ausgeprägten dickkopf durchkommen!
+bei anderen hunden entscheidet die sympathie.
+im regelmäßigen freilauf haben wir festgestellt, dass nemo auf schäferhunde steht. bei schäferhunden hat er mit rüden und hündinnen viel spaß – da verzeiht er auch eine menge. ansonsten müssen hunde im direkten kontakt mit ihm standhaft sein. er benutzt gerne seinen muskulösen körper.
+wenn nemo einen menschen ernst nimmt und die führungsrolle des menschen akzeptiert, dann kann man ihn gut über die stimme korrigieren
+. in seinem kräftigen körper steckt ein sensibler hund, der aber durchaus auch unsensibel werden kann, wenn ihm etwas wichtig ist und er sich als chef sieht (z.b. ein ball). in solchen situationen hat nemo in der vergangenheit auch gebissen.
+nemo benötigt von anfang an klare regeln und grenzen. dann ist er ein sehr ehrlicher und wissbegieriger gute-laune-hund. er lernt schnell und möchte seinen menschen gefallen. wenn er sich über seine bezugspersonen freut wackelt der ganze bodybuilder-körper…was sehr lustig aussieht.
+wenn er im neuen zuhause angekommen ist sollten auf jeden fall alle fragen geklärt sein, damit er der nette nemo sein kann und keine entscheidungen zu seinen gunsten entscheiden muss.
+f
+ür nemo wünschen wir uns ein konsequent liebevolles, erfahrenes neues zuhause ohne kinder und andere tiere.
+die sachkunde für anlagehunde muss vorhanden sein, sowie die bereitschaft, öfter zum spazierengehen und kennenlernen ins tierheim zu kommen und am training teilzunehmen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/nemo-2023-05-13-11-38-44.html" target="_blank" rel="noopener" aria-label="Nemo beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Nemo010523/Nemo5_1_von_1.jpg" alt="Foto von Nemo" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Nemo</h2>
+    <div class="pills"><span class="pill">American Bulldog - Mix</span>
+<span class="pill">6 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 53 cm</span></div>
+    <p class="description">Nemo
+Nemo ist ein American Bulldog - Mix und ca. 2020 geboren. Er hat eine Schulterhöhe von ca. 53 cm und kam als Sicherstellung im März 2023 zu uns. Er sollte eingeschläfert werden, nachdem er zu Hause auffällig geworden war.
+Uns gegenüber war Nemo anfangs sehr skeptisch, weshalb wir uns über Futter erstmal sein Vertrauen erarbeiten mussten.
+Ziemlich schnell war das Ziel erreicht und wir konnten mit ihm ins Maulkorb-Training gehen.
+Auch dies hat Nemo schnell gelernt, sodass wir ihn ausführen und mit unserer Hundetrainerin eine Wesenseinschätzung machen konnten. Der anwesende Amtsveterinär hat daraufhin entschieden, dass Nemo nicht euthanasiert wird.
+Auf Spaziergängen ist Nemo sehr unauffällig, fast schon lauffaul. Er benötigt draußen (und drinnen) klare Führung und darf nicht mit seinem ausgeprägten Dickkopf durchkommen!
+Bei anderen Hunden entscheidet die Sympathie.
+Im regelmäßigen Freilauf haben wir festgestellt, dass Nemo auf Schäferhunde steht. Bei Schäferhunden hat er mit Rüden und Hündinnen viel Spaß – da verzeiht er auch eine Menge. Ansonsten müssen Hunde im direkten Kontakt mit ihm standhaft sein. Er benutzt gerne seinen muskulösen Körper.
+Wenn Nemo einen Menschen ernst nimmt und die Führungsrolle des Menschen akzeptiert, dann kann man ihn gut über die Stimme korrigieren
+. In seinem kräftigen Körper steckt ein sensibler Hund, der aber durchaus auch unsensibel werden kann, wenn ihm etwas wichtig ist und er sich als Chef sieht (z.B. ein Ball). In solchen Situationen hat Nemo in der Vergangenheit auch gebissen.
+Nemo benötigt von Anfang an klare Regeln und Grenzen. Dann ist er ein sehr ehrlicher und wissbegieriger Gute-Laune-Hund. Er lernt schnell und möchte seinen Menschen gefallen. Wenn er sich über seine Bezugspersonen freut wackelt der ganze Bodybuilder-Körper…was sehr lustig aussieht.
+Wenn er im neuen Zuhause angekommen ist sollten auf jeden Fall alle Fragen geklärt sein, damit er der nette Nemo sein kann und keine Entscheidungen zu seinen Gunsten entscheiden muss.
+F
+ür Nemo wünschen wir uns ein konsequent liebevolles, erfahrenes neues Zuhause ohne Kinder und andere Tiere.
+Die Sachkunde für Anlagehunde muss vorhanden sein, sowie die Bereitschaft, öfter zum Spazierengehen und Kennenlernen ins Tierheim zu kommen und am Training teilzunehmen.</p>
+    <p class="compatibility"><span>Verträglich:</span> Dann ist er ein sehr ehrlicher und wissbegieriger Gute-Laune-Hund.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/nemo-2023-05-13-11-38-44.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="maennlich" data-groesse-kat="mittel" data-search="neo pocket bully neo
+der pocket bully neo ist am 21.05.2021 geboren und wurde am 06.02.26 bei uns im tierheim abgegeben.
+der kleine, aber kompakte rüde, braucht eine klare führung, denn er testet die menschen schnell aus. wenn er auf etwas keinen bock hat, lässt er sich einfach fallen und macht einen auf ziegenböckchen. findet er etwas spannend, ist er erst mal nicht ansprechbar.
+typisch bulldogge ist er aber wiederum sehr verschmust.
+lt. vorbesitzer kann er auch gut mal alleine bleiben.
+neo ist jung und kann noch viel lernen. er sucht nun hundefreunde, die sich seinen dickkopf nicht gefallen lassen und ihn erziehen.
+da neo jagdtrieb hat, sollten katzen oder kleintiere nicht im neuen zuhause sein. hier sind bullyfreunde - ohne kinder - gefragt! wer sich auskennt, wird bestimmt einen tollen begleiter aus ihm machen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/neo-0.html" target="_blank" rel="noopener" aria-label="Neo beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Neo110226/Neo_110226.jpg" alt="Foto von Neo" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Neo</h2>
+    <div class="pills"><span class="pill">Pocket Bully</span>
+<span class="pill">5 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 41 cm</span>
+<span class="pill">Rüde</span></div>
+    <p class="description">Neo
+Der Pocket Bully Neo ist am 21.05.2021 geboren und wurde am 06.02.26 bei uns im Tierheim abgegeben.
+Der kleine, aber kompakte Rüde, braucht eine klare Führung, denn er testet die Menschen schnell aus. Wenn er auf etwas keinen Bock hat, lässt er sich einfach fallen und macht einen auf Ziegenböckchen. Findet er etwas spannend, ist er erst mal nicht ansprechbar.
+Typisch Bulldogge ist er aber wiederum sehr verschmust.
+Lt. Vorbesitzer kann er auch gut mal alleine bleiben.
+Neo ist jung und kann noch viel lernen. Er sucht nun Hundefreunde, die sich seinen Dickkopf nicht gefallen lassen und ihn erziehen.
+Da Neo Jagdtrieb hat, sollten Katzen oder Kleintiere nicht im neuen Zuhause sein. Hier sind Bullyfreunde - ohne Kinder - gefragt! Wer sich auskennt, wird bestimmt einen tollen Begleiter aus ihm machen.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/neo-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="gross" data-search="nino schäferhundrüde nino
+schäferhundrüde nino ist 2018 geboren und hat eine schulterhöhe von ca. 63 cm.
+er kam als sicherstellung am 20.02.24 zu uns. seine besitzer hatten ihn über ebay-kleinanzeigen zu sich geholt und schon nach kurzer zeit bemerkt, dass er kein hund für eine familie mit kleinen kindern ist.
+nino ist ein hund, der bei seinen menschen gute und klare führung sucht. kann man ihm diese geben hat man einen treuen und recht unkomplizierten begleiter an seiner seite.
+bekommt er keine führung neigt er allerdings dazu dinge selbst in die hand, oder besser pfote, zu nehmen. diese erfahrung musste er leider bei seinem letzten vermittlungsversuch schon machen.
+auch auf seinen gassirunden nimmt nino führung sehr gut an. so lässt er sich trotz seiner stattlichen größe von vielen unserer gassigeher und gassigeherinnen gut ausführen.
+den stress des tierheimalltags steckt nino erstaunlich gut weg, was für schäferhunde eher untypisch ist.
+trotzdem wünschen wir uns für ihn ein eher ruhiges umfeld. ein haushalt mitten in der stadt, mit viel trubel durch kinder oder auch ein zusammenleben mit katzen oder kleintieren ist nicht was nino sucht.
+bei artgenossen entscheidet sehr stark die sympathie. hier bei uns im tierheim akzeptiert nino die meisten anderen hunde, möchte allerdings zu den wenigsten direkten kontakt.
+aber das sehr gute verhältnis zu seinem kumpel buma zeigt, dass - unter gewissen umständen - ein zusammenleben mit einem anderen hund grundsätzlich möglich sein könnte.
+zusammenfassend kann man also sagen, dass nino ein ruhiges zuhause sucht, in dem man ihm führung und klare regeln gibt. dann bekommt man einen tollen, agilen schäferhund, der seinen menschen gefallen möchte.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/nino-2024-05-02-17-22-12.html" target="_blank" rel="noopener" aria-label="Nino beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Nino300424/Nino_160925b.jpg%23joomlaImage://local-images/Hunde/Nino300424/Nino_160925b.jpg%3Fwidth%3D700%26height%3D466" alt="Foto von Nino" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Nino</h2>
+    <div class="pills"><span class="pill">Schäferhundrüde</span>
+<span class="pill">8 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 63 cm</span></div>
+    <p class="description">Nino
+Schäferhundrüde Nino ist 2018 geboren und hat eine Schulterhöhe von ca. 63 cm.
+Er kam als Sicherstellung am 20.02.24 zu uns. Seine Besitzer hatten ihn über Ebay-Kleinanzeigen zu sich geholt und schon nach kurzer Zeit bemerkt, dass er kein Hund für eine Familie mit kleinen Kindern ist.
+Nino ist ein Hund, der bei seinen Menschen gute und klare Führung sucht. Kann man ihm diese geben hat man einen treuen und recht unkomplizierten Begleiter an seiner Seite.
+Bekommt er keine Führung neigt er allerdings dazu Dinge selbst in die Hand, oder besser Pfote, zu nehmen. Diese Erfahrung musste er leider bei seinem letzten Vermittlungsversuch schon machen.
+Auch auf seinen Gassirunden nimmt Nino Führung sehr gut an. So lässt er sich trotz seiner stattlichen Größe von vielen unserer Gassigeher und Gassigeherinnen gut ausführen.
+Den Stress des Tierheimalltags steckt Nino erstaunlich gut weg, was für Schäferhunde eher untypisch ist.
+Trotzdem wünschen wir uns für ihn ein eher ruhiges Umfeld. Ein Haushalt mitten in der Stadt, mit viel Trubel durch Kinder oder auch ein Zusammenleben mit Katzen oder Kleintieren ist nicht was Nino sucht.
+Bei Artgenossen entscheidet sehr stark die Sympathie. Hier bei uns im Tierheim akzeptiert Nino die meisten anderen Hunde, möchte allerdings zu den wenigsten direkten Kontakt.
+Aber das sehr gute Verhältnis zu seinem Kumpel Buma zeigt, dass - unter gewissen Umständen - ein Zusammenleben mit einem anderen Hund grundsätzlich möglich sein könnte.
+Zusammenfassend kann man also sagen, dass Nino ein ruhiges Zuhause sucht, in dem man ihm Führung und klare Regeln gibt. Dann bekommt man einen tollen, agilen Schäferhund, der seinen Menschen gefallen möchte.</p>
+    <p class="compatibility"><span>Verträglich:</span> Nino ist ein Hund, der bei seinen Menschen gute und klare Führung sucht. Den Stress des Tierheimalltags steckt Nino erstaunlich gut weg, was für Schäferhunde eher untypisch ist. Aber das sehr gute Verhältnis zu seinem Kumpel Buma zeigt, dass - unter gewissen Umständen - ein Zusammenleben mit einem anderen Hund grundsätzlich möglich sein könnte.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/nino-2024-05-02-17-22-12.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="mittel" data-search="odin bulldoggemischling odin
+bulldoggenmischling odin ist ca.2022 geboren. er kam als angeblicher fundhund am 16.09 25 zu uns.
+odin zeigte sich anfangs etwas skeptisch. nach näherem  kennenlernen, fasste er aber sofort vertrauen zu uns. dem menschen gegenüber zeigt er sich sehr zugewandt und kuschelig.
+aber odin hat einen starken jagdinstinkt und reagiert auf bewegungsreize. besonders auch in bezug auf spielzeug. aber auch bei kleintieren, katzen und kleinen hunden ist vorsicht geboten.
+da besteht auf jeden fall trainingsbedarf.
+mit passenden artgenossen tobt er ausgelassen und angemessen. wird ihm was zu wild geht er eher zurück.
+an der leine lässt er sich gut führen. er kennt auch daraus einige grundkommandos.
+zukünftige besitzer müssen trotzdem in der lage sein, die kleine dampfwalze auch halten zu können.
+für odin suchen wir einen kinderlosen haushalt bei erfahrenen hundefreunden.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/odin-0.html" target="_blank" rel="noopener" aria-label="Odin beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Odin210925/Odin_200925.jpg" alt="Foto von Odin" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Odin</h2>
+    <div class="pills"><span class="pill">Bulldoggemischling</span>
+<span class="pill">4 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 55 cm</span></div>
+    <p class="description">Odin
+Bulldoggenmischling Odin ist ca.2022 geboren. Er kam als angeblicher Fundhund am 16.09 25 zu uns.
+Odin zeigte sich anfangs etwas skeptisch. Nach näherem  kennenlernen, fasste er aber sofort Vertrauen zu uns. Dem Menschen gegenüber zeigt er sich sehr zugewandt und kuschelig.
+Aber Odin hat einen starken Jagdinstinkt und reagiert auf Bewegungsreize. Besonders auch in Bezug auf Spielzeug. Aber auch bei Kleintieren, Katzen und kleinen Hunden ist Vorsicht geboten.
+Da besteht auf jeden Fall Trainingsbedarf.
+Mit passenden Artgenossen tobt er ausgelassen und angemessen. Wird ihm was zu wild geht er eher zurück.
+An der Leine lässt er sich gut führen. Er kennt auch daraus einige Grundkommandos.
+Zukünftige Besitzer müssen trotzdem in der Lage sein, die kleine Dampfwalze auch halten zu können.
+Für Odin suchen wir einen kinderlosen Haushalt bei erfahrenen Hundefreunden.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/odin-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="mittel" data-search="rocky terriermischling rocky
+der terriermischling rocky ist am 15.01.2021 geboren und wurde am 09.10.25 im tierheim abgegeben.
+rocky ist ein sehr unsicherer hund, was sich besonders im umgang mit fremden zeigt.
+er braucht einfach seine zeit, um vertrauen aufzubauen.
+mit den menschen, die er hier im tierheim kennen gelernt hat, klappt es schon sehr gut.
+aber es gibt immer wieder situationen, die ihn misstrauisch werden lassen.
+rocky ist ein hund, der nicht viel trubel und viele menschen um sich braucht. wichtig ist, dass er ankommen darf und man nicht gleich zu hohe erwartungen an ihn stellt.
+mit den meisten hunden zeigt er sich verträglich, wäre im neuen zuhause, aber lieber einzelhund und ohne kinder.
+ansonsten ist rocky ein toller kumpel bei den menschen, denen er vertraut.
+er ist auch agil und bewegungsfreudig und liebt spaziergänge.
+ein schlauer kleiner terrier, der gut lernt, aber eben leider noch nicht viel kennengelernt hat.
+rocky wäre auch ein guter bürohund. er verhält sich dann total ruhig und bleibt brav im körbchen liegen. von vertrauten menschen lässt er sich gut lenken. er mag es nur nicht von fremden menschen bedrängt zu werden.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/rocky-0.html" target="_blank" rel="noopener" aria-label="Rocky beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Rocky031125/Rocky031125c.jpg" alt="Foto von Rocky" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Rocky</h2>
+    <div class="pills"><span class="pill">Terriermischling</span>
+<span class="pill">5 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 40 cm</span></div>
+    <p class="description">Rocky
+Der Terriermischling Rocky ist am 15.01.2021 geboren und wurde am 09.10.25 im Tierheim abgegeben.
+Rocky ist ein sehr unsicherer Hund, was sich besonders im Umgang mit Fremden zeigt.
+Er braucht einfach seine Zeit, um Vertrauen aufzubauen.
+Mit den Menschen, die er hier im Tierheim kennen gelernt hat, klappt es schon sehr gut.
+Aber es gibt immer wieder Situationen, die ihn misstrauisch werden lassen.
+Rocky ist ein Hund, der nicht viel Trubel und viele Menschen um sich braucht. Wichtig ist, dass er ankommen darf und man nicht gleich zu hohe Erwartungen an ihn stellt.
+Mit den meisten Hunden zeigt er sich verträglich, wäre im neuen Zuhause, aber lieber Einzelhund und ohne Kinder.
+Ansonsten ist Rocky ein toller Kumpel bei den Menschen, denen er vertraut.
+Er ist auch agil und bewegungsfreudig und liebt Spaziergänge.
+Ein schlauer kleiner Terrier, der gut lernt, aber eben leider noch nicht viel kennengelernt hat.
+Rocky wäre auch ein guter Bürohund. Er verhält sich dann total ruhig und bleibt brav im Körbchen liegen. Von vertrauten Menschen lässt er sich gut lenken. Er mag es nur nicht von fremden Menschen bedrängt zu werden.</p>
+    <p class="compatibility"><span>Verträglich:</span> Mit den meisten Hunden zeigt er sich verträglich, wäre im neuen Zuhause, aber lieber Einzelhund und ohne Kinder. Rocky wäre auch ein guter Bürohund.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/rocky-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="klein" data-search="rusty mischlingsrüde rusty
+mischlingsrüde rusty ist ca. 2014 geboren und hat eine schulterhöhe von ca. 30 cm. er wurde am 25.09.24 im wald in der nähe des tierheims gefunden. niemand kannte ihn oder fragte nach ihm. vielleicht wurde er bewußt in der nähe des tierheims ausgesetzt. man weiß es nicht.
+rusty war anfangs erst misstrauisch uns gegenüber. er braucht ein paar tage um anzukommen. inzwischen ist er schon viel munterer und aufgeweckter...und findet es nicht mehr so lustig weg gesperrt zu werden. allein zu sein, gehört nicht zu seinen stärken.
+rusty scheint mit artgenossen soweit klar zu kommen. ab und zu gibt es schon mal &quot;eine nase&quot;, die ihm nicht geheuer ist.
+der kleine mann geht sehr gerne spazieren und kuschelt auch gerne.
+wer ihm zeit gibt richtig anzukommen, gewinnt bestimmt schnell sein vertrauen. er zeigt schon an was er will und was nicht. daher sollte man einen hund schon richtig lesen können.
+rusty war einige monate vermittelt und kam ende juli wieder zu uns zurück. er hatte gesundheitliche probleme, was sich auch auf sein wesen ausgewirkt hat und er in dieser zeit sehr reizbar war.
+er wurde aufgrund einer bauchspeicheldrüsenerkrankung behandelt. diese ist nun abgeschlossen und weitere blutuntesuchungen werden noch durchgeführt. vorsichtshalber bekommt er aber noch weiterhin spezielles futter.
+zurück im tierheim war er kurze zeit skeptisch, hat sich aber schnell eingewöhnt und freut sich inzwischen über jeden hier und besonders auf die gassigänge.
+rusty sucht ein ruhiges zuhause - ohne kinder - bei hundefreunden, die ihn lesen und verstehen können.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/rusty-2024-10-11-16-59-39.html" target="_blank" rel="noopener" aria-label="Rusty beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Rusty101024/Rusty_060825b-0082.jpg" alt="Foto von Rusty" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Rusty</h2>
+    <div class="pills"><span class="pill">Mischlingsrüde</span>
+<span class="pill">12 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 30 cm</span></div>
+    <p class="description">Rusty
+Mischlingsrüde Rusty ist ca. 2014 geboren und hat eine Schulterhöhe von ca. 30 cm. Er wurde am 25.09.24 im Wald in der Nähe des Tierheims gefunden. Niemand kannte ihn oder fragte nach ihm. Vielleicht wurde er bewußt in der Nähe des Tierheims ausgesetzt. Man weiß es nicht.
+Rusty war anfangs erst misstrauisch uns gegenüber. Er braucht ein paar Tage um anzukommen. Inzwischen ist er schon viel munterer und aufgeweckter...und findet es nicht mehr so lustig weg gesperrt zu werden. Allein zu sein, gehört nicht zu seinen Stärken.
+Rusty scheint mit Artgenossen soweit klar zu kommen. Ab und zu gibt es schon mal &quot;eine Nase&quot;, die ihm nicht geheuer ist.
+Der kleine Mann geht sehr gerne spazieren und kuschelt auch gerne.
+Wer ihm Zeit gibt richtig anzukommen, gewinnt bestimmt schnell sein Vertrauen. Er zeigt schon an was er will und was nicht. Daher sollte man einen Hund schon richtig lesen können.
+Rusty war einige Monate vermittelt und kam Ende Juli wieder zu uns zurück. Er hatte gesundheitliche Probleme, was sich auch auf sein Wesen ausgewirkt hat und er in dieser Zeit sehr reizbar war.
+Er wurde aufgrund einer Bauchspeicheldrüsenerkrankung behandelt. Diese ist nun abgeschlossen und weitere Blutuntesuchungen werden noch durchgeführt. Vorsichtshalber bekommt er aber noch weiterhin spezielles Futter.
+Zurück im Tierheim war er kurze Zeit skeptisch, hat sich aber schnell eingewöhnt und freut sich inzwischen über jeden hier und besonders auf die Gassigänge.
+Rusty sucht ein ruhiges Zuhause - ohne Kinder - bei Hundefreunden, die ihn lesen und verstehen können.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/rusty-2024-10-11-16-59-39.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="maennlich" data-groesse-kat="gross" data-search="samu retrievermischling samu
+retrievermischling samu ist ca. 2020 geboren und kam am 22.01.26 aus einer beschlagnahme aus dem kreis gütersloh. hier wurden in einem haus 30 hunde sichergestellt, die unter schlimmen bedingungen ihr leben dort fristeten. die sieben retrievermixe, die wir davon übernommen haben, waren in einem zimmer untergebracht und standen fast bis zum bauch in scheiße. entsprechend verfilzt sah ihr fell auch aus. da waren bislang nicht nur etliche bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die haut überhaupt atmen konnte. sie waren zu dünn, hatten zum größten teil entzündete ohrgänge und viel zahnstein. da kommt auch jetzt noch einiges auf uns zu.
+samu ist ein sehr freundlicher rüde und sehr bestechlich mit futter. er ist recht selbstbewusst, und mehr in sich ruhend. aber er braucht ebenfalls eine klare führung.
+mit anderen hunden zeigt er sich schon verträglich, aber man merkt schon, dass er dann eher der chef ist.
+alle hunde aus der beschlagnahme brauchen eine zahnsanierung oder sogar mehr, daher würden wir uns über paten, die uns bei den zu erwartenden hohen tierarztkosten unterstützen, sehr freuen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/samu-0.html" target="_blank" rel="noopener" aria-label="Samu beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Samu210326/Samu_210326.jpg" alt="Foto von Samu" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Samu</h2>
+    <div class="pills"><span class="pill">Retrievermischling</span>
+<span class="pill">6 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 64 cm</span>
+<span class="pill">Rüde</span></div>
+    <p class="description">Samu
+Retrievermischling Samu ist ca. 2020 geboren und kam am 22.01.26 aus einer Beschlagnahme aus dem Kreis Gütersloh. Hier wurden in einem Haus 30 Hunde sichergestellt, die unter schlimmen Bedingungen ihr Leben dort fristeten. Die sieben Retrievermixe, die wir davon übernommen haben, waren in einem Zimmer untergebracht und standen fast bis zum Bauch in Scheiße. Entsprechend verfilzt sah ihr Fell auch aus. Da waren bislang nicht nur etliche Bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die Haut überhaupt atmen konnte. Sie waren zu dünn, hatten zum größten Teil entzündete Ohrgänge und viel Zahnstein. Da kommt auch jetzt noch einiges auf uns zu.
+Samu ist ein sehr freundlicher Rüde und sehr bestechlich mit Futter. Er ist recht selbstbewusst, und mehr in sich ruhend. Aber er braucht ebenfalls eine klare Führung.
+Mit anderen Hunden zeigt er sich schon verträglich, aber man merkt schon, dass er dann eher der Chef ist.
+Alle Hunde aus der Beschlagnahme brauchen eine Zahnsanierung oder sogar mehr, daher würden wir uns über Paten, die uns bei den zu erwartenden hohen Tierarztkosten unterstützen, sehr freuen.</p>
+    <p class="compatibility"><span>Verträglich:</span> Mit anderen Hunden zeigt er sich schon verträglich, aber man merkt schon, dass er dann eher der Chef ist.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/samu-0.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="gross" data-search="skipper retrievermischling skipper
+retrievermischling skipper ist ca. 2021 geboren und kam am 22.01.26 aus einer beschlagnahme aus dem kreis gütersloh. hier wurden in einem haus 30 hunde sichergestellt, die unter schlimmen bedingungen ihr leben dort fristeten. die sieben retrievermixe, die wir davon übernommen haben, waren in einem zimmer untergebracht und standen fast bis zum bauch in scheiße. entsprechend verfilzt sah ihr fell auch aus. da waren bislang nicht nur etliche bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die haut überhaupt atmen konnte. sie waren zu dünn, hatten zum größten teil entzündete ohrgänge und viel zahnstein. da kommt auch jetzt noch einiges auf uns zu.
+skipper muss auf jeden fall noch kastriert werden und auch seine zähne weisen starken zahnstein auf.
+aber alle hunde waren von anfang sehr freundlich, nur auf dem stand eines junghundes, der noch nichts kennen gelernt hat. an der leine führten sie sich anfangs wie &quot;wildpferde&quot; auf. aber sie haben schnell dazu gelernt. nur kann man in dieser - noch relativ kurzen zeit - nicht alles aufholen, was jahrelang versäumt wurde ihnen beizubringen.
+skipper ist aufgeschlossen, aber weiß noch nicht, wohin mit sich und seinem temperament. er benimmt sich wie ein hundebaby, obwohl er schon ca. 5 jahre alt ist.
+er sucht sprichwörtlich &quot;den fels in der brandung&quot;, der ihm den weg zeigt.
+mit anderen hunden ist er verträglich.
+alle hunde aus der beschlagnahme brauchen eine zahnsanierung oder sogar mehr, daher würden wir uns über paten, die uns bei den zu erwartenden hohen tierarztkosten unterstützen, sehr freuen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/skipper.html" target="_blank" rel="noopener" aria-label="Skipper beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Skipper210326/Skipper_210326b.jpg" alt="Foto von Skipper" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Skipper</h2>
+    <div class="pills"><span class="pill">Retrievermischling</span>
+<span class="pill">5 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 63 cm</span></div>
+    <p class="description">Skipper
+Retrievermischling Skipper ist ca. 2021 geboren und kam am 22.01.26 aus einer Beschlagnahme aus dem Kreis Gütersloh. Hier wurden in einem Haus 30 Hunde sichergestellt, die unter schlimmen Bedingungen ihr Leben dort fristeten. Die sieben Retrievermixe, die wir davon übernommen haben, waren in einem Zimmer untergebracht und standen fast bis zum Bauch in Scheiße. Entsprechend verfilzt sah ihr Fell auch aus. Da waren bislang nicht nur etliche Bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die Haut überhaupt atmen konnte. Sie waren zu dünn, hatten zum größten Teil entzündete Ohrgänge und viel Zahnstein. Da kommt auch jetzt noch einiges auf uns zu.
+Skipper muss auf jeden Fall noch kastriert werden und auch seine Zähne weisen starken Zahnstein auf.
+Aber alle Hunde waren von Anfang sehr freundlich, nur auf dem Stand eines Junghundes, der noch nichts kennen gelernt hat. An der Leine führten sie sich anfangs wie &quot;Wildpferde&quot; auf. Aber sie haben schnell dazu gelernt. Nur kann man in dieser - noch relativ kurzen Zeit - nicht alles aufholen, was jahrelang versäumt wurde ihnen beizubringen.
+Skipper ist aufgeschlossen, aber weiß noch nicht, wohin mit sich und seinem Temperament. Er benimmt sich wie ein Hundebaby, obwohl er schon ca. 5 Jahre alt ist.
+Er sucht sprichwörtlich &quot;den Fels in der Brandung&quot;, der ihm den Weg zeigt.
+Mit anderen Hunden ist er verträglich.
+Alle Hunde aus der Beschlagnahme brauchen eine Zahnsanierung oder sogar mehr, daher würden wir uns über Paten, die uns bei den zu erwartenden hohen Tierarztkosten unterstützen, sehr freuen.</p>
+    <p class="compatibility"><span>Verträglich:</span> Aber alle Hunde waren von Anfang sehr freundlich, nur auf dem Stand eines Junghundes, der noch nichts kennen gelernt hat. Mit anderen Hunden ist er verträglich.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/skipper.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="maennlich" data-groesse-kat="gross" data-search="tucker retrievermischling tucker
+retrievermischling tucker ist ca. 2018 geboren und kam am 22.01.26 aus einer beschlagnahme aus dem kreis gütersloh. hier wurden in einem haus 30 hunde sichergestellt, die unter schlimmen bedingungen ihr leben dort fristeten. die sieben retrievermixe, die wir davon übernommen haben, waren in einem zimmer untergebracht und standen fast bis zum bauch in scheiße. entsprechend verfilzt sah ihr fell auch aus. da waren bislang nicht nur etliche bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die haut überhaupt atmen konnte. sie waren zu dünn, hatten zum größten teil entzündete ohrgänge und viel zahnstein. da kommt auch jetzt noch einiges auf uns zu.
+tucker war anfangs uns gegenüber zurückhaltender was sich aber näherem kennenlernen schnell änderte. er ist ein lieber und auch selbstbewusster rüde. er braucht regeln, bislang musste er alles selbst klären.
+tucker ist eher ein einzelhund. er versteht sich zwar mit den meisten hunden, aber da entscheidet doch eher die sympathie.
+tucker sucht menschen, die einen hund führen können.
+alle hunde aus der beschlagnahme brauchen eine zahnsanierung oder sogar mehr, daher würden wir uns über paten, die uns bei den zu erwartenden hohen tierarztkosten unterstützen, sehr freuen.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/tucker.html" target="_blank" rel="noopener" aria-label="Tucker beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Tucker210326/Tucker_210326.jpg" alt="Foto von Tucker" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Tucker</h2>
+    <div class="pills"><span class="pill">Retrievermischling</span>
+<span class="pill">8 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 64 cm</span>
+<span class="pill">Rüde</span></div>
+    <p class="description">Tucker
+Retrievermischling Tucker ist ca. 2018 geboren und kam am 22.01.26 aus einer Beschlagnahme aus dem Kreis Gütersloh. Hier wurden in einem Haus 30 Hunde sichergestellt, die unter schlimmen Bedingungen ihr Leben dort fristeten. Die sieben Retrievermixe, die wir davon übernommen haben, waren in einem Zimmer untergebracht und standen fast bis zum Bauch in Scheiße. Entsprechend verfilzt sah ihr Fell auch aus. Da waren bislang nicht nur etliche Bäder notwendig, teilweise musste auch geschoren und geschnitten werden, damit die Haut überhaupt atmen konnte. Sie waren zu dünn, hatten zum größten Teil entzündete Ohrgänge und viel Zahnstein. Da kommt auch jetzt noch einiges auf uns zu.
+Tucker war anfangs uns gegenüber zurückhaltender was sich aber näherem Kennenlernen schnell änderte. Er ist ein lieber und auch selbstbewusster Rüde. Er braucht Regeln, bislang musste er alles selbst klären.
+Tucker ist eher ein Einzelhund. Er versteht sich zwar mit den meisten Hunden, aber da entscheidet doch eher die Sympathie.
+Tucker sucht Menschen, die einen Hund führen können.
+Alle Hunde aus der Beschlagnahme brauchen eine Zahnsanierung oder sogar mehr, daher würden wir uns über Paten, die uns bei den zu erwartenden hohen Tierarztkosten unterstützen, sehr freuen.</p>
+    <p class="compatibility compatibility--empty">Verträglichkeit: beim Tierheim erfragen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/tucker.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+<article class="card" role="listitem" data-heim="Tierheim Paderborn" data-geschlecht="" data-groesse-kat="mittel" data-search="wim kurzhaarfoxterrier wim
+der glatthaar-foxterrier wim ist ca. 1,5 jahre alt und wurde am 17.06.26 bei uns wegen überforderung abgegeben.
+wim ist ein freundlicher und sehr aktiver vierbeiner.
+rassetypisch brauchen gerade diese hund körperlich wie auch geistige auslastung. sie sind sehr intelligent und gelehrig, testen aber ihre menschen - und vorhandene schwächen -  auch schnell aus um sie zu ihren gunsten zu nutzen. daher ist es wichtig, dass sie gut und konsequent geführt werden.
+wim ist sehr selbstbewusst und setzt sich schon mal gerne durch.
+andere hunde dominiert er gerne, wäre daher besser einzelhund.
+da er auch zu den jagdhundrassen gehört, ist sein jagdinstinkt sehr ausgeprägt. zu katzen und kleintieren würde wim also nicht gut passen.
+wer einen agilen, sportlichen hund sucht, spaß an mantrailing oder ähnlichen beschäftigungen für hunde hat, der findet in wim bestimmt den idealen partner.">
+  <a class="photo-link" href="https://www.tierheim-paderborn.de/tierprofil/wim.html" target="_blank" rel="noopener" aria-label="Wim beim Tierheim Paderborn ansehen">
+    <div class="photo-wrap"><img src="https://www.tierheim-paderborn.de/images/Hunde/Wim180626/Wim_180626c%201%20von%201.jpg" alt="Foto von Wim" loading="lazy"></div>
+  </a>
+  <div class="card-body">
+    <p class="eyebrow">Tierheim Paderborn</p>
+    <h2 class="dog-name">Wim</h2>
+    <div class="pills"><span class="pill">Kurzhaarfoxterrier</span>
+<span class="pill">1 Jahre, 6 Monate</span>
+<span class="pill">Schulterhöhe ca. 45 cm</span></div>
+    <p class="description">Wim
+Der Glatthaar-Foxterrier Wim ist ca. 1,5 Jahre alt und wurde am 17.06.26 bei uns wegen Überforderung abgegeben.
+Wim ist ein freundlicher und sehr aktiver Vierbeiner.
+Rassetypisch brauchen gerade diese Hund körperlich wie auch geistige Auslastung. Sie sind sehr intelligent und gelehrig, testen aber ihre Menschen - und vorhandene Schwächen -  auch schnell aus um sie zu ihren Gunsten zu nutzen. Daher ist es wichtig, dass sie gut und konsequent geführt werden.
+Wim ist sehr selbstbewusst und setzt sich schon mal gerne durch.
+Andere Hunde dominiert er gerne, wäre daher besser Einzelhund.
+Da er auch zu den Jagdhundrassen gehört, ist sein Jagdinstinkt sehr ausgeprägt. Zu Katzen und Kleintieren würde Wim also nicht gut passen.
+Wer einen agilen, sportlichen Hund sucht, Spaß an Mantrailing oder ähnlichen Beschäftigungen für Hunde hat, der findet in Wim bestimmt den idealen Partner.</p>
+    <p class="compatibility"><span>Verträglich:</span> Zu Katzen und Kleintieren würde Wim also nicht gut passen.</p>
+    <a class="btn" href="https://www.tierheim-paderborn.de/tierprofil/wim.html" target="_blank" rel="noopener">Zum Tierheim →</a>
+  </div>
+</article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <strong>Mission</strong>
+      <p>Wir verlinken direkt zu den Tierheimen – die Vermittlung läuft immer über das jeweilige Heim.</p>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      const cards = Array.from(document.querySelectorAll('.card'));
+      const searchInput = document.getElementById('filter-search');
+      const heimSelect = document.getElementById('filter-heim');
+      const geschlechtSelect = document.getElementById('filter-geschlecht');
+      const groesseSelect = document.getElementById('filter-groesse');
+      const resetBtn = document.getElementById('filter-reset');
+      const countLabel = document.getElementById('filter-count');
+      const emptyState = document.getElementById('empty-state');
+      const total = cards.length;
+
+      function filterCards() {
+        const search = searchInput.value.trim().toLowerCase();
+        const heim = heimSelect.value;
+        const geschlecht = geschlechtSelect.value;
+        const groesse = groesseSelect.value;
+
+        let visible = 0;
+        cards.forEach(function (card) {
+          const cardHeim = card.dataset.heim || '';
+          const cardGeschlecht = card.dataset.geschlecht || '';
+          const cardGroesse = card.dataset.groesseKat || '';
+          const cardSearch = card.dataset.search || '';
+
+          const matchesSearch = !search || cardSearch.includes(search);
+          const matchesHeim = !heim || cardHeim === heim;
+          const matchesGeschlecht = !geschlecht || cardGeschlecht === geschlecht;
+          const matchesGroesse = !groesse || cardGroesse === groesse;
+
+          if (matchesSearch && matchesHeim && matchesGeschlecht && matchesGroesse) {
+            card.style.display = '';
+            visible += 1;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        countLabel.textContent = visible + ' von ' + total + ' Hunden';
+        emptyState.classList.toggle('is-visible', visible === 0);
+      }
+
+      function resetFilters() {
+        searchInput.value = '';
+        heimSelect.value = '';
+        geschlechtSelect.value = '';
+        groesseSelect.value = '';
+        filterCards();
+        searchInput.focus();
+      }
+
+      searchInput.addEventListener('input', filterCards);
+      heimSelect.addEventListener('change', filterCards);
+      geschlechtSelect.addEventListener('change', filterCards);
+      groesseSelect.addEventListener('change', filterCards);
+      resetBtn.addEventListener('click', resetFilters);
+
+      filterCards();
+    })();
+  </script>
+</body>
+</html>
