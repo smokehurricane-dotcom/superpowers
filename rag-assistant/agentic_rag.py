@@ -7,28 +7,49 @@ from langgraph.graph import END, START, StateGraph
 
 class GraphState(TypedDict):
     question: str
-    documents: List[str]
+    documents: List[dict]  # Changed from List[str] to List[dict]
     generation: str
     retries: int
+    model: str  # Dynamic LLM model key
 
 
 def retrieve(state: GraphState) -> dict:
     question = state["question"]
     hits = rag.retrieve_hybrid(question, k=5)
-    documents = [chunk["text"] for score, chunk in hits]
+    documents = [chunk for score, chunk in hits]  # Keep full chunk dictionary
     return {"documents": documents}
 
 
 rag.load_env()
-llm = ChatAnthropic(model="claude-haiku-4-5-20251001", max_tokens=600)
+
+def get_llm(state: GraphState):
+    model_name = state.get("model") or "claude-haiku-4-5-20251001"
+    return ChatAnthropic(model=model_name, max_tokens=600)
 
 
 def generate(state: GraphState) -> dict:
     question = state["question"]
     documents = state["documents"]
-    context = "\n\n".join(documents)
-    prompt = f"Du bist ein präziser Handbuch-Assistent. Beantworte die Frage NUR anhand des Kontexts (ein technisches Handbuch). Nenne konkrete Schritte, Codes und Ursachen GENAU so, wie sie im Kontext stehen — erfinde KEINE Begriffe und KEINE Schritte, die nicht wörtlich im Kontext vorkommen. Antworte knapp, in der Sprache der Frage. Wenn der Kontext die Antwort nicht enthält, sage in EINEM Satz, dass du dazu keine Information hast.\n\nKontext:\n{context}\n\nFrage: {question}"
-    answer = llm.invoke(prompt)
+    
+    # Build formatted context with citations
+    context_parts = []
+    for i, doc in enumerate(documents, 1):
+        title = doc.get("title", "Unbekannt")
+        context_parts.append(f"[{i}] Quelle: {title}\n{doc['text']}")
+    context = "\n\n".join(context_parts)
+    
+    prompt = (
+        "Du bist ein präziser Handbuch-Assistent. Beantworte die Frage NUR anhand des Kontexts (ein technisches Handbuch).\n"
+        "Nenne konkrete Schritte, Codes und Ursachen GENAU so, wie sie im Kontext stehen.\n"
+        "Zitiere die genutzten Quellen im Text am Satzende mit ihren Nummern wie z. B. [1] oder [2].\n"
+        "Erfinde KEINE Begriffe und KEINE Schritte, die nicht wörtlich im Kontext vorkommen.\n"
+        "Antworte knapp, in der Sprache der Frage.\n"
+        "Wenn der Kontext die Antwort nicht enthält, sage in EINEM Satz, dass du dazu keine Information hast.\n\n"
+        f"Kontext:\n{context}\n\n"
+        f"Frage: {question}"
+    )
+    model = get_llm(state)
+    answer = model.invoke(prompt)
     return {"generation": answer.content}
 
 
@@ -36,9 +57,11 @@ def grade_documents(state: GraphState) -> dict:
     question = state["question"]
     documents = state["documents"]
     keep = []
+    model = get_llm(state)
     for doc in documents:
-        prompt = f"Frage: {question}\n\nText: {doc}\n\nIst dieser Text relevant für die Frage? Antworte nur mit 'ja' oder 'nein'."
-        antwort = llm.invoke(prompt)
+        text = doc["text"]
+        prompt = f"Frage: {question}\n\nText: {text}\n\nIst dieser Text relevant für die Frage? Antworte nur mit 'ja' oder 'nein'."
+        antwort = model.invoke(prompt)
         if "ja" in antwort.content.lower():
             keep.append(doc)
     return {"documents": keep}
@@ -55,7 +78,8 @@ def decide_to_generate(state: GraphState) -> str:
 def transform_query(state: GraphState) -> dict:
     question = state["question"]
     prompt = f"Formuliere diese Suchfrage um, damit sie andere/bessere Treffer findet. Gib NUR die neue Frage zurück, ohne Erklärung.\n\nFrage: {question}"
-    antwort = llm.invoke(prompt)
+    model = get_llm(state)
+    antwort = model.invoke(prompt)
     return {"question": antwort.content, "retries": state["retries"] + 1}
 
 
@@ -64,17 +88,33 @@ def grade_generation(state: GraphState) -> str:
         return "useful"
     question = state["question"]
     generation = state["generation"]
-    context = "\n\n".join(state["documents"])
+    context = "\n\n".join(doc["text"] for doc in state["documents"])
     prompt = f"Frage: {question}\n\nQuellen:\n{context}\n\nAntwort: {generation}\n\nIst die Antwort durch die Quellen gedeckt UND beantwortet sie die Frage? Antworte nur mit 'ja' oder 'nein'."
-    antwort = llm.invoke(prompt)
+    model = get_llm(state)
+    antwort = model.invoke(prompt)
     if "ja" in antwort.content.lower():
         return "useful"
     return "not useful"
 
+
 def web_search(state: GraphState) -> dict:
     question = state["question"]
-    results = DDGS().text(question, max_results=5)
-    documents = [r["body"] for r in results]
+    try:
+        results = DDGS().text(question, max_results=5)
+        documents = [{
+            "text": r["body"],
+            "title": r["title"],
+            "source": "Web Suche (DuckDuckGo)",
+            "url": r["href"]
+        } for r in results]
+    except Exception as e:
+        print(f"Web search error: {e}")
+        documents = [{
+            "text": f"Die Websuche schlug fehl mit Fehler: {e}",
+            "title": "Fehler bei Websuche",
+            "source": "System",
+            "url": ""
+        }]
     return {"documents": documents}
 
 
@@ -95,7 +135,7 @@ app = graph.compile()
 
 def ask(question: str) -> str:
     result = app.invoke(
-        {"question": question, "documents": [], "generation": "", "retries": 0}
+        {"question": question, "documents": [], "generation": "", "retries": 0, "model": ""}
     )
     return result["generation"]
 
@@ -106,6 +146,7 @@ if __name__ == "__main__":
         "documents": [],
         "generation": "",
         "retries": 0,
+        "model": ""
     }
     result = app.invoke(start)
     print(result["generation"])
