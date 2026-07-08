@@ -28,10 +28,10 @@ st.markdown(
         font-family: 'Outfit', sans-serif !important;
       }
       
-      /* Global Page Background & Text Color */
+      /* Global Page Background & Text Color - Warm Dark Espresso */
       .stApp {
-        background-color: #FAF6F0 !important;
-        color: #3C332A !important;
+        background-color: #1E1A16 !important;
+        color: #F4ECE1 !important;
       }
       
       .block-container {
@@ -39,10 +39,10 @@ st.markdown(
         max-width: 780px;
       }
       
-      /* Sidebar Oatmeal/Sand Warm Background */
+      /* Sidebar Warm Dark Sepia */
       [data-testid="stSidebar"] {
-        background-color: #F4ECE1 !important;
-        border-right: 1px solid rgba(139, 115, 85, 0.15) !important;
+        background-color: #15120F !important;
+        border-right: 1px solid rgba(220, 208, 192, 0.1) !important;
       }
       
       /* Hide default streamlit decoration lines */
@@ -51,59 +51,67 @@ st.markdown(
       [data-testid="stToolbar"] {visibility: hidden;}
       [data-testid="stDecoration"] {display: none;}
       
-      /* Headings Color */
+      /* Headings Color - Soft warm cream */
       h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: #4A3B32 !important;
+        color: #FAF6F0 !important;
         font-weight: 600 !important;
       }
       
-      /* Warm Link Styling */
+      /* Warm Amber Link Styling */
       a {
-        color: #B85A1C !important;
+        color: #E58F44 !important;
         text-decoration: none !important;
-        border-bottom: 1px dashed #B85A1C !important;
+        border-bottom: 1px dashed #E58F44 !important;
         transition: all 0.2s ease !important;
         font-weight: 500 !important;
       }
       a:hover {
-        color: #D27D2D !important;
+        color: #FFB066 !important;
         border-bottom-style: solid !important;
       }
       
-      /* Chat Message Overrides */
+      /* Chat Message Overrides - Dark Chocolate Cards */
       [data-testid="stChatMessage"] {
-        background-color: #FFFFFF !important;
-        border: 1px solid rgba(220, 208, 192, 0.5) !important;
+        background-color: #28221D !important;
+        border: 1px solid rgba(220, 208, 192, 0.12) !important;
         border-radius: 14px !important;
         padding: 1.25rem !important;
         margin-bottom: 1rem !important;
-        box-shadow: 0 3px 10px rgba(139, 115, 85, 0.04) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
       }
       
-      /* Highlight User message slightly differently with a warm tint */
+      /* Force text inside chat messages to be warm cream */
+      [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li, [data-testid="stChatMessage"] span {
+        color: #F4ECE1 !important;
+      }
+      
+      /* Highlight User message slightly differently with a warm copper accent */
       [data-testid="stChatMessage"][data-testid$="user"] {
-        background-color: #FDFBF8 !important;
-        border-left: 4px solid #D27D2D !important;
+        background-color: #2D2621 !important;
+        border-left: 4px solid #E58F44 !important;
       }
       
-      /* Expanders (Traces & Sources) styling to look like premium cards */
+      /* Expanders (Traces & Sources) styling to look like premium dark cards */
       .conda-expander, [data-testid="stExpander"] {
-        background-color: #FFFFFF !important;
-        border: 1px solid rgba(220, 208, 192, 0.4) !important;
+        background-color: #231E1A !important;
+        border: 1px solid rgba(220, 208, 192, 0.1) !important;
         border-radius: 10px !important;
-        box-shadow: 0 2px 6px rgba(139, 115, 85, 0.02) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
         margin-top: 0.5rem !important;
+      }
+      [data-testid="stExpander"] p, [data-testid="stExpander"] span, [data-testid="stExpander"] summary {
+        color: #FAF6F0 !important;
       }
       
       /* Citation Badge Styling inside the text */
       .citation-badge {
-        background-color: #F4E8DB !important;
-        color: #B85A1C !important;
+        background-color: #3E322A !important;
+        color: #FFB066 !important;
         padding: 2px 6px !important;
         border-radius: 6px !important;
         font-weight: 600 !important;
         font-size: 0.85em !important;
-        border: 1px solid rgba(184, 90, 28, 0.2) !important;
+        border: 1px solid rgba(229, 143, 68, 0.3) !important;
         display: inline-block !important;
         margin: 0 2px !important;
         vertical-align: middle !important;
@@ -113,20 +121,20 @@ st.markdown(
       hr {
         border: 0 !important;
         height: 1px !important;
-        background: rgba(220, 208, 192, 0.4) !important;
+        background: rgba(220, 208, 192, 0.1) !important;
         margin: 1rem 0 !important;
       }
       
-      /* Text input fields custom warm border */
+      /* Text input fields custom warm dark border */
       [data-testid="stChatInput"] textarea {
-        border: 1px solid rgba(220, 208, 192, 0.8) !important;
-        background-color: #FFFFFF !important;
+        border: 1px solid rgba(220, 208, 192, 0.2) !important;
+        background-color: #28221D !important;
         border-radius: 10px !important;
-        color: #3C332A !important;
+        color: #FAF6F0 !important;
       }
       [data-testid="stChatInput"] textarea:focus {
-        border-color: #B85A1C !important;
-        box-shadow: 0 0 0 1px #B85A1C !important;
+        border-color: #E58F44 !important;
+        box-shadow: 0 0 0 1px #E58F44 !important;
       }
     </style>
     """,
