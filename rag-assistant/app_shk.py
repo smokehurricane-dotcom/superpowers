@@ -16,34 +16,129 @@ import streamlit as st
 import agentic_rag
 import rag
 
-st.set_page_config(page_title="Handbuch-Assistent", page_icon="📘", layout="centered")
+st.set_page_config(page_title="Hunde-Wissens-Assistent", page_icon="🐕", layout="centered")
 
 # --- etwas Politur: Premium Styling & Menüs ausblenden ---
 st.markdown(
     """
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+      
       html, body, [data-testid="stWidgetLabel"] {
-        font-family: 'Outfit', sans-serif;
+        font-family: 'Outfit', sans-serif !important;
       }
+      
+      /* Global Page Background & Text Color */
+      .stApp {
+        background-color: #FAF6F0 !important;
+        color: #3C332A !important;
+      }
+      
       .block-container {
         padding-top: 2rem;
         max-width: 780px;
       }
-      /* Sidebar Glassmorphism */
+      
+      /* Sidebar Oatmeal/Sand Warm Background */
       [data-testid="stSidebar"] {
-        background-color: rgba(245, 247, 250, 0.9);
-        backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(0,0,0,0.05);
+        background-color: #F4ECE1 !important;
+        border-right: 1px solid rgba(139, 115, 85, 0.15) !important;
       }
+      
+      /* Hide default streamlit decoration lines */
       #MainMenu {visibility: hidden;}
       footer {visibility: hidden;}
       [data-testid="stToolbar"] {visibility: hidden;}
       [data-testid="stDecoration"] {display: none;}
+      
+      /* Headings Color */
+      h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+        color: #4A3B32 !important;
+        font-weight: 600 !important;
+      }
+      
+      /* Warm Link Styling */
+      a {
+        color: #B85A1C !important;
+        text-decoration: none !important;
+        border-bottom: 1px dashed #B85A1C !important;
+        transition: all 0.2s ease !important;
+        font-weight: 500 !important;
+      }
+      a:hover {
+        color: #D27D2D !important;
+        border-bottom-style: solid !important;
+      }
+      
+      /* Chat Message Overrides */
+      [data-testid="stChatMessage"] {
+        background-color: #FFFFFF !important;
+        border: 1px solid rgba(220, 208, 192, 0.5) !important;
+        border-radius: 14px !important;
+        padding: 1.25rem !important;
+        margin-bottom: 1rem !important;
+        box-shadow: 0 3px 10px rgba(139, 115, 85, 0.04) !important;
+      }
+      
+      /* Highlight User message slightly differently with a warm tint */
+      [data-testid="stChatMessage"][data-testid$="user"] {
+        background-color: #FDFBF8 !important;
+        border-left: 4px solid #D27D2D !important;
+      }
+      
+      /* Expanders (Traces & Sources) styling to look like premium cards */
+      .conda-expander, [data-testid="stExpander"] {
+        background-color: #FFFFFF !important;
+        border: 1px solid rgba(220, 208, 192, 0.4) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 2px 6px rgba(139, 115, 85, 0.02) !important;
+        margin-top: 0.5rem !important;
+      }
+      
+      /* Citation Badge Styling inside the text */
+      .citation-badge {
+        background-color: #F4E8DB !important;
+        color: #B85A1C !important;
+        padding: 2px 6px !important;
+        border-radius: 6px !important;
+        font-weight: 600 !important;
+        font-size: 0.85em !important;
+        border: 1px solid rgba(184, 90, 28, 0.2) !important;
+        display: inline-block !important;
+        margin: 0 2px !important;
+        vertical-align: middle !important;
+      }
+      
+      /* Source items dividers */
+      hr {
+        border: 0 !important;
+        height: 1px !important;
+        background: rgba(220, 208, 192, 0.4) !important;
+        margin: 1rem 0 !important;
+      }
+      
+      /* Text input fields custom warm border */
+      [data-testid="stChatInput"] textarea {
+        border: 1px solid rgba(220, 208, 192, 0.8) !important;
+        background-color: #FFFFFF !important;
+        border-radius: 10px !important;
+        color: #3C332A !important;
+      }
+      [data-testid="stChatInput"] textarea:focus {
+        border-color: #B85A1C !important;
+        box-shadow: 0 0 0 1px #B85A1C !important;
+      }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+import re
+
+def format_citations(text: str) -> str:
+    pattern = r'\[(\d+)\]'
+    replacement = r'<span class="citation-badge">[\1]</span>'
+    return re.sub(pattern, replacement, text)
 
 # Hübsche Namen für die geladenen Wissensbausteine (Dateiname -> Klartext)
 PRETTY_SOURCES = {
@@ -128,8 +223,10 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 for m in st.session_state.history:
-    with st.chat_message(m["role"]):
-        st.markdown(m["content"])
+        if m["role"] == "user":
+            st.markdown(m["content"])
+        else:
+            st.markdown(format_citations(m["content"]), unsafe_allow_html=True)
         if m["role"] == "assistant":
             docs_m = m.get("docs", [])
             retries_m = m.get("retries", 0)
