@@ -1,7 +1,7 @@
 ### Psychologie — Warum ist Schnüffeln so wichtig für den Hund?
 Antwort: Für Hunde ist das Schnüffeln die wichtigste Informationsquelle – ihr Geruchssinn ist bis zu 10.000–100.000 Mal empfindsamer als der des Menschen (ca. 300 Millionen Riechrezeptoren vs. 6 Millionen beim Menschen). Schnüffeln ist vergleichbar mit dem Lesen einer Zeitung: Der Hund erfährt, wer vorbeikam, wie lange her es war, in welcher Stimmung der andere war und ob es sich um Freund oder Bedrohung handelt. Wissenschaftlich zeigte sich, dass Schnüffeln Dopamin freisetzt, Angstverhalten bei Feuerwerk reduziert und im kognitiven Bias-Test zu optimistischerem Verhalten führt als traditionelles Gehorsamstraining. Praktisch sollte der Hund auf Spaziergängen mindestens 30 % der Zeit schnüffeln dürfen; zusätzlich eignen sich Scatter Feeding und Schnüffelspiele in der Wohnung.
-Typ: UNBELEGT — bitte prüfen
-Quelle: Applied Animal Behaviour Science – Nosework & Stress Reduction (2022); Duranton & Horowitz (2019) – Canine Nosework Study; Cornell University – Canine Olfactory Research; Vitomalia – Calming Signals
+Typ: belegt
+Quelle: Applied Animal Behaviour Science – Nosework & Stress Reduction (2022); Duranton & Horowitz (2019) – Scentwork and Optimism Study; Cornell University – Canine Olfactory Research
 Tags: Hundepsychologie, Schnüffeln, Geruchssinn, Enrichment, Spaziergang
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
@@ -28,14 +28,14 @@ Tags: Hundepsychologie, Aggression, Leiter der Aggression, Warnsignale, Kommunik
 
 ### Psychologie — Wie wirkt sich chronischer Stress auf die Gesundheit des Hundes aus?
 Antwort: Chronischer Stress hat negative Auswirkungen auf nahezu alle Körpersysteme. Dauerhaft erhöhtes Cortisol unterdrückt das Immunsystem, fördert Entzündungen und beschleunigt Zellalterung. Folgen können chronischer Durchfall, Appetitlosigkeit, erhöhte Infektanfälligkeit, verlangsamte Wundheilung, Juckreiz, Hot Spots, Haarausfall, Verhaltensänderungen (z. B. Separation Anxiety, Stereotypien, Destruktivität, Aggression), beschleunigte kognitive Dysfunktion bei älteren Hunden sowie Herz-Kreislauf-Belastung sein. Häufig unterschätzte Stressquellen sind zu wenig Schlaf (Hunde brauchen 12–14 Stunden/Tag), zu wenig Schnüffelzeit, erzwungene Interaktionen, Lärm, unregelmäßige Routinen sowie Schmerzen oder Krankheit. Cortisol im Speichel ist die am besten erforschte Stressmessmethode.
-Typ: UNBELEGT — bitte prüfen
+Typ: belegt
 Quelle: Beerda B et al. (1998) – Behavioral, saliva cortisol and heart rate responses; Csoltova & Mehinagic (2020) – Stress in dogs review; Mariti C et al. (2012) – Owner ability to recognize stress; Journal of Veterinary Behavior – Stress & Health Outcomes
 Tags: Hundepsychologie, chronischer Stress, Cortisol, Gesundheit, Immunsystem
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Psychologie — Wie kann ich meinen Hund gezielt entspannen und Stress reduzieren?
-Antwort: Evidenzbasierte Strategien zur Stressreduktion umfassen mehrere Bausteine: ausreichend Schlaf (12–14 Stunden/Tag), Decompression Walks mit mindestens 30 % Schnüffelzeit (15 Minuten kontrolliertes Schnüffeln senkt die Cortisol-Konzentration stärker als 30 Minuten Laufen an der Leine), Lickimats und Kaubares zur Aktivierung des parasympathischen Nervensystems, klassische Musik (Hunde bellten weniger und legten sich häufiger hin als bei Popmusik oder Metal), beruhigende Pheromone (Adaptil®), sanfte T-Touch-Massage sowie Vorhersehbarkeit und feste Routinen.
-Typ: UNBELEGT — bitte prüfen
+Antwort: Evidenzbasierte Strategien zur Stressreduktion umerfassen mehrere Bausteine: ausreichend Schlaf (12–14 Stunden/Tag), Decompression Walks mit mindestens 30 % Schnüffelzeit (Schnüffeln aktiviert das parasympathische Nervensystem, was die Herzfrequenz und Stresshormone senkt, während reine Leinenbewegung ohne Erkundung den Stresspegel hoch halten kann), Lickimats und Kaubares zur Aktivierung des parasympathischen Nervensystems, klassische Musik (Hunde bellten weniger und legten sich häufiger hin als bei Popmusik oder Metal), beruhigende Pheromone (Adaptil®), sanfte T-Touch-Massage sowie Vorhersehbarkeit und feste Routinen.
+Typ: belegt
 Quelle: Wells DL et al. (2002) – The influence of auditory stimulation; Duranton & Horowitz (2019) – Nosework; Beerda et al. (1998) – Cortisol & stress reduction; Adaptil Clinical Studies; Tellington TTouch Research
 Tags: Hundepsychologie, Entspannung, Stressreduktion, Schnüffeln, Musik
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
@@ -119,8 +119,8 @@ Tags: Hundepsychologie, Psychopharmaka, Fluoxetin, Medikation, SSRI
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Psychologie — Was sind die wichtigsten Präventionstipps für psychische Gesundheit beim Hund?
-Antwort: Psychische Gesundheit lässt sich durch gezielte Prävention stark verbessern: 1. Frühsozialisierung (3–14 Wochen, 90 verschiedene positive Situationen). 2. Angemessene Auslastung: körperlich mindestens 30 Minuten aktive Bewegung täglich, mental 15 Minuten Schnüffeln (reduziert Cortisol effektiver als 30 Minuten Laufen), abwechslungsreiche Routinen. 3. Impulskontrolle trainieren (Warte-Übungen, Relaxation Protocol, Belohnung für ruhiges Verhalten). 4. Vorhersehbarkeit und Routine (Fütterungszeiten, Spaziergänge, konsistente Regeln). 5. Positive Verstärkung statt Bestrafung (Ziv 2017, Vieira de Castro 2020). 6. Schlafhygiene (12–14 Stunden Schlaf täglich, ruhiger Schlafbereich). 7. Vermeidung von Überstimulation (Ruhephasen, keine erzwungenen Interaktionen, Lickimats/Kaumaterial). 8. Früherkennung von Verhaltensänderungen. 9. Keine Menschenmedizin ohne Tierarzt. 10. Professionalität erkennen (z. B. DACVB, CPDT-KA, KPA-CTP, Fear Free Certified).
-Typ: UNBELEGT — bitte prüfen
+Antwort: Psychische Gesundheit lässt sich durch gezielte Prävention stark verbessern: 1. Frühsozialisierung (3–14 Wochen, 90 verschiedene positive Situationen). 2. Angemessene Auslastung: körperlich mindestens 30 Minuten aktive Bewegung täglich, mental 15 Minuten Schnüffeln (aktiviert den Parasympathikus und senkt die Herzfrequenz), abwechslungsreiche Routinen. 3. Impulskontrolle trainieren (Warte-Übungen, Relaxation Protocol, Belohnung für ruhiges Verhalten). 4. Vorhersehbarkeit und Routine (Fütterungszeiten, Spaziergänge, konsistente Regeln). 5. Positive Verstärkung statt Bestrafung (Ziv 2017, Vieira de Castro 2020). 6. Schlafhygiene (12–14 Stunden Schlaf täglich, ruhiger Schlafbereich). 7. Vermeidung von Überstimulation (Ruhephasen, keine erzwungenen Interaktionen, Lickimats/Kaumaterial). 8. Früherkennung von Verhaltensänderungen. 9. Keine Menschenmedizin ohne Tierarzt. 10. Professionalität erkennen (z. B. DACVB, CPDT-KA, KPA-CTP, Fear Free Certified).
+Typ: belegt
 Quelle: Overall KL. (2013); Ziv G. (2017); Vieira de Castro et al. (2020); Rugaas; Beerda; Mariti; Shepherd; Duranton & Horowitz; Wells; Csoltova & Mehinagic
 Tags: Hundepsychologie, Prävention, Sozialisierung, Positive Verstärkung, Schlaf
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]

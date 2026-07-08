@@ -77,6 +77,50 @@ def _read_file(fp):
     return ""
 
 
+def is_faq_file(fp):
+    if not fp.endswith(".md"):
+        return False
+    try:
+        with open(fp, encoding="utf-8", errors="ignore") as f:
+            head = f.read(500)
+            return "### " in head and "Antwort:" in head
+    except:
+        return False
+
+
+def _parse_faq_md(fp):
+    content = open(fp, encoding="utf-8", errors="ignore").read()
+    content = content.replace("\r", "")
+    
+    # Strip trailing sources section
+    if "\n---" in content:
+        content = content.split("\n---")[0]
+    elif "---" in content:
+        content = content.split("---")[0]
+        
+    sections = []
+    # Normalize start
+    if content.startswith("### "):
+        content = "\n" + content
+    parts = content.split("\n### ")
+    for part in parts:
+        part = part.strip()
+        if not part:
+            continue
+        lines = part.split("\n", 1)
+        title = lines[0].strip()
+        text = "### " + part
+        sections.append({
+            "text": text,
+            "title": title,
+            "source": os.path.basename(fp),
+            "date": "",
+            "url": fp,
+            "is_faq": True
+        })
+    return sections
+
+
 def load_corpus(path=None):
     """Load docs from: news JSON (default), a single .txt/.md/.pdf/.json, or a folder of them.
     Returns list of {text, title, source, date, url}."""
@@ -90,8 +134,13 @@ def load_corpus(path=None):
         for ext in ("txt", "md", "pdf", "json"):
             files += glob.glob(os.path.join(path, "*." + ext))
         for fp in sorted(files):
+            # Ignore non-FAQ meta documents in the docs folder to keep the index clean
+            if os.path.basename(fp) in ("INTEGRATION_REPORT.md", "README.kimi.md", "README.opencode.md", "porting-to-a-new-harness.md", "testing.md"):
+                continue
             if fp.endswith(".json"):
                 docs += _load_news_json(fp)
+            elif is_faq_file(fp):
+                docs += _parse_faq_md(fp)
             else:
                 t = _read_file(fp).strip()
                 if t:
@@ -99,6 +148,8 @@ def load_corpus(path=None):
                                  "source": os.path.basename(fp), "date": "", "url": fp})
     elif path.endswith(".json"):
         docs = _load_news_json(path)
+    elif is_faq_file(path):
+        docs = _parse_faq_md(path)
     else:
         t = _read_file(path).strip()
         if t:
@@ -112,6 +163,9 @@ def chunk_docs(docs, max_chars=900):
     """Split long docs into passages on sentence boundaries; short ones stay whole."""
     chunks = []
     for d in docs:
+        if d.get("is_faq"):
+            chunks.append(d)
+            continue
         t = d["text"]
         if len(t) <= max_chars:
             chunks.append(d); continue
