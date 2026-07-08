@@ -29,7 +29,7 @@ Tags: Krankheit, Häufigkeit, Pyometra, Risiko, Rassen
 Antwort: Hormonelle Schwankungen nach jeder Läufigkeit (Progesteron-Phase) verdicken die Gebärmutterschleimhaut, was ideale Bedingungen für aufsteigende Bakterien (z. B. E. coli) schafft. Die Gabe von Hormonpräparaten zur Läufigkeitsunterdrückung erhöht das Risiko massiv.
 
 **Schutzmaßnahmen:**
-- **Kastration (Ovariohysterektomie):** Bietet **100 % Schutz**. Bei Durchführung vor der ersten Läufigkeit sinkt das Mammatumor-Risiko zusätzlich um 99,5 %.
+- **Kastration (Ovariohysterektomie):** Bietet **100 % Schutz**. Bei Durchführung vor der ersten Läufigkeit wird das Mammatumor-Risiko zusätzlich deutlich reduziert.
 - Bei Zuchthündinnen: Frühe Erkennung durch regelmäßige Ultraschallkontrollen nach der Läufigkeit
 
 **Therapieoptionen:**

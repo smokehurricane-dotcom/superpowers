@@ -64,6 +64,7 @@ Tags: Gift, Lebensmittel, Weintrauben, Rosinen, Nierenversagen, Notfall
 
 ### Giftige Lebensmittel — Warum dürfen Hunde keine Zwiebeln und Knoblauch essen?
 Antwort: Alle Gewächse der Allium-Familie (Zwiebeln, Knoblauch, Schnittlauch, Lauch) enthalten N-Propyldisulfid und andere Schwefelverbindungen. Diese zerstören die Zellmembran der roten Blutkörperchen des Hundes (oxidativer Stress) und führen zur Bildung sogenannter Heinz-Körperchen und schließlich zu einer lebensbedrohlichen Blutarmut (hämolytische Anämie). Dies gilt für rohe, gekochte oder getrocknete Formen! Symptome: Blasse Schleimhäute, Schwäche, schnelle Atmung, dunkler (rot-brauner) Urin, Gelbsucht.
+*Achtung: Ersetzt nicht den Tierarzt – bei Verdacht auf eine Vergiftung sofortige tierärztliche Hilfe suchen.*
 Typ: belegt
 Quelle: Allium species poisoning in dogs and cats (Journal of Veterinary Medical Science)
 Tags: Gift, Lebensmittel, Zwiebel, Knoblauch, Anämie
@@ -71,6 +72,7 @@ Tags: Gift, Lebensmittel, Zwiebel, Knoblauch, Anämie
 
 ### Giftige Lebensmittel — Was macht Macadamia-Nüsse toxisch für Hunde?
 Antwort: Der genaue toxische Wirkstoff in Macadamia-Nüssen ist bislang unbekannt, aber die Aufnahme führt zu starken neurologischen und muskulären Störungen. Typische Symptome sind vor allem Schwäche in den Hinterbeinen (der Hund kann oft nicht mehr stehen oder laufen), Muskelzittern, Erbrechen und Fieber. Die Symptome treten meist innerhalb von 12 Stunden auf und verschwinden bei milder Vergiftung oft nach 24-48 Stunden mit unterstützender tierärztlicher Pflege wieder.
+*Achtung: Ersetzt nicht den Tierarzt – bei Verdacht auf eine Vergiftung sofortige tierärztliche Hilfe suchen.*
 Typ: belegt
 Quelle: Macadamia nut poisoning of dogs (Veterinary and Human Toxicology)
 Tags: Gift, Lebensmittel, Macadamia, Nüsse, Neurologie
@@ -78,6 +80,7 @@ Tags: Gift, Lebensmittel, Macadamia, Nüsse, Neurologie
 
 ### Giftige Lebensmittel — Ist Avocado für Hunde gefährlich?
 Antwort: Avocados (vor allem Blätter, Rinde, Kern und in geringerem Maß das Fruchtfleisch) enthalten das Toxin Persin. Während Vögel extrem empfindlich auf Persin reagieren, können Hunde leichte Magen-Darm-Probleme (Erbrechen, Durchfall) bekommen. Das größte Risiko für Hunde ist jedoch der große, runde Kern: Er kann beim Verschlucken zu einem lebensbedrohlichen Darmverschluss führen. Außerdem ist das Fruchtfleisch sehr fettreich und kann eine schmerzhafte Bauchspeicheldrüsenentzündung (Pankreatitis) auslösen.
+*Achtung: Ersetzt nicht den Tierarzt – bei Verdacht auf eine Vergiftung sofortige tierärztliche Hilfe suchen.*
 Typ: belegt
 Quelle: ASPCA Animal Poison Control Center: Avocado Toxicity
 Tags: Gift, Lebensmittel, Avocado, Persin, Darmverschluss
@@ -85,6 +88,7 @@ Tags: Gift, Lebensmittel, Avocado, Persin, Darmverschluss
 
 ### Giftige Lebensmittel — Wie wirkt Alkohol auf Hunde?
 Antwort: Hunde reagieren wesentlich sensibler auf Alkohol (Ethanol) als Menschen. Schon kleine Mengen (auch in verrottetem Obst oder gärendem Hefeteig im Magen) führen schnell zu einer Alkoholvergiftung. Symptome: Erbrechen, Koordinationsstörungen, Unterkühlung (Hypothermie), Atemdepression, Krampfanfälle, Koma und Tod. Hefeteig ist doppelt gefährlich: Er produziert nicht nur Alkohol, sondern dehnt sich im warmen Hundemagen stark aus und kann einen Magenriss oder eine Magendrehung verursachen.
+*Achtung: Ersetzt nicht den Tierarzt – bei Verdacht auf eine Vergiftung sofortige tierärztliche Hilfe suchen.*
 Typ: belegt
 Quelle: Ethanol toxicosis in dogs (Veterinary Medicine Today / AVMA)
 Tags: Gift, Lebensmittel, Alkohol, Hefeteig, Ethanol
@@ -107,6 +111,7 @@ Antwort: Übersicht der wichtigsten für Hunde giftigen Lebensmittel mit toxisch
 | **Koffein** | Methylxanthin | ~140 mg/kg | Unruhe, Herzrasen, Krämpfe | 1–2 h |
 | **Pflaumen/Kirschen** | Cyanid (in Kernen) | Viele Kerne | Atemnot, Krampfanfälle | 15 Min–2 h |
 
+*Achtung: Ersetzt nicht den Tierarzt – bei Verdacht auf eine Vergiftung sofortige tierärztliche Hilfe suchen.*
 Typ: belegt
 Quelle: Merck Veterinary Manual; ASPCA Animal Poison Control Center; Veterinary Clinics of North America; Journal of Veterinary Emergency and Critical Care
 Tags: Gift, Lebensmittel, Toxizitätstabelle, Vergiftung, Notfall, Übersicht

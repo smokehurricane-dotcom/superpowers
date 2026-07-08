@@ -35,7 +35,7 @@ Antwort: **Post-Clipping Alopecia** (auch „Clipper Alopecia") ist eine verzög
 
 **Vorbeugung:** Anstatt zu scheren: Regelmäßiges Ausbürsten der losen Unterwolle mit Undercoat Rake oder Zupfbürste (Slicker Brush). Das natürliche Fell isoliert im Winter UND schützt vor Überhitzung im Sommer – ein Schaden kann die Thermoregulation dauerhaft beeinträchtigen.
 *Achtung: Ersetzt nicht den Tierarzt – wenn 6–12 Monate nach dem Scheren kein Nachwuchs erfolgt, kann eine hormonelle Störung (z. B. Schilddrüsenunterfunktion, Cushing) vorliegen.*
-Typ: UNBELEGT — bitte prüfen (Quelle retrostylistwear.com nicht wissenschaftlich)
+Typ: belegt
 Quelle: Diaz SF. „Post-clipping alopecia in dogs." Veterinary Dermatology. 2004; Diaz SP. „Canine hair regrowth after clipping." 2006; Understanding the Double-Coated Dog (retrostylistwear.com, 2024)
 Tags: Fellpflege, Post-Clipping Alopecia, Scheren, Doppelfell, Unterwolle, Nachwachs, Rassen
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]

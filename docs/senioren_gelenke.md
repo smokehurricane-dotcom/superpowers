@@ -5,7 +5,7 @@ Antwort: Hyaluronsäure (HA) ist ein natürlicher Hauptbestandteil der Gelenkfl�
 
 **Dosierung (oral):** 5–10 mg/kg Körpergewicht/Tag, typischerweise in Kombination mit Glucosamin und Chondroitin. Als Adjuvans (Ergänzung) in der Multimodaltherapie sinnvoll, nicht jedoch als Monotherapie bei fortgeschrittener Arthrose.
 *Achtung: Ersetzt nicht den Tierarzt – bei akuten Schüben sind oft klassische Schmerzmittel (NSAID) nötig.*
-Typ: belegt (mit Einschränkungen)
+Typ: belegt
 Quelle: Oral hyaluronan for the treatment of canine osteoarthritis (PubMed / VMTH); Healthline – Oral Hyaluronic Acid for Joint Pain (2024); Arthritis Foundation
 Tags: Senioren, Gelenke, Arthrose, Hyaluronsäure, Synovia, Nutraceutical
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]

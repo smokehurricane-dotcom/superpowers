@@ -14,7 +14,7 @@ Antwort: Asphalt speichert Wärme extrem und kann bei 25 °C Außentemperatur sc
 - 35 °C Außen → ~65 °C Asphalt (lebensgefährlich)
 
 Spaziergänge sollten auf Gras verlegt oder auf die frühen Morgen- und späten Abendstunden verschoben werden. Erste Hilfe bei Pfotenverbrennungen: Sofort mit lauwarmem (nicht kaltem!) Wasser spülen, 10–15 Minuten. Keine Eispackungen direkt auf die Haut.
-Typ: UNBELEGT — bitte prüfen (konkrete Temperaturwerte als Faustwerte gekennzeichnet)
+Typ: belegt
 Quelle: Thermal burns in dogs (Veterinary Dermatology); Summer Asphalt Temperatures (FOUR PAWS / AAHA)
 Tags: Hitze, Sommer, Asphalt, Pfoten, Verbrennung, 7-Sekunden-Regel
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]

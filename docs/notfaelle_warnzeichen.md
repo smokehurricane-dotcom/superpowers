@@ -38,7 +38,6 @@ Tags: Notfall, Magendrehung, GDV, Bloat, chirurgisch, Lebensgefahr
 ---
 **Quellenliste:**
 - "Triage and emergency care of the small animal patient", Journal of Veterinary Emergency and Critical Care
-- "Clinical guidelines for canine emergencies", American Veterinary Medical Association (AVMA)
 - "Gastric dilatation-volvulus (GDV) or 'bloat'", Cornell University Riney Canine Health Center (vet.cornell.edu)
 - "Gastric Dilatation-Volvulus (GDV) in Dogs", BluePearl Veterinary Partners (bluepearlvet.com, 2024)
 - "GDV (Gastric Dilatation Volvulus) in dogs", PDSA UK (pdsa.org.uk, 2024)
