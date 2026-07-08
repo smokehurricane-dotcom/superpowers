@@ -6,34 +6,86 @@ Tags: Erste Hilfe, Wunde, Wundversorgung, Desinfektion, Octenisept, Jod
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Erste Hilfe — Wie stille ich eine starke Blutung richtig?
-Antwort: Bei stark blutenden Wunden ist direkter Druck lebensrettend. Legen Sie eine sterile Kompresse (aus dem Erste-Hilfe-Set) direkt auf die Wunde und drücken Sie diese mit der Hand fest auf. Blutet es durch, legen Sie weitere Kompressen darüber – entfernen Sie niemals die erste Schicht, da dies die beginnende Blutgerinnung stört! Legen Sie anschließend einen strammen Druckverband an. Vom eigenmächtigen Abbinden der Gliedmaße wird dringend abgeraten, da hierbei schnell extremes Gewebssterben (Nekrose) droht. *Achtung: Ersetzt nicht den Tierarzt – bei stark pochenden, hellroten (arteriellen) Blutungen oder Blutungen, die nicht stoppen, fahren Sie sofort in die nächste Tierklinik.*
+Antwort: Bei stark blutenden Wunden ist **direkter Druck lebensrettend**:
+
+1. Legen Sie eine sterile Kompresse direkt auf die Wunde und drücken Sie fest mit der Hand darauf.
+2. Blutet es durch? Legen Sie **weitere Kompressen darüber** – entfernen Sie niemals die erste Schicht, da dies die beginnende Blutgerinnung stört!
+3. Legen Sie anschließend einen strammen Druckverband an.
+4. **Vom eigenmächtigen Abbinden der Gliedmaße wird dringend abgeraten** – hierbei droht schnell extremes Gewebssterben (Nekrose).
+
+**Unterscheidung Blutungsarten:**
+- **Arterielle Blutung:** Hellrot, pulsiert im Rhythmus des Herzschlags → sofortiger Druck + Klinik
+- **Venöse Blutung:** Dunkelrot, gleichmäßig fließend → Druckverband
+- **Kapillare Blutung:** Sickerblutung → meist mit Druckverband beherrschbar
+
+Bei stark pochenden, hellroten (arteriellen) Blutungen oder Blutungen, die nicht innerhalb von 5 Minuten stoppen: sofortige Fahrt in die nächste Tierklinik.
 Typ: belegt
-Quelle: Hemorrhage control in veterinary trauma (Journal of Veterinary Emergency and Critical Care)
-Tags: Erste Hilfe, Blutung, Druckverband, Kompresse, Notfall
+Quelle: Hemorrhage control in veterinary trauma (Journal of Veterinary Emergency and Critical Care); RECOVER 2024 Guidelines
+Tags: Erste Hilfe, Blutung, Druckverband, Kompresse, Notfall, Blutstillung
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Erste Hilfe — Was gehört zwingend in ein Hunde-Erste-Hilfe-Set?
 Antwort: Ein gut ausgestattetes Basis-Set für Spaziergänge und Reisen sollte Folgendes beinhalten:
-- Verbandsmaterial: Sterile Kompressen, Polsterwatte, elastische Fixierbinden, selbsthaftende Bandagen (Kohäsivbinden).
-- Desinfektionsmittel (z. B. Octenisept für Tiere) und sterile Kochsalzlösung in kleinen Ampullen.
-- Instrumente: Verbandsschere (stumpf), Zeckenzange/haken, Pinzette, Fieberthermometer (digital, für Rektalmessung).
-- Sonstiges: Einweghandschuhe, Rettungsdecke (Gold/Silber) zur Vermeidung von Unterkühlung, Vaseline (fürs Thermometer).
-- Wichtig: Eine Notfall-Karte mit der Telefonnummer des Haustierarztes und der nächsten 24/7-Tierklinik.
+
+**Verbandsmaterial:**
+- Sterile Kompressen (10 × 10 cm) – mindestens 5 Stück
+- **Polsterwatte / Verbandwatte**
+- **Elastische Fixierbinden** (2–3 Stück)
+- **Selbsthaftende Bandagen (Kohäsivbinden, z. B. VetWrap)**
+
+**Desinfektion & Reinigung:**
+- Octenidin-Spray (z. B. Octenisept – für Tiere zugelassen, nicht brennend)
+- **Povidon-Jod-Lösung** (Betaisodona – verdünnt; nicht bei Schilddrüsenpatienten)
+- Sterile Kochsalzlösung 0,9 % in kleinen Ampullen (zum Ausspülen von Wunden/Augen)
+
+**Instrumente:**
+- Verbandsschere (stumpf/spitz)
+- Zeckenzange / Zeckenhaken
+- Pinzette (spitz und gerade)
+- Digitales Fieberthermometer (für Rektalmessung)
+
+**Sonstiges:**
+- Einweghandschuhe (Latex/Nitril)
+- Rettungsdecke (Gold/Silber) – verhindert Unterkühlung
+- Vaseline (für das Thermometer)
+- **Notfall-Karte:** Telefonnummer des Tierarztes + nächste 24/7-Tierklinik + **Giftnotruf**
+- **Aktivkohle-Tabletten** (bei Vergiftungen, Dosierung: **1 g/kg KG**)
+
+*Achtung: Ersetzt nicht den Tierarzt – das Erste-Hilfe-Set dient nur der Stabilisierung bis zur Klinik.*
 Typ: belegt
-Quelle: First Aid for Dogs (American Veterinary Medical Association - AVMA)
-Tags: Erste Hilfe, Set, Apotheke, Verband, Thermometer
+Quelle: First Aid for Dogs (American Veterinary Medical Association – AVMA); RECOVER 2024 CPR Guidelines; ASPCA Animal Poison Control
+Tags: Erste Hilfe, Set, Apotheke, Verband, Thermometer, Notfall, Aktivkohle
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Erste Hilfe — Wo ist die Grenze der Selbstbehandlung? Wann muss ich zum Tierarzt?
-Antwort: Die Erste Hilfe beim Hund dient primär der Stabilisierung bis zum Erreichen der Klinik. Die absolute Grenze der Selbstbehandlung ist erreicht bei: jeder Form von Bisswunden (Zähne bringen aggressive Bakterien tief ins Gewebe; es drohen Abszesse und Sepsis), Augenverletzungen (Gefahr der Erblindung), Verletzungen am Bauch oder Brustkorb, Knochenbrüchen, Verbrennungen und großflächigen Abschürfungen. Jede Wunde, die länger als einen Zentimeter ist, klafft oder nicht aufhört zu bluten, erfordert zwingend tierärztliche Intervention. *Achtung: Warten Sie nicht auf Heilung durch "Lecken des Hundes" – Hundespeichel ist nicht antiseptisch und verschlimmert Wundinfektionen!*
+Antwort: Die Erste Hilfe dient primär der Stabilisierung bis zum Erreichen der Klinik. Die **absolute Grenze** der Selbstbehandlung ist erreicht bei:
+
+**Immer tierärztlich (sofort!):**
+- **Bisswunden** (Zähne bringen aggressive Bakterien tief ins Gewebe; Abszesse und Sepsis drohen)
+- **Augenverletzungen** (Gefahr der Erblindung)
+- **Verletzungen am Bauch oder Brustkorb**
+- **Knochenbrüche** (offene oder geschlossene)
+- **Verbrennungen** (egal welchen Grades)
+- **Wunden > 1 cm, die klaffen oder nicht aufhören zu bluten**
+- **Vergiftungen** (Xylit, Schokolade, Rattengift)
+
+**Was Sie NICHT tun sollten:**
+- Niemals eigenmächtig Erbrechen einleiten (bei ätzenden Substanzen oder Benzin lebensgefährlich)
+- Niemals offene Brüche zurückdrücken
+- Niemals einen Verband so fest anlegen, dass die Durchblutung gestoppt wird
+- **Hundespeichel ist nicht antiseptisch** – das Lecken verschlimmert Wundinfektionen
+
+**Faustregel:** Wenn Sie zweimal hinsehen müssen, gehört es in die Klinik.
 Typ: belegt
-Quelle: Guidelines for initial wound management (Veterinary Surgery)
-Tags: Erste Hilfe, Notfall, Bisswunde, Tierarzt, Grenzen
+Quelle: Guidelines for initial wound management (Veterinary Surgery / PubMed); RECOVER 2024 Emergency Guidelines; AVMA First Aid Resources
+Tags: Erste Hilfe, Notfall, Bisswunde, Tierarzt, Grenzen, Selbstbehandlung, Wundversorgung
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ---
 **Quellenliste:**
 - "Wound management in small animal practice", Veterinary Clinics of North America: Small Animal Practice
 - "Hemorrhage control in veterinary trauma", Journal of Veterinary Emergency and Critical Care
+- "RECOVER 2024 CPR & Emergency Guidelines", J Vet Emerg Crit Care
 - "First Aid for Dogs", American Veterinary Medical Association (AVMA)
 - "Guidelines for initial wound management", Veterinary Surgery / PubMed
+- "ASPCA Animal Poison Control Center", aspca.org

@@ -1,0 +1,33 @@
+"""Shadow-Resume: Equity-Curve-Gate. SHADOW (kein Echtgeld) <-> LIVE.
+Reine Logik, kein Trading -- erst isoliert testen, dann verdrahten."""
+from collections import deque
+
+
+class ShadowGate:
+    def __init__(self, n=20, on=10.0, off=-10.0, state="SHADOW"):
+        assert on > off, "Hysterese: ON muss > OFF sein"
+        self.n = n
+        self.on = on
+        self.off = off
+        self.state = state            # "SHADOW" oder "LIVE"
+        self.window = deque(maxlen=n) # die letzten n realisierten PnLs
+
+    @property
+    def rolling(self):
+        """Netto-PnL der letzten n Trades."""
+        return round(sum(self.window), 2)
+
+    @property
+    def is_live(self):
+        return self.state == "LIVE"
+
+    def record(self, pnl):
+        """Einen geschlossenen Trade verbuchen, dann ggf. Zustand wechseln.
+        Gibt den (evtl. neuen) Zustand zurueck."""
+        self.window.append(pnl)
+        # DU (1): (len(self.window) < self.n) -> bleib SHADOW, return self.state
+        # DU (2):  if/elif
+        #   - in SHADOW und rolling >= on  -> wechsle auf "LIVE"
+        #   - in LIVE  und rolling <= off  -> wechsle auf "SHADOW"
+        #   sonst Zustand unveraendert
+        return self.state

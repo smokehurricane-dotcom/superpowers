@@ -1,0 +1,23 @@
+TAGES-REPORT  2026-06-05 06:00 UTC
+==============================================================================
+==============================================================================
+PAPER-TRADE-ANALYSE  |  Start $100.0  Cash $0.00  P&L -100.00  (1 Trades)
+==============================================================================
+GESAMT         | n=  1 | Treffer   1/1 (100.0%) | P&L    +4.15 | ROI  +41.5% | Einsatz 10
+------------------------------------------------------------------------------
+--- nach coin ---
+coin:SOLA      | n=  1 | Treffer   1/1 (100.0%) | P&L    +4.15 | ROI  +41.5% | Einsatz 10
+--- nach tf ---
+tf:FV          | n=  1 | Treffer   1/1 (100.0%) | P&L    +4.15 | ROI  +41.5% | Einsatz 10
+--- nach side ---
+side:No        | n=  1 | Treffer   1/1 (100.0%) | P&L    +4.15 | ROI  +41.5% | Einsatz 10
+--- nach exit ---
+exit:sell      | n=  1 | Treffer   1/1 (100.0%) | P&L    +4.15 | ROI  +41.5% | Einsatz 10
+------------------------------------------------------------------------------
+Offen: 12 Positionen, gebundener Einsatz $104.15
+
+
+--- ECHTES COPY-TRADING ---
+Aktive Subscriptions: 2
+Executions: {'Rejected': 1, 'Completed': 2, 'Skipped': 3}
+pUSD-Guthaben: 19.57

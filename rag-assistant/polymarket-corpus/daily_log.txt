@@ -1,0 +1,15 @@
+2026-06-04 | Paper: equity $100.00 pnl +0.00 trades 0 treffer 0/0 | pUSD $42.55
+2026-06-05 | Paper: equity $0.00 pnl -100.00 trades 1 treffer 1/1 | pUSD $19.57
+2026-06-06 | Paper: equity $37.00 pnl -113.00 trades 17 treffer 17/17 | pUSD $17.43
+2026-06-07 | Paper: equity $-0.00 pnl -150.00 trades 47 treffer 38/47 | pUSD $40.94
+2026-06-08 | Paper: equity $0.00 pnl -150.00 trades 122 treffer 89/122 | pUSD $110.76
+2026-06-09 | Paper: equity $-0.00 pnl -150.00 trades 153 treffer 115/153 | pUSD $0.0
+2026-06-11 | Paper: equity $-0.00 pnl -150.00 trades 210 treffer 150/210 | pUSD $28.18
+2026-06-12 | Paper: equity $-0.00 pnl -150.00 trades 229 treffer 162/229 | pUSD $0.88
+2026-06-13 | Paper: equity $247.01 pnl +97.01 trades 279 treffer 177/279 | pUSD $42.74
+2026-06-14 | Paper: equity $252.86 pnl +102.86 trades 286 treffer 182/286 | pUSD $43.21
+2026-06-15 | Paper: equity $322.32 pnl +172.32 trades 301 treffer 194/301 | pUSD $0.47
+2026-06-16 | Paper: equity $255.40 pnl +105.40 trades 312 treffer 202/312 | pUSD $0.47
+2026-06-17 | Paper: equity $255.40 pnl +105.40 trades 312 treffer 202/312 | pUSD $0.47
+2026-06-18 | Paper: equity $265.80 pnl +115.80 trades 330 treffer 209/330 | pUSD $0.47
+2026-06-19 | Paper: equity $327.86 pnl +177.86 trades 346 treffer 217/346 | pUSD $3.91

@@ -1,0 +1,17 @@
+[server]
+# Streamlit's file-watcher tries to inspect every imported module, including
+# transformers vision modules (yolos/zoedepth) that need torchvision (unused here).
+# That spams harmless tracebacks. "none" disables the watcher -> quiet console.
+# Side effect: no auto-reload on code change -> just restart streamlit to see edits.
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "dark"
+primaryColor = "#3D9BE9"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#1B212E"
+textColor = "#E8ECF3"
+font = "sans serif"

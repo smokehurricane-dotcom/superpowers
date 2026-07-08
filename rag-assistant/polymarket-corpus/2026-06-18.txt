@@ -1,0 +1,31 @@
+TAGES-REPORT  2026-06-18 06:00 UTC
+==============================================================================
+==============================================================================
+PAPER-TRADE-ANALYSE  |  Start $150.0  Cash $265.80  P&L +115.80  (330 Trades)
+==============================================================================
+GESAMT         | n=330 | Treffer 209/330 (63.3%) | P&L  +258.92 | ROI   +3.4% | Einsatz 7620
+------------------------------------------------------------------------------
+--- nach stil ---
+stil:favorit   | n=215 | Treffer 146/215 (67.9%) | P&L   -16.57 | ROI   -0.3% | Einsatz 5448
+stil:longshot  | n=115 | Treffer  63/115 (54.8%) | P&L  +275.49 | ROI  +12.7% | Einsatz 2172
+--- nach side ---
+side:No        | n=199 | Treffer 133/199 (66.8%) | P&L    -7.11 | ROI   -0.1% | Einsatz 5244
+side:Yes       | n=131 | Treffer  76/131 (58.0%) | P&L  +266.03 | ROI  +11.2% | Einsatz 2376
+--- nach coin ---
+coin:BITC      | n=126 | Treffer  77/126 (61.1%) | P&L  +347.90 | ROI  +15.2% | Einsatz 2288
+coin:ETHE      | n= 35 | Treffer  21/35 (60.0%) | P&L   +29.63 | ROI   +4.3% | Einsatz 692
+coin:SOLA      | n=  2 | Treffer   1/2 (50.0%) | P&L    -0.96 | ROI   -5.9% | Einsatz 16
+coin:WTR       | n=167 | Treffer 110/167 (65.9%) | P&L  -117.65 | ROI   -2.5% | Einsatz 4624
+--- nach tf ---
+tf:FV          | n=330 | Treffer 209/330 (63.3%) | P&L  +258.92 | ROI   +3.4% | Einsatz 7620
+--- nach exit ---
+exit:ceiling   | n= 38 | Treffer  38/38 (100.0%) | P&L  +221.81 | ROI  +26.5% | Einsatz 837
+exit:sell      | n=292 | Treffer 171/292 (58.6%) | P&L   +37.10 | ROI   +0.5% | Einsatz 6783
+------------------------------------------------------------------------------
+Offen: 14 Positionen, gebundener Einsatz $143.12
+
+
+--- ECHTES COPY-TRADING ---
+Aktive Subscriptions: 0
+Executions: {'Completed': 3, 'Skipped': 9, 'Failed': 8}
+pUSD-Guthaben: 0.47

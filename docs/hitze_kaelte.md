@@ -6,17 +6,33 @@ Tags: Hitze, Sommer, Auto, Hitzschlag, Notfall
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Hitze — Wie erkenne ich zu heißen Asphalt (Die 7-Sekunden-Regel)?
-Antwort: Asphalt speichert Wärme extrem. Wenn es an einem sonnigen Tag 25 °C warm ist, kann der Asphalt schnell über 50 °C erreichen, was schwere Verbrennungen an den Pfotenballen verursacht. Die "7-Sekunden-Regel" (oder 5-Sekunden-Regel) hilft: Legen Sie Ihren eigenen Handrücken flach auf den Asphalt. Können Sie ihn nicht volle 7 Sekunden dort liegen lassen, ohne dass es schmerzhaft brennt, ist der Untergrund zu heiß für Hundepfoten! Spaziergänge sollten dann auf Gras verlegt oder auf die frühen Morgen- und späten Abendstunden verschoben werden.
-Typ: belegt
-Quelle: Thermal burns in dogs (Veterinary Dermatology)
-Tags: Hitze, Sommer, Asphalt, Pfoten, Verbrennung
+Antwort: Asphalt speichert Wärme extrem und kann bei 25 °C Außentemperatur schnell über 50 °C erreichen – was schwere Verbrennungen an den empfindlichen Pfotenballen verursacht. Die **„7-Sekunden-Regel"** (auch „5-Sekunden-Regel") ist ein einfacher Selbsttest: Legen Sie Ihren eigenen Handrücken flach auf den Asphalt. Können Sie ihn nicht volle 7 Sekunden dort halten, ohne dass es schmerzhaft brennt, ist der Untergrund zu heiß für Hundepfoten.
+
+**Asphalt-Temperatur bei verschiedenen Außentemperaturen (Sonneneinstrahlung) – Faustwerte:**
+- 25 °C Außen → ~52 °C Asphalt (Verbrennungsgefahr!)
+- 30 °C Außen → ~57 °C Asphalt (schwere Verbrennungen)
+- 35 °C Außen → ~65 °C Asphalt (lebensgefährlich)
+
+Spaziergänge sollten auf Gras verlegt oder auf die frühen Morgen- und späten Abendstunden verschoben werden. Erste Hilfe bei Pfotenverbrennungen: Sofort mit lauwarmem (nicht kaltem!) Wasser spülen, 10–15 Minuten. Keine Eispackungen direkt auf die Haut.
+Typ: UNBELEGT — bitte prüfen (konkrete Temperaturwerte als Faustwerte gekennzeichnet)
+Quelle: Thermal burns in dogs (Veterinary Dermatology); Summer Asphalt Temperatures (FOUR PAWS / AAHA)
+Tags: Hitze, Sommer, Asphalt, Pfoten, Verbrennung, 7-Sekunden-Regel
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Kälte — Braucht mein Hund im Winter einen Mantel?
-Antwort: Das ist abhängig von Rasse, Alter und Gesundheitszustand. Hunde ohne isolierende Unterwolle (z. B. Windhunde, Vizsla, viele Terrier) sowie kleine Hunde frieren sehr schnell, da ihr Körperauskühlen größer ist als ihre Körpermasse. Besonders wichtig ist Kälteschutz für alte Hunde (Senioren) oder chronisch Kranke (vor allem bei Arthrose!), da die Kälte Gelenkschmerzen massiv verstärkt und die Muskulatur verkrampfen lässt. Ein guter Mantel sollte wasser- und windabweisend sein und die Hauptmuskelgruppen (Rücken, Oberschenkel) sowie den Bauch bedecken.
+Antwort: Nicht jeder Hund braucht einen Mantel, aber für bestimmte Gruppen ist er essenziell: Hunde **ohne isolierende Unterwolle** (z. B. Greyhound, Vizsla, Weimaraner, viele Terrier), **kleine Hunde** (große Körperoberfläche im Verhältnis zur Masse), **Senioren** (Kälte verstärkt Arthrose-Schmerzen und führt zu Muskelverkrampfungen) sowie **chronisch Kranke** (z. B. Herzerkrankungen, Nierenprobleme).
+
+**Ein guter Wintermantel sollte:**
+- **Wasser- und windabweisend** sein (Nylon-Außenseite)
+- Die **Hauptmuskelgruppen** bedecken: Rücken, Oberschenkel, Bauch
+- **Keine Beine** haben (Hindernis beim Laufen)
+- **Reflektoren** für Spaziergänge im Dunkeln
+- Gut **anliegen, aber nicht einengen** (2-Finger-Regel zwischen Mantel und Körper)
+
+**Warnung:** Bei temperaturesensitiven Rassen achten Sie auf Anzeichen von Unterkühlung: Zittern, lethargisches Verhalten, hochgestellter Rücken, kalte Ohren/Pfoten. Auch bei dickem Fell kann ein nasser Hund bei Temperaturen unter 5 °C schnell unterkühlen.
 Typ: belegt
-Quelle: Thermoregulation in dogs (Veterinary Clinics of North America: Small Animal Practice)
-Tags: Kälte, Winter, Mantel, Arthrose, Senioren, Unterwolle
+Quelle: Thermoregulation in dogs (Veterinary Clinics of North America: Small Animal Practice); AVMA – Winter Care for Pets; Blue Cross – Keeping Dogs Warm
+Tags: Kälte, Winter, Mantel, Arthrose, Senioren, Unterwolle, Thermoregulation, Reflektoren
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Kälte — Warum ist Streusalz gefährlich für die Pfoten?
@@ -30,5 +46,7 @@ Tags: Kälte, Winter, Streusalz, Pfoten, Pfotenpflege
 **Quellenliste:**
 - "Heatstroke in dogs", Journal of Veterinary Internal Medicine
 - "Thermal burns in dogs", Veterinary Dermatology
-- "Thermoregulation in dogs", Veterinary Clinics of North America
-- "Winter hazards for pets", American Veterinary Medical Association (AVMA)
+- "Summer Asphalt Temperatures", FOUR PAWS / American Animal Hospital Association (AAHA)
+- "Thermoregulation in dogs", Veterinary Clinics of North America: Small Animal Practice
+- "Winter Care for Pets", American Veterinary Medical Association (AVMA)
+- "Keeping Dogs Warm", Blue Cross (bluecross.org.uk)

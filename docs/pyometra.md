@@ -13,17 +13,32 @@ Tags: Krankheit, Symptome, Pyometra, Fieber, Durst
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Krankheiten — Wie häufig ist die Pyometra bei Hündinnen?
-Antwort: Die Pyometra ist eine der häufigsten Erkrankungen bei unkastrierten, älteren Hündinnen. Statistiken zeigen, dass bis zu 25 % aller unkastrierten Hündinnen vor Erreichen ihres 10. Lebensjahres an einer Pyometra erkranken. Das Risiko steigt mit jedem ungedeckten Läufigkeitszyklus an.
+Antwort: Pyometra ist eine der häufigsten Erkrankungen bei unkastrierten, älteren Hündinnen. Statistiken zeigen, dass bis zu **25 % aller unkastrierten Hündinnen** vor Erreichen ihres 10. Lebensjahres an einer Pyometra erkranken. Das Risiko steigt mit jedem ungedeckten Läufigkeitszyklus an.
+
+**Risikofaktoren:**
+- **Alter:** Häufigkeit steigt ab dem 6. Lebensjahr exponentiell
+- **Ungedeckte Läufigkeiten:** Jeder Zyklus ohne Trächtigkeit erhöht das Risiko
+- **Hormonpräparate** zur Läufigkeitsunterdrückung: Erhöhen das Risiko **massiv** (besonders Progestogene)
+- **Rasseprädisposition:** Golden und Labrador Retriever, Collie, Rottweiler, Cavalier King Charles Spaniel
 Typ: belegt
 Quelle: Incidence of Pyometra in Swedish insured dogs (Theriogenology)
-Tags: Krankheit, Häufigkeit, Pyometra, Risiko
+Tags: Krankheit, Häufigkeit, Pyometra, Risiko, Rassen
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ### Krankheiten — Welche Risikofaktoren und Schutzmöglichkeiten gibt es?
-Antwort: Hormonelle Schwankungen nach jeder Läufigkeit (Progesteron-Phase) verdicken die Gebärmutterschleimhaut, was ideale Bedingungen für aufsteigende Bakterien (z. B. E. coli) schafft. Die Gabe von Hormonpräparaten zur Läufigkeitsunterdrückung erhöht das Risiko massiv. Der einzige 100%ige Schutz ist die chirurgische Kastration (Ovariohysterektomie oder Ovariektomie). Manche Tierärzte versuchen bei jüngeren Zuchthündinnen mit offener Form eine konservative Therapie mit Alizin (Aglepriston) und Antibiotika, dies birgt jedoch eine hohe Rückfallquote bei der nächsten Läufigkeit.
+Antwort: Hormonelle Schwankungen nach jeder Läufigkeit (Progesteron-Phase) verdicken die Gebärmutterschleimhaut, was ideale Bedingungen für aufsteigende Bakterien (z. B. E. coli) schafft. Die Gabe von Hormonpräparaten zur Läufigkeitsunterdrückung erhöht das Risiko massiv.
+
+**Schutzmaßnahmen:**
+- **Kastration (Ovariohysterektomie):** Bietet **100 % Schutz**. Bei Durchführung vor der ersten Läufigkeit sinkt das Mammatumor-Risiko zusätzlich um 99,5 %.
+- Bei Zuchthündinnen: Frühe Erkennung durch regelmäßige Ultraschallkontrollen nach der Läufigkeit
+
+**Therapieoptionen:**
+- **Chirurgisch (Goldstandard):** Ovariohysterektomie – bei geschlossener Pyometra zwingend notwendig. Überlebensrate > 90 % bei rechtzeitiger Operation.
+- **Konservativ:** Aglepriston (Alizin®) – ein Progesteron-Rezeptor-Antagonist, der den Muttermund öffnet und die Eiterentleerung ermöglicht. Nur bei offener Pyometra und jungen Zuchthündinnen sinnvoll. **Hohe Rückfallquote (bis zu 70 %)** beim nächsten Zyklus.
+*Achtung: Ersetzt nicht den Tierarzt – Pyometra ist ein akuter, lebensbedrohlicher Notfall.*
 Typ: belegt
-Quelle: Pathogenesis and medical treatment of canine pyometra (Veterinary Record / PubMed)
-Tags: Krankheit, Prävention, Kastration, Risiko, Hormone
+Quelle: Pathogenesis and medical treatment of canine pyometra (Veterinary Record / PubMed); Cornell University – Canine Pyometra Guidelines
+Tags: Krankheit, Prävention, Kastration, Risiko, Hormone, Aglepriston
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
 ---
@@ -31,4 +46,5 @@ Tags: Krankheit, Prävention, Kastration, Risiko, Hormone
 - "Canine pyometra: an update on pathogenesis and treatment", PubMed / Vet-Unis
 - "Clinical presentation of canine pyometra", Journal of Small Animal Practice
 - "Incidence of Pyometra in Swedish insured dogs", Theriogenology
-- "Pathogenesis and medical treatment of canine pyometra", Veterinary Record
+- "Pathogenesis and medical treatment of canine pyometra", Veterinary Record / PubMed
+- "Cornell University Riney Canine Health Center – Pyometra Guidelines"

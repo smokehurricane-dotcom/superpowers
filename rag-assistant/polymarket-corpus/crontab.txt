@@ -1,0 +1,12 @@
+# Polymarket-Bot cron (Zeiten = Europe/Berlin)
+# Dashboard laeuft via Windows-Foreground-Task (run_dashboard.sh) -> KEIN cron-keepalive mehr.
+# Taeglicher Report um 08:00
+0 8 * * * cd /home/k9l0v3r/polymarket-bot && /home/k9l0v3r/kronos-venv/bin/python daily_report.py >> reports/cron.log 2>&1
+# Favorite-Longshot-Bias-Studie: alle 10 Min Snapshot + Aufloesung
+*/10 * * * * cd /home/k9l0v3r/polymarket-bot && /home/k9l0v3r/kronos-venv/bin/python fl_bias.py snapshot >> reports/fl_cron.log 2>&1; /home/k9l0v3r/kronos-venv/bin/python fl_bias.py resolve >> reports/fl_cron.log 2>&1
+# Copy-Trading AUS (2026-06-06, User-Wunsch -> Bot soll selbst live traden). Copy-Refresh deaktiviert:
+# 0 * * * * cd /home/k9l0v3r/polymarket-bot && /home/k9l0v3r/kronos-venv/bin/python copy_refresh.py --apply >> copy_refresh.log 2>&1
+# Echte Positions-Stops ueberwachen (real_stops.json): verkauft Position bei Wert <= stop_value. Jede Minute.
+* * * * * cd /home/k9l0v3r/polymarket-bot && /home/k9l0v3r/kronos-venv/bin/python real_stop_watch.py >/dev/null 2>&1
+# LIVE-HANDEL: alle 30 Min Fair-Value-Favoriten (+1 Longshot) kaufen. Echtgeld, gedeckelt: $6/Trade, max $32 deployed, max 6/Lauf, Duplikat-Schutz. Log: live_scan.log
+*/30 * * * * cd /home/k9l0v3r/polymarket-bot && /home/k9l0v3r/kronos-venv/bin/python live_scan.py --execute >> live_scan.log 2>&1

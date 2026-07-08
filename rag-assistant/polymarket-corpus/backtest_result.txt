@@ -1,0 +1,68 @@
+... backteste BTC (30 Tage)
+
+=== BTC ===
+  n=30 | up-rate=40% | Trefferquote=46.7% | Baseline(naiv)=60.0% | Breakeven=52.6% -> ZU SCHWACH
+  High-Conviction (|p-0.5|>=0.15): n=17 Treffer=47.1% | Ensemble-agree: n=26 Treffer=46.2% | Brier=0.316
+    p[0.00-0.30): n=  5  pred~0.20  real_up=0.40
+    p[0.30-0.45): n=  5  pred~0.39  real_up=0.40
+    p[0.45-0.55): n=  2  pred~0.50  real_up=0.50
+    p[0.55-0.70): n=  8  pred~0.64  real_up=0.25
+    p[0.70-1.01): n= 10  pred~0.78  real_up=0.50
+... backteste ETH (30 Tage)
+
+=== ETH ===
+  n=30 | up-rate=33% | Trefferquote=46.7% | Baseline(naiv)=66.7% | Breakeven=52.6% -> ZU SCHWACH
+  High-Conviction (|p-0.5|>=0.15): n=15 Treffer=53.3% | Ensemble-agree: n=28 Treffer=42.9% | Brier=0.291
+    p[0.00-0.30): n=  6  pred~0.21  real_up=0.33
+    p[0.30-0.45): n=  4  pred~0.36  real_up=0.25
+    p[0.45-0.55): n=  1  pred~0.50  real_up=0.00
+    p[0.55-0.70): n= 11  pred~0.60  real_up=0.36
+    p[0.70-1.01): n=  8  pred~0.80  real_up=0.38
+... backteste SOL (30 Tage)
+
+=== SOL ===
+  n=30 | up-rate=43% | Trefferquote=50.0% | Baseline(naiv)=56.7% | Breakeven=52.6% -> ZU SCHWACH
+  High-Conviction (|p-0.5|>=0.15): n=16 Treffer=50.0% | Ensemble-agree: n=23 Treffer=43.5% | Brier=0.289
+    p[0.00-0.30): n=  9  pred~0.15  real_up=0.44
+    p[0.30-0.45): n=  9  pred~0.37  real_up=0.44
+    p[0.45-0.55): n=  3  pred~0.50  real_up=0.33
+    p[0.55-0.70): n=  4  pred~0.58  real_up=0.50
+    p[0.70-1.01): n=  5  pred~0.77  real_up=0.40
+... backteste XRP (30 Tage)
+
+=== XRP ===
+  n=30 | up-rate=43% | Trefferquote=50.0% | Baseline(naiv)=56.7% | Breakeven=52.6% -> ZU SCHWACH
+  High-Conviction (|p-0.5|>=0.15): n=12 Treffer=41.7% | Ensemble-agree: n=24 Treffer=45.8% | Brier=0.300
+    p[0.00-0.30): n=  5  pred~0.12  real_up=0.20
+    p[0.30-0.45): n=  7  pred~0.40  real_up=0.57
+    p[0.45-0.55): n=  3  pred~0.51  real_up=0.33
+    p[0.55-0.70): n=  8  pred~0.59  real_up=0.75
+    p[0.70-1.01): n=  7  pred~0.75  real_up=0.14
+... backteste DOGE (30 Tage)
+
+=== DOGE ===
+  n=30 | up-rate=60% | Trefferquote=43.3% | Baseline(naiv)=60.0% | Breakeven=52.6% -> ZU SCHWACH
+  High-Conviction (|p-0.5|>=0.15): n=15 Treffer=46.7% | Ensemble-agree: n=24 Treffer=45.8% | Brier=0.311
+    p[0.00-0.30): n=  9  pred~0.17  real_up=0.56
+    p[0.30-0.45): n=  6  pred~0.38  real_up=0.83
+    p[0.55-0.70): n= 10  pred~0.60  real_up=0.50
+    p[0.70-1.01): n=  5  pred~0.75  real_up=0.60
+... backteste BNB (30 Tage)
+
+=== BNB ===
+  n=30 | up-rate=57% | Trefferquote=36.7% | Baseline(naiv)=56.7% | Breakeven=52.6% -> ZU SCHWACH
+  High-Conviction (|p-0.5|>=0.15): n=18 Treffer=38.9% | Ensemble-agree: n=24 Treffer=33.3% | Brier=0.364
+    p[0.00-0.30): n= 10  pred~0.17  real_up=0.60
+    p[0.30-0.45): n=  6  pred~0.38  real_up=0.83
+    p[0.45-0.55): n=  1  pred~0.50  real_up=0.00
+    p[0.55-0.70): n=  6  pred~0.61  real_up=0.50
+    p[0.70-1.01): n=  7  pred~0.78  real_up=0.43
+
+=== GESAMT (alle Coins) ===
+  n=180 | up-rate=46% | Trefferquote=45.6% | Baseline(naiv)=53.9% | Breakeven=52.6% -> ZU SCHWACH
+  High-Conviction (|p-0.5|>=0.15): n=93 Treffer=46.2% | Ensemble-agree: n=149 Treffer=43.0% | Brier=0.312
+    p[0.00-0.30): n= 44  pred~0.17  real_up=0.45
+    p[0.30-0.45): n= 37  pred~0.38  real_up=0.57
+    p[0.45-0.55): n= 10  pred~0.50  real_up=0.30
+    p[0.55-0.70): n= 47  pred~0.60  real_up=0.47
+    p[0.70-1.01): n= 42  pred~0.77  real_up=0.40

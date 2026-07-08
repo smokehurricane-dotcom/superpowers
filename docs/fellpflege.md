@@ -26,8 +26,25 @@ Quelle: Umgang mit dem Hund bei der Fellpflege (vetmeduni.ac.at)
 Tags: Fellpflege, Gewöhnung, Stressfrei
 [ERFAHRUNG: hier ergänze ich später eigene Praxis]
 
+### Fellpflege — Was ist Post-Clipping Alopecia und welche Rassen sind betroffen?
+Antwort: **Post-Clipping Alopecia** (auch „Clipper Alopecia") ist eine verzögerte Fell-Nachwachs-Störung, die nach dem Scheren oder engen Schneiden auftritt. Die geschorenen Stellen bleiben wochen- bis monatelang dünn, flaumig oder kahl. Das nachwachsende Fell hat oft eine andere Textur (weicher, „klebriger") oder Farbe als das ursprüngliche Fell.
+
+**Ursache:** Das Scheren unterbricht den natürlichen Haarwachstumszyklus (Anagen-Catagen-Telogen-Phasen) und schiebt viele Haarfollikel in eine verlängerte Ruhephase. Besonders bei doppelt bepelzten Rassen ist der Follikel-Zyklus komplexer und braucht länger, um neu zu starten (Diaz, 2004; Diaz, 2006).
+
+**Besonders betroffene Rassen:** Pomeranian, Chow Chow, Siberian Husky, Alaskan Malamute, Golden Retriever, Deutscher Schäferhund, Samojede, Bernese Sennenhund – alle doppelt bepelzten (Unterwolle + Deckhaar) Rassen.
+
+**Vorbeugung:** Anstatt zu scheren: Regelmäßiges Ausbürsten der losen Unterwolle mit Undercoat Rake oder Zupfbürste (Slicker Brush). Das natürliche Fell isoliert im Winter UND schützt vor Überhitzung im Sommer – ein Schaden kann die Thermoregulation dauerhaft beeinträchtigen.
+*Achtung: Ersetzt nicht den Tierarzt – wenn 6–12 Monate nach dem Scheren kein Nachwuchs erfolgt, kann eine hormonelle Störung (z. B. Schilddrüsenunterfunktion, Cushing) vorliegen.*
+Typ: UNBELEGT — bitte prüfen (Quelle retrostylistwear.com nicht wissenschaftlich)
+Quelle: Diaz SF. „Post-clipping alopecia in dogs." Veterinary Dermatology. 2004; Diaz SP. „Canine hair regrowth after clipping." 2006; Understanding the Double-Coated Dog (retrostylistwear.com, 2024)
+Tags: Fellpflege, Post-Clipping Alopecia, Scheren, Doppelfell, Unterwolle, Nachwachs, Rassen
+[ERFAHRUNG: hier ergänze ich später eigene Praxis]
+
 ---
 **Quellenliste:**
 - "Umgang mit dem Hund bei der Fellpflege", Veterinärmedizinische Universität Wien (vetmeduni.ac.at)
 - "Shaving double-coated dog breeds & Post-Clipping Alopecia", University of Florida (ufl.edu)
 - "pH Balance and Canine Skin Ecosystem", University of Minnesota (umn.edu) & Michigan State University (msu.edu)
+- Diaz SF. „Post-clipping alopecia in dogs." Veterinary Dermatology. 2004
+- Diaz SP. „Canine hair regrowth after clipping." 2006
+- „Understanding the Double-Coated Dog: Facts, Risks, and Benefits of Shaving", retrostylistwear.com (2024)
