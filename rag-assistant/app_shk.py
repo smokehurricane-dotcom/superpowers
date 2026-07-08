@@ -223,10 +223,12 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 for m in st.session_state.history:
+    with st.chat_message(m["role"]):
         if m["role"] == "user":
             st.markdown(m["content"])
         else:
             st.markdown(format_citations(m["content"]), unsafe_allow_html=True)
+            
         if m["role"] == "assistant":
             docs_m = m.get("docs", [])
             retries_m = m.get("retries", 0)
