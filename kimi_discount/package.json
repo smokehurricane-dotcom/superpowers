@@ -1,0 +1,10 @@
+{
+  "name": "kimi-discount",
+  "version": "1.0.0",
+  "description": "Zoomer discount bargaining bot with anti-hack checks and tiered pricing.",
+  "main": "discount.js",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 discount.test.js",
+    "start": "node cli.js"
+  }
+}
